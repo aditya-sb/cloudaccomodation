@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { FaHeart, FaWater, FaUserFriends } from "react-icons/fa";
+import { FaHeart, FaUserFriends } from "react-icons/fa";
 
 interface PropertyCardProps {
   image: string;
@@ -15,7 +15,6 @@ export default function PropertyCard({
   title,
   location,
   price,
-  description,
 }: PropertyCardProps) {
   return (
     <Link href="/property" passHref>

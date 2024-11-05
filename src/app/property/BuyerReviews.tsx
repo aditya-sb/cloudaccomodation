@@ -6,13 +6,13 @@ export default function BuyerReviews() {
       <div className="space-y-6">
         <div className="border-b border-gray-600 pb-4">
           <p className="text-lg text-gray-300 italic">
-            "This property was everything we dreamed of. The process was smooth and the house is fantastic!"
+            This property was everything we dreamed of. The process was smooth and the house is fantastic!
           </p>
           <p className="text-sm text-gray-500 mt-2 font-semibold">- John Doe</p>
         </div>
         <div className="border-b border-gray-600 pb-4">
           <p className="text-lg text-gray-300 italic">
-            "A wonderful place to live with the family. Highly recommend."
+            A wonderful place to live with the family. Highly recommend.
           </p>
           <p className="text-sm text-gray-500 mt-2 font-semibold">- Jane Smith</p>
         </div>

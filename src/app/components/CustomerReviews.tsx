@@ -9,7 +9,7 @@ export default function CustomerReviews() {
             {/* Review 1 */}
             <div className="bg-gray-800 p-6 rounded-lg shadow-lg transform transition hover:-translate-y-2 duration-300">
               <p className="text-xl font-light leading-relaxed text-gray-200 mb-4">
-                "I found my dream home with Luxury Properties. Highly recommend!"
+                I found my dream home with Luxury Properties. Highly recommend!
               </p>
               <p className="font-semibold text-gray-400">- Rajesh, Mumbai</p>
             </div>
@@ -17,7 +17,7 @@ export default function CustomerReviews() {
             {/* Review 2 */}
             <div className="bg-gray-800 p-6 rounded-lg shadow-lg transform transition hover:-translate-y-2 duration-300">
               <p className="text-xl font-light leading-relaxed text-gray-200 mb-4">
-                "Amazing service and premium listings. Very satisfied!"
+                Amazing service and premium listings. Very satisfied!
               </p>
               <p className="font-semibold text-gray-400">- Priya, Bangalore</p>
             </div>

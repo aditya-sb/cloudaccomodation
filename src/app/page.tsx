@@ -1,5 +1,5 @@
 // src/app/page.tsx
-import Header from "./components/Header";
+
 import SearchBar from "./components/SearchBar";
 import PropertyCard from "./components/PropertyCard";
 import CustomerReviews from "./components/CustomerReviews";
