@@ -32,7 +32,7 @@ const mockProperties: Property[] = [
 
 function MapView({ properties }: { properties: Property[] }) {
   return (
-    <div className="flex bg-white shadow-lg rounded-lg overflow-hidden">
+    <div className="flex bg-blue-50 shadow-lg rounded-lg overflow-hidden">
       {/* Map Section */}
       <div className="w-2/3 bg-blue-100 h-[600px] flex items-center justify-center rounded-l-lg">
         <span className="text-gray-700 font-semibold text-lg">Map Placeholder</span>

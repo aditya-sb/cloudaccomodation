@@ -1,6 +1,7 @@
 // src/app/components/Header.tsx
 "use client"; // Mark as client-side component
 
+import Link from "next/link";
 import { useState, useEffect } from "react";
 
 export default function Header() {
@@ -54,9 +55,11 @@ export default function Header() {
           <a href="#" className="text-gray-400 hover:text-white transition">
             Find or List Your Dream Property
           </a>
+          <Link href="/list_property" passHref>
           <button className="bg-gray-700 hover:bg-gray-600 text-white py-2 px-6 rounded-lg shadow-md transition">
             List Property
           </button>
+          </Link>
         </nav>
         <button className="md:hidden" onClick={toggleMenu}>
           <span className="text-white text-3xl">&#9776;</span>
