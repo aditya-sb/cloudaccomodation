@@ -1,6 +1,7 @@
 // src/app/components/Header.tsx
 "use client"; // Mark as client-side component
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
@@ -42,7 +43,7 @@ export default function Header() {
     >
       <div className="flex justify-between items-center p-5 bg-gray-800 shadow-lg">
         <div className="flex items-center">
-          <img
+        <Image
             src="/images/property-logo.png"
             alt="Property Logo"
             className="h-8 w-auto"

@@ -1,7 +1,7 @@
 // src/app/propertyPage.tsx
 "use client";
 
-import { Key, useEffect, useState } from "react";
+import {  useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import PropertyCard from "../components/PropertyCard";
 import Header from "../components/Header";
