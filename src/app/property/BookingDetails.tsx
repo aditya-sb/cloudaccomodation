@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { FaAngleDown, FaMoneyBillWave, FaCalendarAlt, FaArrowRight } from "react-icons/fa";
+import { FaAngleDown, FaMoneyBillWave, FaArrowRight } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -10,7 +10,7 @@ const BookingDetails = ({ price }: { price: string }) => {
   const [checkInDate, setCheckInDate] = useState<Date | null>(null);
   const [checkOutDate, setCheckOutDate] = useState<Date | null>(null);
 
-  const monthlyRent = parseFloat(price.replace(/[^\d.-]/g, ""));
+//   const monthlyRent = parseFloat(price.replace(/[^\d.-]/g, ""));
 
   // Smooth scroll visibility handling
   useEffect(() => {

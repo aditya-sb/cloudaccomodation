@@ -6,8 +6,8 @@ const PropertyDetails = ({
   title,
   location,
   price,
-  description,
-  features,
+  // description,
+  // features,
 }: {
   title: string;
   location: string;
