@@ -7,7 +7,7 @@ export default function PrivacySection() {
         <div>
           <h3 className="text-2xl font-semibold text-white">Unmatched Privacy</h3>
           <p className="text-gray-400 mt-2">
-            We're committed to protecting your privacy. Throughout your rental journey, we’ll be there for you every step of the way.
+            We're committed to protecting your privacy. Throughout your rental journey, we'll be there for you every step of the way.
           </p>
         </div>
       </div>

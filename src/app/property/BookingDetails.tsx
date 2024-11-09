@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import {
   FaAngleDown,
-  FaRegCheckCircle,
+//   FaRegCheckCircle,
   FaMoneyBillWave,
 } from "react-icons/fa";
 import DatePicker from "react-datepicker";
@@ -11,14 +11,14 @@ import "react-datepicker/dist/react-datepicker.css";
 const BookingDetails = ({ price }: { price: string }) => {
   const [isMinimized, setIsMinimized] = useState(true);
   const [rentalDays, setRentalDays] = useState(30);
-  const [isFirstLastMonth, setIsFirstLastMonth] = useState(false);
-  const [isSecurityDeposit, setIsSecurityDeposit] = useState(false);
+//   const [isFirstLastMonth, setIsFirstLastMonth] = useState(false);
+//   const [isSecurityDeposit, setIsSecurityDeposit] = useState(false);
   const [checkInDate, setCheckInDate] = useState<Date | null>(null);
   const [checkOutDate, setCheckOutDate] = useState<Date | null>(null);
 
   const monthlyRent = parseFloat(price.replace(/[^\d.-]/g, ""));
-  const bookingFee = (monthlyRent * 0.07).toFixed(2);
-  const totalRent = (monthlyRent * rentalDays).toFixed(2);
+//   const bookingFee = (monthlyRent * 0.07).toFixed(2);
+//   const totalRent = (monthlyRent * rentalDays).toFixed(2);
 
   useEffect(() => {
     const handleScroll = () => {

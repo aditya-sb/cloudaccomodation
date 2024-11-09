@@ -1,13 +1,13 @@
 "use client";
 import React from "react";
-import { FaBed, FaBath, FaRuler, FaCalendarAlt, FaArrowCircleRight } from "react-icons/fa";
+import { FaBed, FaBath, FaRuler, FaCalendarAlt} from "react-icons/fa";
 
 const PropertyDetails = ({
   title,
   location,
   price,
-  description,
-  features,
+  // description,
+  // features,
 }: {
   title: string;
   location: string;
