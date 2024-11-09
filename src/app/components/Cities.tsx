@@ -1,25 +1,24 @@
 // src/app/components/CityCardSlider.tsx
-"use client"; 
+"use client";
 import { useState } from "react";
-import Image from "next/image";
 import { MdArrowBackIos, MdArrowForwardIos } from "react-icons/md";
 
 interface CityCardProps {
   name: string;
-  image: string;
+  shortCode: string;
 }
 
 const cities: CityCardProps[] = [
-  { name: "Mumbai", image: "/images/mumbai.jpg" },
-  { name: "Delhi", image: "/images/delhi.jpg" },
-  { name: "Bangalore", image: "/images/bangalore.jpg" },
-  { name: "Chennai", image: "/images/chennai.jpg" },
-  { name: "Kolkata", image: "/images/kolkata.jpg" },
-  { name: "Hyderabad", image: "/images/hyderabad.jpg" },
-  { name: "Pune", image: "/images/pune.jpg" },
-  { name: "Ahmedabad", image: "/images/ahmedabad.jpg" },
-  { name: "Jaipur", image: "/images/jaipur.jpg" },
-  { name: "Goa", image: "/images/goa.jpg" },
+  { name: "Mumbai", shortCode: "MUM" },
+  { name: "Delhi", shortCode: "DEL" },
+  { name: "Bangalore", shortCode: "BLR" },
+  { name: "Chennai", shortCode: "CHE" },
+  { name: "Kolkata", shortCode: "KOL" },
+  { name: "Hyderabad", shortCode: "HYD" },
+  { name: "Pune", shortCode: "PNQ" },
+  { name: "Ahmedabad", shortCode: "AMD" },
+  { name: "Jaipur", shortCode: "JAI" },
+  { name: "Goa", shortCode: "GOA" },
 ];
 
 export default function CityCardSlider() {
@@ -38,41 +37,39 @@ export default function CityCardSlider() {
   };
 
   return (
-    <div className="relative w-full max-w-6xl mx-auto">
-      <div className="flex items-center justify-between mb-4">
+    <div className="relative w-full max-w-6xl mx-auto py-8">
+      <div className="flex items-center justify-between mb-6">
         <MdArrowBackIos
-          className="text-3xl cursor-pointer text-gray-500 hover:text-white"
+          className="text-4xl cursor-pointer text-gray-300 hover:text-gray-100 transition duration-200"
           onClick={handlePrevClick}
         />
+        
         <div className="overflow-hidden w-full">
           <div
-            className="flex transition-transform duration-300"
+            className="flex transition-transform duration-500 ease-in-out"
             style={{ transform: `translateX(-${currentIndex * 100}%)` }}
           >
             {cities.map((city, index) => (
               <div
                 key={index}
                 className="w-full flex-shrink-0 p-4"
-                style={{ width: "200px" }}
+                style={{ width: "220px" }}
               >
-                <div className="bg-gray-800 rounded-lg shadow-lg p-4 text-center">
-                  <Image
-                    src={city.image}
-                    alt={city.name}
-                    width={200}
-                    height={150}
-                    className="rounded-lg object-cover"
-                  />
-                  <h3 className="mt-2 text-xl font-bold text-white">
+                <div className="bg-gradient-to-r cursor-pointer from-gray-800 to-gray-700 rounded-lg shadow-lg p-8 text-center transition transform hover:scale-105 duration-300">
+                  <h2 className="text-4xl font-extrabold text-white tracking-wide">
+                    {city.shortCode}
+                  </h2>
+                  <p className="mt-2 text-lg font-semibold text-gray-300 tracking-wide">
                     {city.name}
-                  </h3>
+                  </p>
                 </div>
               </div>
             ))}
           </div>
         </div>
+        
         <MdArrowForwardIos
-          className="text-3xl cursor-pointer text-gray-500 hover:text-white"
+          className="text-4xl cursor-pointer text-gray-300 hover:text-gray-100 transition duration-200"
           onClick={handleNextClick}
         />
       </div>

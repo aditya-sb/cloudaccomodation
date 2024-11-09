@@ -1,27 +1,15 @@
-// src/app/components/Map.tsx
-"use client";
-import { useEffect } from "react";
+import { FaMapMarkerAlt } from "react-icons/fa";
 
-interface MapProps {
-  location: string;
-}
-
-export default function Map({ location }: MapProps) {
-  useEffect(() => {
-    console.log(`Initializing map for ${location}`);
-    // Implement Google Maps API or a suitable library here
-  }, [location]);
-
-  return (
-    <div className="h-96 bg-gray-900 rounded-xl shadow-2xl overflow-hidden mb-10">
-      <iframe
-        src={`https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${encodeURIComponent(location)}`}
-        width="100%"
-        height="100%"
-        allowFullScreen
-        loading="lazy"
-        className="rounded-xl"
-      ></iframe>
+const Map = ({ location }: { location: string }) => (
+  <div className="mt-10 bg-gray-800 p-8 rounded-lg shadow-lg flex justify-between items-center">
+    <div className="text-white">
+      <h3 className="text-xl font-semibold">Explore the Area</h3>
+      <p className="mt-2">{location}</p>
     </div>
-  );
-}
+    <button className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md transition-all hover:bg-blue-700 flex items-center">
+      <FaMapMarkerAlt className="mr-2" /> View on Map
+    </button>
+  </div>
+);
+
+export default Map;

@@ -37,21 +37,26 @@ export default function Header() {
 
   return (
     <header
+    id="header"
       className={`fixed top-0 left-0 w-full z-10 transition-transform duration-300 ${
         isVisible ? "translate-y-0" : "-translate-y-full"
       } bg-gray-800 shadow-lg`}
     >
       <div className="flex justify-between items-center p-5 bg-gray-800 shadow-lg">
+        <Link href="/" passHref>
         <div className="flex items-center">
         <Image
             src="/images/property-logo.png"
             alt="Property Logo"
             className="h-8 w-auto"
+            width={50}
+            height={50}
           />
           <h1 className="ml-4 text-2xl font-bold text-white">
             Luxury Properties
           </h1>
         </div>
+        </Link>
         <nav className="hidden md:flex items-center space-x-8">
           <a href="#" className="text-gray-400 hover:text-white transition">
             Find or List Your Dream Property

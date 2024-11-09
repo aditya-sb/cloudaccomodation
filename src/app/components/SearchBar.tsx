@@ -62,16 +62,16 @@ export default function SearchBar() {
         </div>
         {/* Filter Tags */}
         <div className="mt-4 flex space-x-3">
-          <button className="bg-gray-800 text-white px-3 py-1 rounded-full shadow hover:bg-gray-200 flex items-center space-x-2">
+          <button className="bg-gray-800 text-white px-3 py-1 rounded-full shadow hover:text-yellow-500 flex items-center space-x-2">
             <FaHome /> <span>Property Type</span>
           </button>
-          <button className="bg-gray-800 text-white px-3 py-1 rounded-full shadow hover:bg-gray-200 flex items-center space-x-2">
+          <button className="bg-gray-800 text-white px-3 py-1 rounded-full shadow hover:text-yellow-500 flex items-center space-x-2">
             <FaSearch /> <span>Looking For</span>
           </button>
-          <button className="bg-gray-800 text-white px-3 py-1 rounded-full shadow hover:bg-gray-200 flex items-center space-x-2">
+          <button className="bg-gray-800 text-white px-3 py-1 rounded-full shadow hover:text-yellow-500 flex items-center space-x-2">
             <FaSortAmountUpAlt /> <span>Sort</span>
           </button>
-          <button className="bg-gray-800 text-white px-3 py-1 rounded-full shadow hover:bg-gray-200 flex items-center space-x-2">
+          <button className="bg-gray-800 text-white px-3 py-1 rounded-full shadow hover:text-yellow-500 flex items-center space-x-2">
             <FaFilter /> <span>Filters</span>
           </button>
         </div>
