@@ -18,7 +18,7 @@ export default function PropertyCard({
 }: PropertyCardProps) {
   return (
     <Link href="/property" passHref>
-      <div className="bg-gradient-to-br from-gray-800 to-gray-900 text-gray-100 rounded-lg shadow-xl p-5 transition hover:scale-105 hover:shadow-2xl cursor-pointer w-full max-w-md mx-auto">
+      <div className="bg-gradient-to-br from-gray-800 to-gray-900 text-gray-100 rounded-lg shadow-xl p-5 transition hover:scale-105 hover:shadow-2xl cursor-pointer w-full max-w-md mx-auto sm:w-[95%] sm:mx-2">
         <div className="relative">
           <Image
             src={image}
@@ -35,13 +35,13 @@ export default function PropertyCard({
           </button>
         </div>
         <div className="mt-4">
-          <h2 className="text-xl font-semibold text-white">{title}</h2>
-          <p className="text-gray-400 text-sm mt-1">{location}</p>
+          <h2 className="text-lg sm:text-xl font-semibold text-white">{title}</h2>
+          <p className="text-gray-400 text-sm mt-1 truncate">{location}</p>
           <div className="flex items-center mt-3">
             <FaUserFriends className="text-blue-400 mr-2" />
             <span className="text-gray-300 text-sm">Boys, Girls, Family</span>
           </div>
-          <div className="grid grid-cols-3 gap-2 mt-4 text-sm">
+          <div className="grid grid-cols-3 gap-2 mt-4 text-xs sm:text-sm">
             <p className="text-gray-100 font-bold">{price} /month</p>
             <p className="text-gray-400">Security Deposit</p>
             <p className="text-gray-400">Area</p>

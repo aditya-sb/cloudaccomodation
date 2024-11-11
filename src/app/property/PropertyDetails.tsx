@@ -1,13 +1,22 @@
 "use client";
 import React from "react";
-import { FaBed, FaBath, FaRuler, FaCalendarAlt, FaChevronRight } from "react-icons/fa";
+import {
+  FaBed,
+  FaBath,
+  FaRuler,
+  FaCalendarAlt,
+  FaChevronRight,
+  FaHome,
+  FaConciergeBell,
+  FaMapMarkerAlt,
+  FaDollarSign,
+  FaFileContract,
+} from "react-icons/fa";
 
 const PropertyDetails = ({
   title,
   location,
   price,
-  // description,
-  // features,
 }: {
   title: string;
   location: string;
@@ -24,36 +33,51 @@ const PropertyDetails = ({
       <p className="text-lg md:text-xl mt-2">{location}</p>
 
       {/* Navigation Tabs */}
-      <div className="flex flex-wrap mt-6 mb-4 border-b border-gray-600">
+      <div className="flex flex-wrap mt-6 mb-4 border-b border-gray-600 space-x-4 md:space-x-6 text-gray-400">
         <button
           onClick={() => setActiveSection('overview')}
-          className={`px-4 py-2 md:px-6 md:py-3 text-sm md:text-lg ${activeSection === 'overview' ? 'font-bold text-gray-300' : 'text-gray-500'}`}
+          className={`flex items-center space-x-2 px-3 py-2 text-sm md:text-lg transition ${
+            activeSection === 'overview' ? 'text-gray-300 font-bold' : 'hover:text-gray-300'
+          }`}
         >
-          Overview
+          <FaHome />
+          <span>Overview</span>
         </button>
         <button
           onClick={() => setActiveSection('amenities')}
-          className={`px-4 py-2 md:px-6 md:py-3 text-sm md:text-lg ${activeSection === 'amenities' ? 'font-bold text-gray-300' : 'text-gray-500'}`}
+          className={`flex items-center space-x-2 px-3 py-2 text-sm md:text-lg transition ${
+            activeSection === 'amenities' ? 'text-gray-300 font-bold' : 'hover:text-gray-300'
+          }`}
         >
-          Amenities
+          <FaConciergeBell />
+          <span>Amenities</span>
         </button>
         <button
           onClick={() => setActiveSection('exploreNearby')}
-          className={`px-4 py-2 md:px-6 md:py-3 text-sm md:text-lg ${activeSection === 'exploreNearby' ? 'font-bold text-gray-300' : 'text-gray-500'}`}
+          className={`flex items-center space-x-2 px-3 py-2 text-sm md:text-lg transition ${
+            activeSection === 'exploreNearby' ? 'text-gray-300 font-bold' : 'hover:text-gray-300'
+          }`}
         >
-          Explore Nearby
+          <FaMapMarkerAlt />
+          <span>Explore Nearby</span>
         </button>
         <button
           onClick={() => setActiveSection('rentDetails')}
-          className={`px-4 py-2 md:px-6 md:py-3 text-sm md:text-lg ${activeSection === 'rentDetails' ? 'font-bold text-gray-300' : 'text-gray-500'}`}
+          className={`flex items-center space-x-2 px-3 py-2 text-sm md:text-lg transition ${
+            activeSection === 'rentDetails' ? 'text-gray-300 font-bold' : 'hover:text-gray-300'
+          }`}
         >
-          Rent Details
+          <FaDollarSign />
+          <span>Rent Details</span>
         </button>
         <button
           onClick={() => setActiveSection('termsOfStay')}
-          className={`px-4 py-2 md:px-6 md:py-3 text-sm md:text-lg ${activeSection === 'termsOfStay' ? 'font-bold text-gray-300' : 'text-gray-500'}`}
+          className={`flex items-center space-x-2 px-3 py-2 text-sm md:text-lg transition ${
+            activeSection === 'termsOfStay' ? 'text-gray-300 font-bold' : 'hover:text-gray-300'
+          }`}
         >
-          Terms of Stay
+          <FaFileContract />
+          <span>Terms of Stay</span>
         </button>
       </div>
 
@@ -131,11 +155,11 @@ const PropertyDetails = ({
       )}
 
       {/* Bottom Section with Price and Booking Button */}
-      <div className="flex justify-between items-center mt-6 md:mt-8">
+      <div className="flex flex-col md:flex-row justify-between items-center mt-6 md:mt-8 space-y-4 md:space-y-0">
         <div className="text-xl font-bold">{price}</div>
-        <button className="bg-blue-600 text-white py-2 px-6 rounded-lg shadow-md hover:bg-blue-700 flex items-center space-x-2">
+        <button className="flex items-center justify-center bg-blue-600 text-white py-2 px-6 rounded-lg shadow-md transition hover:bg-blue-700 w-full md:w-auto">
           <span>Book a Visit</span>
-          <FaChevronRight className="text-white" />
+          <FaChevronRight className="ml-2" />
         </button>
       </div>
     </div>

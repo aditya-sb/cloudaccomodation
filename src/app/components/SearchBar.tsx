@@ -40,19 +40,22 @@ export default function SearchBar() {
         className="opacity-80 transition-all duration-300 ease-in-out"
       />
       <div className="absolute inset-0 flex flex-col justify-center items-center px-4 sm:px-8">
-        <div className="bg-gradient-to-r from-gray-800 to-gray-900 p-4 rounded-full shadow-lg flex items-center space-x-2 transform transition-transform duration-300 hover:scale-105 w-full max-w-md sm:max-w-lg lg:max-w-xl">
+        <div className="bg-gradient-to-r from-gray-800 to-gray-900 p-4 rounded-full shadow-xl flex items-center space-x-2 transform transition-transform duration-300 hover:scale-105 w-full max-w-md sm:max-w-lg lg:max-w-2xl">
           <input
             type="text"
             placeholder="Search for properties..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="px-4 py-2 w-full sm:w-72 rounded-l-full border-none bg-gray-800 text-white placeholder-gray-400 focus:ring-2 focus:ring-yellow-400 focus:outline-none text-sm sm:text-base"
+            className="px-4 py-2 w-full sm:w-80 rounded-l-full border-none bg-gray-800 text-white placeholder-gray-400 focus:ring-2 focus:ring-yellow-400 focus:outline-none text-sm sm:text-base"
           />
-          <select className="hidden sm:block w-20 px-4 py-2.5 border-l border-gray-600 bg-gradient-to-r from-gray-800 to-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-r-none shadow-md hover:border-indigo-400 transition duration-200 ease-in-out">
-            <option className="bg-gray-800 text-white">🏠</option>
-            <option className="bg-gray-800 text-white">Mumbai</option>
-            <option className="bg-gray-800 text-white">Delhi</option>
+          <select className="hidden sm:block w-24 px-3 py-2 border-l border-gray-700 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-r-none shadow-md hover:border-indigo-400 transition duration-200 ease-in-out">
+            <option className="bg-gray-800 text-white">Cities</option>
+            <option className="bg-gray-800 text-white">Toronto</option>
+            <option className="bg-gray-800 text-white">Vancouver</option>
+            <option className="bg-gray-800 text-white">Montreal</option>
+            <option className="bg-gray-800 text-white">Calgary</option>
+            <option className="bg-gray-800 text-white">Ottawa</option>
           </select>
           <Link href={`/properties?search=${searchTerm}`} passHref>
             <button className="bg-yellow-500 hover:bg-yellow-400 text-gray-900 px-4 py-2 rounded-r-full transition-all focus:ring-2 focus:ring-yellow-300 text-sm sm:text-base">
@@ -62,17 +65,17 @@ export default function SearchBar() {
         </div>
         
         {/* Filter Tags */}
-        <div className="mt-4 flex flex-wrap justify-center gap-2 sm:space-x-3 text-xs sm:text-sm">
-          <button className="bg-gray-800 text-white px-3 py-1 rounded-full shadow hover:text-yellow-500 flex items-center space-x-2">
+        <div className="mt-6 flex flex-wrap justify-center gap-3 text-xs sm:text-sm">
+          <button className="bg-gray-800 text-white px-3 py-1 rounded-full shadow-md hover:bg-yellow-500 transition duration-200 ease-in-out flex items-center space-x-2">
             <FaHome /> <span>Property Type</span>
           </button>
-          <button className="bg-gray-800 text-white px-3 py-1 rounded-full shadow hover:text-yellow-500 flex items-center space-x-2">
+          <button className="bg-gray-800 text-white px-3 py-1 rounded-full shadow-md hover:bg-yellow-500 transition duration-200 ease-in-out flex items-center space-x-2">
             <FaSearch /> <span>Looking For</span>
           </button>
-          <button className="bg-gray-800 text-white px-3 py-1 rounded-full shadow hover:text-yellow-500 flex items-center space-x-2">
+          <button className="bg-gray-800 text-white px-3 py-1 rounded-full shadow-md hover:bg-yellow-500 transition duration-200 ease-in-out flex items-center space-x-2">
             <FaSortAmountUpAlt /> <span>Sort</span>
           </button>
-          <button className="bg-gray-800 text-white px-3 py-1 rounded-full shadow hover:text-yellow-500 flex items-center space-x-2">
+          <button className="bg-gray-800 text-white px-3 py-1 rounded-full shadow-md hover:bg-yellow-500 transition duration-200 ease-in-out flex items-center space-x-2">
             <FaFilter /> <span>Filters</span>
           </button>
         </div>

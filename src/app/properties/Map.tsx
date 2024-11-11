@@ -1,7 +1,9 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
 import { FaMapMarkerAlt, FaExpand, FaCompress } from "react-icons/fa";
 
+// Define the props for the Map component
 interface MapProps {
   location: string;
   lat: number;
@@ -24,11 +26,11 @@ const Map: React.FC<MapProps> = ({ location, lat, lon }) => {
 
   return (
     <div
-      className={`relative mt-10 bg-gray-800 rounded-lg shadow-lg ${
-        isFullScreen ? "fixed inset-0 z-50" : "p-8"
+      className={`relative mt-4 bg-gray-800 rounded-lg shadow-lg overflow-hidden ${
+        isFullScreen ? "fixed inset-0 z-50" : "h-full"
       }`}
     >
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-4 px-4 py-2 bg-gray-700 rounded-t-lg">
         <div className="text-white">
           <h3 className="text-xl font-semibold">Explore the Area</h3>
           <p className="mt-2 flex items-center">
@@ -46,8 +48,8 @@ const Map: React.FC<MapProps> = ({ location, lat, lon }) => {
       </div>
 
       <div
-        className={`overflow-hidden transition-all ${
-          isFullScreen ? "h-full w-full" : "h-96 w-full"
+        className={`transition-all duration-300 ${
+          isFullScreen ? "h-full w-full" : "h-[400px] w-full"
         }`}
       >
         <iframe
