@@ -1,7 +1,7 @@
 // src/app/propertyContent.tsx
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import {  useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import ListView from "./ListView";
 import MapView from "./MapView";
