@@ -42,7 +42,7 @@ export default function Header() {
             <Image
               src="/images/property-logo.png"
               alt="Property Logo"
-              className="h-8 w-auto"
+              className="h-8 w-auto rounded-2xl"
               width={50}
               height={50}
             />
