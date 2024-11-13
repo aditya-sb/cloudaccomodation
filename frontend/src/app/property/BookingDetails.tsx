@@ -41,7 +41,7 @@ const BookingDetails = ({ price }: { price: string }) => {
       onClick={() => setIsMinimized(false)}
       className={`fixed transition-all duration-500 ease-in-out shadow-xl transform ${
         isMinimized
-          ? "bottom-6 right-6 w-16 h-16 rounded-full cursor-pointer bg-gradient-to-r from-indigo-700 to-indigo-500 text-white flex justify-center items-center text-sm sm:text-base"
+          ? "bottom-6 right-6 w-16 h-16 rounded-full cursor-pointer bg-gradient-to-r from-purple-500 to-pink-500 text-white flex justify-center items-center text-sm sm:text-base"
           : "top-20 right-6 w-full max-w-md p-6 bg-gray-900 text-white rounded-xl"
       } flex flex-col justify-center items-center z-20 sm:w-96 sm:h-auto sm:bottom-10 sm:right-6 sm:p-6`}
       style={{ zIndex: 10 }}
@@ -49,7 +49,7 @@ const BookingDetails = ({ price }: { price: string }) => {
       {/* Minimized Version */}
       {isMinimized && (
         <div className="text-center font-semibold text-white">
-          {price}
+          {price} 
         </div>
       )}
 

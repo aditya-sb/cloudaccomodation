@@ -1,83 +1,127 @@
-// src/app/components/SearchBar.tsx
 "use client";
+import React, { useState, useEffect } from 'react';
 
-import Image from "next/image";
-import Header from "./Header";
-import Link from "next/link";
-import { useState, useEffect } from "react";
-import { FaHome, FaSortAmountUpAlt, FaFilter, FaSearch } from "react-icons/fa";
+const canadianCities = [
+  "Toronto", "Vancouver", "Montreal", "Calgary", "Ottawa", "Edmonton", "Winnipeg", "Quebec City",
+  "Hamilton", "Kitchener", "London", "Halifax", "Victoria", "Oshawa", "St. Catharines", "Regina",
+  "Saskatoon", "Burnaby", "Kelowna", "Chilliwack"
+];
 
 export default function SearchBar() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [imageHeight, setImageHeight] = useState(380);
+  const [imageHeight, setImageHeight] = useState(600);
+  const [selectedCity, setSelectedCity] = useState("");
+  const [adults, setAdults] = useState(1);
+  const [children, setChildren] = useState(0);
+  const [dates, setDates] = useState("");
 
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
-      setImageHeight(Math.max(120, 380 - scrollPosition / 2));
+      setImageHeight(Math.max(200, 600 - scrollPosition / 2));
     };
 
     window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      window.location.href = `/properties?search=${searchTerm}`;
-    }
+  const handleSearch = () => {
+    // Instead of navigation, we'll just log the search params
+    console.log({
+      search: searchTerm,
+      city: selectedCity,
+      adults,
+      children,
+      dates
+    });
   };
 
   return (
-    <div className="relative mt-20 transition-all duration-300 ease-in-out" style={{ height: `${imageHeight}px` }}>
-      <Header />
-      <Image
-        src="/images/cityscape.jpeg"
-        alt="Cityscape"
-        layout="fill"
-        objectFit="cover"
-        className="opacity-80 transition-all duration-300 ease-in-out"
+    <div className="relative w-full" style={{ height: `${imageHeight}px` }}>
+      <div 
+        className="absolute inset-0 bg-cover bg-center"
+        style={{
+          backgroundImage: "url('/api/placeholder/1920/1080')",
+          filter: "brightness(50%)"
+        }}
       />
-      <div className="absolute inset-0 flex flex-col justify-center items-center px-4 sm:px-8">
-        <div className="bg-gradient-to-r from-gray-800 to-gray-900 p-4 rounded-full shadow-xl flex items-center space-x-2 transform transition-transform duration-300 hover:scale-105 w-full max-w-md sm:max-w-lg lg:max-w-2xl">
-          <input
-            type="text"
-            placeholder="Search for properties..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="px-4 py-2 w-full sm:w-80 rounded-l-full border-none bg-gray-800 text-white placeholder-gray-400 focus:ring-2 focus:ring-yellow-400 focus:outline-none text-sm sm:text-base"
-          />
-          <select className="hidden sm:block w-24 px-3 py-2 border-l border-gray-700 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-r-none shadow-md hover:border-indigo-400 transition duration-200 ease-in-out">
-            <option className="bg-gray-800 text-white">Cities</option>
-            <option className="bg-gray-800 text-white">Toronto</option>
-            <option className="bg-gray-800 text-white">Vancouver</option>
-            <option className="bg-gray-800 text-white">Montreal</option>
-            <option className="bg-gray-800 text-white">Calgary</option>
-            <option className="bg-gray-800 text-white">Ottawa</option>
-          </select>
-          <Link href={`/properties?search=${searchTerm}`} passHref>
-            <button className="bg-yellow-500 hover:bg-yellow-400 text-gray-900 px-4 py-2 rounded-r-full transition-all focus:ring-2 focus:ring-yellow-300 text-sm sm:text-base">
-              Search
+      
+      <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
+        {/* Welcome Text */}
+        <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
+          Welcome to <span className="text-yellow-400">Canada</span>
+        </h1>
+        <h2 className="text-xl md:text-2xl text-white mb-8">Search Your Destination....</h2>
+
+        {/* Main Search Container */}
+        <div className="bg-white rounded-lg shadow-xl w-full max-w-5xl p-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {/* Destination */}
+            <div className="relative">
+              <label className="text-sm text-gray-600 font-semibold mb-1 block">DESTINATIONS</label>
+              <select
+                value={selectedCity}
+                onChange={(e) => setSelectedCity(e.target.value)}
+                className="w-full p-2 border rounded focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+              >
+                <option value="">Select City</option>
+                {canadianCities.map((city) => (
+                  <option key={city} value={city}>{city}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Duration/Dates */}
+            <div>
+              <label className="text-sm text-gray-600 font-semibold mb-1 block">DURATION</label>
+              <input
+                type="date"
+                value={dates}
+                onChange={(e) => setDates(e.target.value)}
+                className="w-full p-2 border rounded focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+              />
+            </div>
+
+            {/* Adults */}
+            <div>
+              <label className="text-sm text-gray-600 font-semibold mb-1 block">ADULT</label>
+              <select
+                value={adults}
+                onChange={(e) => setAdults(Number(e.target.value))}
+                className="w-full p-2 border rounded focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+              >
+                {[1, 2, 3, 4, 5].map(num => (
+                  <option key={num} value={num}>{num}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Children */}
+            <div>
+              <label className="text-sm text-gray-600 font-semibold mb-1 block">CHILDREN</label>
+              <select
+                value={children}
+                onChange={(e) => setChildren(Number(e.target.value))}
+                className="w-full p-2 border rounded focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+              >
+                {[0, 1, 2, 3, 4].map(num => (
+                  <option key={num} value={num}>{num}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Search Button */}
+          <div className="mt-4 flex justify-end">
+            <button
+              onClick={handleSearch}
+              className="bg-yellow-500 hover:bg-yellow-600 text-white px-8 py-2 rounded-md transition-colors duration-200 flex items-center space-x-2"
+            >
+              <span>SEARCH</span>
+              {/* Simple search icon using HTML entities */}
+              <span className="ml-2">🔍</span>
             </button>
-          </Link>
-        </div>
-        
-        {/* Filter Tags */}
-        <div className="mt-6 flex flex-wrap justify-center gap-3 text-xs sm:text-sm">
-          <button className="bg-gray-800 text-white px-3 py-1 rounded-full shadow-md hover:bg-yellow-500 transition duration-200 ease-in-out flex items-center space-x-2">
-            <FaHome /> <span>Property Type</span>
-          </button>
-          <button className="bg-gray-800 text-white px-3 py-1 rounded-full shadow-md hover:bg-yellow-500 transition duration-200 ease-in-out flex items-center space-x-2">
-            <FaSearch /> <span>Looking For</span>
-          </button>
-          <button className="bg-gray-800 text-white px-3 py-1 rounded-full shadow-md hover:bg-yellow-500 transition duration-200 ease-in-out flex items-center space-x-2">
-            <FaSortAmountUpAlt /> <span>Sort</span>
-          </button>
-          <button className="bg-gray-800 text-white px-3 py-1 rounded-full shadow-md hover:bg-yellow-500 transition duration-200 ease-in-out flex items-center space-x-2">
-            <FaFilter /> <span>Filters</span>
-          </button>
+          </div>
         </div>
       </div>
     </div>

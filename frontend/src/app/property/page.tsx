@@ -11,8 +11,9 @@ import SearchBar from "../components/SearchBar";
 export default function PropertyPage() {
   return (
     <>
-      <Header />
-      <SearchBar />
+      {/* <Header /> */}
+      {/* <SearchBar /> */}
+      <br/><br/><br/>
       <div className="bg-gray-950 min-h-screen text-white p-10">
         <PropertyGallery images={["/images/cottage.jpeg", "/images/luxuryinside.jpeg", "/images/property-logo.png"]} />
         
