@@ -21,6 +21,8 @@ const cities: CityCardProps[] = [
   { name: "Victoria", shortCode: "VIC" },
 ];
 
+const CARD_WIDTH = 240; // width of each card in pixels
+
 export default function CityCardSlider() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -48,10 +50,13 @@ export default function CityCardSlider() {
         <div className="overflow-hidden w-full">
           <div
             className="flex transition-transform duration-500 ease-in-out"
-            style={{ transform: `translateX(-${currentIndex * (100 / cities.length)}%)` }}
+            style={{
+              transform: `translateX(-${currentIndex * CARD_WIDTH}px)`,
+              width: `${cities.length * CARD_WIDTH}px`,
+            }}
           >
             {cities.map((city, index) => (
-              <div key={index} className="w-full flex-shrink-0 p-4" style={{ width: "240px" }}>
+              <div key={index} className="w-full flex-shrink-0 p-4" style={{ width: CARD_WIDTH }}>
                 <div className="bg-gradient-to-r from-gray-900 to-gray-800 cursor-pointer rounded-lg shadow-xl p-8 text-center transform hover:scale-105 duration-300">
                   <h2 className="text-5xl font-extrabold text-yellow-400 tracking-wide">
                     {city.shortCode}
