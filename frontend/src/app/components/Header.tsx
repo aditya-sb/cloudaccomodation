@@ -200,10 +200,13 @@ export default function Header() {
                 </button>
               </Link>
               <button onClick={toggleTheme} className="text-xl transition">
-              {isDarkTheme ? (
-                <FaMoon className="text-blue-500" />
+              {isDarkTheme ? (<>
+                <FaMoon className="text-blue-500" /> <span className="text-blue-500">Dark</span>
+                </>
               ) : (
-                <FaSun className="text-yellow-500" />
+                <>
+                <FaSun className="text-yellow-500" /><span className="text-yellow-500">Light</span>
+                </>
               )}
             </button>
 
