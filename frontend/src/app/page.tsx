@@ -115,7 +115,7 @@ export default function Home() {
         }}
       >
         <img
-          src="/images/refer.jpg"
+          src="/images/refer.png"
           alt="Refer and Earn"
           className="w-full h-full object-cover opacity-50"
         />
