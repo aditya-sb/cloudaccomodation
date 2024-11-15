@@ -1,7 +1,6 @@
 // RootLayout.tsx
 "use client";
 import "./globals.css";
-import Header from "./components/Header";
 import { ThemeProvider } from "./ThemeContext";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -9,7 +8,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <ThemeProvider>
       <html lang="en">
         <body className="antialiased">
-          <Header />
           {children}
         </body>
       </html>

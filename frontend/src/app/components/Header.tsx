@@ -30,6 +30,7 @@ export default function Header() {
   const [modalContent, setModalContent] = useState<React.ReactNode>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isProfileSidebarOpen, setIsProfileSidebarOpen] = useState(false);
+  const scrollThreshold = 50; 
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
 
@@ -52,32 +53,53 @@ export default function Header() {
   };
 
   useEffect(() => {
+    // Check if user is logged in
     const userId = sessionStorage.getItem("userId");
     setIsLoggedIn(!!userId);
 
+    // Handle scroll with debounce for better performance
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      if (currentScrollY < 20 || lastScrollY - currentScrollY > 10) setIsVisible(true);
-      else if (currentScrollY > lastScrollY && currentScrollY > 100) setIsVisible(false);
+      
+      // Show the header if scrolling up or near the top, hide when scrolling down
+      if (currentScrollY < scrollThreshold || lastScrollY - currentScrollY > 10) {
+        setIsVisible(true);
+      } else if (currentScrollY > lastScrollY && currentScrollY > scrollThreshold) {
+        setIsVisible(false);
+      }
+
       setLastScrollY(currentScrollY);
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    // Throttle scroll event listener for smoother behavior
+    let throttleTimeout: NodeJS.Timeout | null = null;
+    const throttledHandleScroll = () => {
+      if (!throttleTimeout) {
+        throttleTimeout = setTimeout(() => {
+          handleScroll();
+          throttleTimeout = null;
+        }, 100); // Adjust this value (in ms) to control scroll detection sensitivity
+      }
+    };
+
+    window.addEventListener("scroll", throttledHandleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", throttledHandleScroll);
+    };
   }, [lastScrollY]);
 
   return (
     <>
       <header
-        id="header"
-        className={`fixed top-0 left-0 w-full z-10 transition-transform duration-300 ${
-          isVisible ? "translate-y-0" : "-translate-y-full"
-        } shadow-lg`}
+        className={`fixed top-0 left-0 w-full z-10 transition-transform duration-300 ${isVisible ? "translate-y-0" : "-translate-y-full"
+          } shadow-lg`}
         style={{
-          background: "var(--background)",
+          backgroundColor: "var(--background)",
           color: "var(--foreground)",
         }}
       >
+
         <div className="flex justify-between items-center p-5">
           <Link href="/" passHref legacyBehavior>
             <a className="flex items-center cursor-pointer">
@@ -88,15 +110,22 @@ export default function Header() {
                 width={50}
                 height={50}
               />
-              <h1 className="ml-4 text-2xl font-bold">Luxury Properties</h1>
+              <h1 className="ml-4 text-2xl font-bold" style={{ color: "var(--copy-primary)" }}>Luxury Properties</h1>
             </a>
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
+            <button onClick={toggleTheme} className="text-xl transition">
+              {isDarkTheme ? (
+                <FaMoon className="text-blue-500" />
+              ) : (
+                <FaSun className="text-yellow-500" />
+              )}
+            </button>
             <Link href="/list_property" passHref>
               <button
-                className="py-2 px-6 rounded-lg shadow-md transition"
+                className="py-2 px-6 rounded-lg shadow-md transition hover:opacity-75"
                 style={{
                   backgroundColor: "var(--cta)",
                   color: "var(--cta-text)",
@@ -108,13 +137,13 @@ export default function Header() {
 
             {isLoggedIn ? (
               <>
-                <button onClick={() => openModal(<Profile />, true)} className="flex items-center transition">
+                <button onClick={() => openModal(<Profile />, true)} className="flex items-center transition" style={{ color: "var(--gray-text)" }}>
                   <FaUser className="text-xl mr-2" style={{ color: "var(--gray-text)" }} /> Profile
                 </button>
-                <button onClick={() => openModal(<div>History Content</div>)} className="flex items-center transition">
+                <button onClick={() => openModal(<div>History Content</div>)} className="flex items-center transition" style={{ color: "var(--gray-text)" }}>
                   <FaHistory className="text-xl mr-2" style={{ color: "var(--gray-text)" }} /> History
                 </button>
-                <button onClick={() => openModal(<div>Chat Content</div>)} className="flex items-center transition">
+                <button onClick={() => openModal(<div>Chat Content</div>)} className="flex items-center transition" style={{ color: "var(--gray-text)" }}>
                   <FaComments className="text-xl mr-2" style={{ color: "var(--gray-text)" }} /> Chat
                 </button>
               </>
@@ -122,28 +151,20 @@ export default function Header() {
               <>
                 <button
                   onClick={() => openModal(<Login openForgetPassword={() => openModal(<ForgetPassword />)} />)}
-                  className="flex items-center transition"
+                  className="flex items-center transition" style={{ color: "var(--gray-text)" }}
                 >
                   <FaSignInAlt className="mr-2" style={{ color: "var(--gray-text)" }} /> Log In
                 </button>
-                <button onClick={() => openModal(<Register />)} className="flex items-center transition">
+                <button onClick={() => openModal(<Register />)} className="flex items-center transition" style={{ color: "var(--gray-text)" }}>
                   <FaUserPlus className="mr-2" style={{ color: "var(--gray-text)" }} /> Sign Up
                 </button>
               </>
             )}
           </nav>
 
-          <button onClick={toggleTheme} className="text-xl transition">
-            {isDarkTheme ? (
-              <FaMoon className="text-blue-500" />
-            ) : (
-              <FaSun className="text-yellow-500" />
-            )}
-          </button>
-
           {/* Mobile Menu Toggle */}
           <button className="md:hidden" onClick={toggleMenu}>
-            <span className="text-3xl" style={{ color: "var(--foreground)" }}>
+            <span className="text-3xl" style={{  color: "var(--gray-text)" }}>
               &#9776;
             </span>
           </button>
@@ -154,16 +175,19 @@ export default function Header() {
           <div
             className={`md:hidden fixed top-0 right-0 h-full w-3/4 max-w-sm p-6 space-y-6 transition-transform duration-300`}
             style={{
-              backgroundColor: "rgba(var(--background), 0.9)",
-              color: "var(--foreground)",
+              backgroundColor: "var(--gray-bg)",
+              color: "var(--gray-text)",
               zIndex: 20,
             }}
           >
             <button className="text-3xl mb-4" onClick={toggleMenu}>
-              <FaTimes style={{ color: "var(--foreground)" }} />
+              <FaTimes style={{ color: "var(--gray-text)" }} />
             </button>
 
-            <div className="p-4 rounded-lg space-y-4 text-lg">
+            <div className="p-4 rounded-lg space-y-4 text-lg" style={{
+              backgroundColor: "var(--gray-bg)",
+              zIndex: 20,
+            }}>
               <Link href="/list_property" passHref>
                 <button
                   className="py-2 px-6 rounded-lg shadow-md transition w-full"
@@ -175,25 +199,32 @@ export default function Header() {
                   List Property
                 </button>
               </Link>
+              <button onClick={toggleTheme} className="text-xl transition">
+              {isDarkTheme ? (
+                <FaMoon className="text-blue-500" />
+              ) : (
+                <FaSun className="text-yellow-500" />
+              )}
+            </button>
 
               {isLoggedIn ? (
                 <>
-                  <button onClick={() => openModal(<Profile />, true)} className="flex items-center transition">
+                  <button onClick={() => openModal(<Profile />, true)} className="flex items-center transition" style={{ color: "var(--gray-text)" }}>
                     <FaUser className="mr-3" style={{ color: "var(--gray-text)" }} /> Profile
                   </button>
-                  <button onClick={() => openModal(<div>History Content</div>)} className="flex items-center transition">
+                  <button onClick={() => openModal(<div>History Content</div>)} className="flex items-center transition" style={{ color: "var(--gray-text)" }}>
                     <FaHistory className="mr-3" style={{ color: "var(--gray-text)" }} /> History
                   </button>
-                  <button onClick={() => openModal(<div>Chat Content</div>)} className="flex items-center transition">
+                  <button onClick={() => openModal(<div>Chat Content</div>)} className="flex items-center transition" style={{ color: "var(--gray-text)" }}>
                     <FaComments className="mr-3" style={{ color: "var(--gray-text)" }} /> Chat
                   </button>
                 </>
               ) : (
                 <>
-                  <button onClick={() => openModal(<Login openForgetPassword={() => openModal(<ForgetPassword />)} />)} className="flex items-center transition">
+                  <button onClick={() => openModal(<Login openForgetPassword={() => openModal(<ForgetPassword />)} />)} className="flex items-center transition" style={{ color: "var(--gray-text)" }}>
                     <FaSignInAlt className="mr-3" style={{ color: "var(--gray-text)" }} /> Log In
                   </button>
-                  <button onClick={() => openModal(<Register />)} className="flex items-center transition">
+                  <button onClick={() => openModal(<Register />)} className="flex items-center transition" style={{ color: "var(--gray-text)" }}>
                     <FaUserPlus className="mr-3" style={{ color: "var(--gray-text)" }} /> Sign Up
                   </button>
                 </>
@@ -221,9 +252,8 @@ export default function Header() {
       {/* Profile Sidebar */}
       {isProfileSidebarOpen && (
         <div
-          className={`fixed inset-y-0 right-0 transform transition-transform duration-300 ${
-            isProfileSidebarOpen ? "translate-x-0" : "translate-x-full"
-          } w-80 md:w-96 shadow-lg z-10`}
+          className={`fixed inset-y-0 right-0 transform transition-transform duration-300 ${isProfileSidebarOpen ? "translate-x-0" : "translate-x-full"
+            } w-80 md:w-96 shadow-lg z-10`}
           style={{
             backgroundColor: "var(--gray-bg)",
             color: "var(--foreground)",

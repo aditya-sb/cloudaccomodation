@@ -31,6 +31,7 @@ const Register: React.FC = () => {
       setMessage('Password must be at least 8 characters.');
       return;
     }
+    
     try {
       const response = await axios.post('http://localhost:5000/register', data);
       setMessage(response.data.success || "Registration successful!");
@@ -46,59 +47,67 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4 ">
-      <h2 className="text-2xl font-semibold text-gray-800 text-center">Register</h2>
+    <div className="space-y-4">
+      <h2 className="text-2xl font-semibold text-center" style={{ color: "var(--gray-text)" }}>Register</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="flex items-center border border-gray-300 rounded-lg p-3 bg-gray-100">
-          <FaUser className="text-gray-500 mr-3" />
+        <div className="flex items-center border rounded-lg p-3" style={{ backgroundColor: "var(--input-bg)", borderColor: "var(--input-border)" }}>
+          <FaUser className="mr-3" style={{ color: "var(--gray-text)" }} />
           <input
             type="text"
             name="username"
             placeholder="Username"
-            className="w-full text-gray-500 bg-transparent focus:outline-none"
+            className="w-full bg-transparent focus:outline-none"
+            style={{ color: "var(--gray-text)" }}
             required
           />
         </div>
-        <div className="flex items-center border border-gray-300 rounded-lg p-3 bg-gray-100">
-          <FaEnvelope className="text-gray-500 mr-3" />
+        <div className="flex items-center border rounded-lg p-3" style={{ backgroundColor: "var(--input-bg)", borderColor: "var(--input-border)" }}>
+          <FaEnvelope className="mr-3" style={{ color: "var(--gray-text)" }} />
           <input
             type="email"
             name="email"
             placeholder="Email"
-            className="w-full bg-transparent text-gray-500 focus:outline-none"
+            className="w-full bg-transparent focus:outline-none"
+            style={{ color: "var(--gray-text)" }}
             required
           />
         </div>
-        <div className="flex items-center border border-gray-300 rounded-lg p-3 bg-gray-100">
-          <FaLock className="text-gray-500 mr-3" />
+        <div className="flex items-center border rounded-lg p-3" style={{ backgroundColor: "var(--input-bg)", borderColor: "var(--input-border)" }}>
+          <FaLock className="mr-3" style={{ color: "var(--gray-text)" }} />
           <input
             type="password"
             name="password"
             placeholder="Password (8+ characters)"
-            className="w-full bg-transparent text-gray-500 focus:outline-none"
+            className="w-full bg-transparent focus:outline-none"
+            style={{ color: "var(--gray-text)" }}
             minLength={8}
             required
           />
         </div>
-        <div className="flex items-center border border-gray-300 rounded-lg p-3 bg-gray-100">
-          <FaCheckCircle className="text-gray-500 mr-3" />
+        <div className="flex items-center border rounded-lg p-3" style={{ backgroundColor: "var(--input-bg)", borderColor: "var(--input-border)" }}>
+          <FaCheckCircle className="mr-3" style={{ color: "var(--gray-text)" }} />
           <input
             type="password"
             name="passwordConf"
             placeholder="Confirm Password"
-            className="w-full bg-transparent text-gray-500 focus:outline-none"
+            className="w-full bg-transparent focus:outline-none"
+            style={{ color: "var(--gray-text)" }}
             minLength={8}
             required
           />
         </div>
         <button
           type="submit"
-          className="w-full bg-gray-800 text-white py-2 rounded-lg transition hover:bg-gray-700"
+          className="w-full py-2 rounded-lg transition hover:opacity-75"
+          style={{
+            backgroundColor: "var(--cta)",
+            color: "var(--cta-text)",
+          }}
         >
           Register
         </button>
       </form>
-      {message && <p className="text-green-500 mt-2 text-center">{message}</p>}
+      {message && <p className="mt-2 text-center" style={{ color: "var(--success-text)" }}>{message}</p>}
     </div>
   );
 };

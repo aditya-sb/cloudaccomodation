@@ -12,24 +12,19 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [isDarkTheme, setIsDarkTheme] = useState(false);
 
   useEffect(() => {
-    // Retrieve saved theme from localStorage on initial load
     const savedTheme = localStorage.getItem("theme");
-    if (savedTheme) {
-      setIsDarkTheme(savedTheme === "dark");
-    }
+    const isDark = savedTheme === "dark";
+    setIsDarkTheme(isDark);
+    document.documentElement.classList.toggle("dark", isDark);
   }, []);
-
+  
   const toggleTheme = () => {
     const newTheme = !isDarkTheme;
     setIsDarkTheme(newTheme);
     localStorage.setItem("theme", newTheme ? "dark" : "light");
-    // Update the class on the root element
-    if (newTheme) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
+    document.documentElement.classList.toggle("dark", newTheme);
   };
+  
 
   return (
     <ThemeContext.Provider value={{ isDarkTheme, toggleTheme }}>

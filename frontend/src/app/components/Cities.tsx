@@ -16,7 +16,7 @@ const cities: CityCardProps[] = [
   { name: "Ottawa", shortCode: "OTT" },
   { name: "Edmonton", shortCode: "EDM" },
   { name: "Winnipeg", shortCode: "WPG" },
-  { name: "Quebec City", shortCode: "QUE" },
+  { name: "Quebec", shortCode: "QUE" },
   { name: "Halifax", shortCode: "HAL" },
   { name: "Victoria", shortCode: "VIC" },
 ];
@@ -40,13 +40,18 @@ export default function CityCardSlider() {
         <button
           onClick={handlePrevClick}
           disabled={currentIndex === 0}
-          className={`text-4xl ${
-            currentIndex === 0 ? "text-gray-500" : "text-gray-300 hover:text-gray-100"
-          } transition duration-200`}
+          className={`text-4xl transition duration-200 ${
+            currentIndex === 0
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:opacity-80"
+          }`}
+          style={{
+            color: currentIndex === 0 ? "var(--gray-text)" : "var(--gray-hover-text)",
+          }}
         >
           <MdArrowBackIos />
         </button>
-
+  
         <div className="overflow-hidden w-full">
           <div
             className="flex transition-transform duration-500 ease-in-out"
@@ -56,12 +61,28 @@ export default function CityCardSlider() {
             }}
           >
             {cities.map((city, index) => (
-              <div key={index} className="w-full flex-shrink-0 p-4" style={{ width: CARD_WIDTH }}>
-                <div className="bg-gradient-to-r from-gray-900 to-gray-800 cursor-pointer rounded-lg shadow-xl p-8 text-center transform hover:scale-105 duration-300">
-                  <h2 className="text-5xl font-extrabold text-yellow-400 tracking-wide">
+              <div
+                key={index}
+                className="w-full flex-shrink-0 p-4"
+                style={{ width: CARD_WIDTH }}
+              >
+                <div
+                  className="cursor-pointer rounded-lg shadow-xl p-8 text-center transform hover:scale-105 duration-300"
+                  style={{
+                    background: "linear-gradient(to right, var(--gray-bg), var(--gray-hover-bg))",
+                    color: "var(--cta-text)",
+                  }}
+                >
+                  <h2
+                    className="text-5xl font-extrabold tracking-wide"
+                    style={{ color: "var(--grape)" }}
+                  >
                     {city.shortCode}
                   </h2>
-                  <p className="mt-3 text-xl font-semibold text-gray-300 tracking-wide">
+                  <p
+                    className="mt-3 text-xl font-semibold tracking-wide"
+                    style={{ color: "var(--copy-secondary)" }}
+                  >
                     {city.name}
                   </p>
                 </div>
@@ -69,17 +90,25 @@ export default function CityCardSlider() {
             ))}
           </div>
         </div>
-
+  
         <button
           onClick={handleNextClick}
           disabled={currentIndex === cities.length - 1}
-          className={`text-4xl ${
-            currentIndex === cities.length - 1 ? "text-gray-500" : "text-gray-300 hover:text-gray-100"
-          } transition duration-200`}
+          className={`text-4xl transition duration-200 ${
+            currentIndex === cities.length - 1
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:opacity-80"
+          }`}
+          style={{
+            color: currentIndex === cities.length - 1
+              ? "var(--gray-text)"
+              : "var(--gray-hover-text)",
+          }}
         >
           <MdArrowForwardIos />
         </button>
       </div>
     </div>
   );
+  
 }

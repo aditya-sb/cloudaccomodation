@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import { FaSignOutAlt, FaArrowRight } from "react-icons/fa";
+import { FaSignOutAlt } from "react-icons/fa";
 import axios from 'axios';
 
 const Profile: React.FC = () => {
@@ -36,49 +36,31 @@ const Profile: React.FC = () => {
   };
 
   return (
-    <div className="text-white px-6 py-8 space-y-6">
-
-
-      {/* Profile Picture and Details */}
-      <div className="flex flex-col items-center space-y-2">
-        <div className="bg-gray-600 rounded-full w-20 h-20 flex items-center justify-center">
-          {/* Placeholder for profile picture */}
-          <span className="text-3xl">👤</span>
+    <div className="px-6 py-8 space-y-6 rounded-lg shadow-lg" style={{ backgroundColor: "var(--card)", color: "var(--copy-primary)" }}>
+      <div className="flex flex-col items-center space-y-4">
+        <div className="rounded-full w-24 h-24 flex items-center justify-center shadow-md" style={{ backgroundColor: "var(--grape)" }}>
+          <span className="text-4xl text-white">👤</span>
         </div>
-        <h3 className="text-2xl font-semibold">{name}</h3>
-        <p className="text-gray-400">{email}</p>
+        <h3 className="text-3xl font-semibold">{name}</h3>
+        <p style={{ color: "var(--copy-secondary)" }}>{email}</p>
       </div>
-
-      {/* Divider */}
-      <div className="border-t border-gray-600"></div>
-
-      {/* Subscription Details Placeholder */}
-      <div className="text-center space-y-2">
-        <p className="text-gray-400 text-sm">Subscription Details</p>
-        <p className="font-semibold">25<sup>th</sup> July - 24<sup>th</sup> August 2017</p>
-        <button className="mt-2 bg-blue-600 text-white py-1 px-4 rounded-full text-sm shadow-md hover:bg-blue-700">
+      <div className="border-t mt-6" style={{ borderColor: "var(--border)" }}></div>
+      <div className="text-center space-y-2 mt-4">
+        <p className="text-sm font-medium" style={{ color: "var(--gray-text)" }}>Subscription Details</p>
+        <p className="font-semibold text-lg text-yellow-500">Premium Member</p>
+        <p className="font-semibold text-sm">25<sup>th</sup> July - 24<sup>th</sup> August 2024</p>
+        <button className="mt-4 py-2 px-6 rounded-full font-medium shadow-md transition hover:opacity-90" style={{ backgroundColor: "var(--cta)", color: "var(--cta-text)" }}>
           Update Subscription
         </button>
       </div>
-
-      {/* Additional Content Placeholder */}
-      <div className="text-center text-gray-400 text-sm italic">
-        Additional content can go here.
-      </div>
-
-      {/* Logout Button */}
-      <div className="flex justify-center">
-        <button
-          onClick={handleLogout}
-          className="mt-6 bg-red-600 text-white py-2 px-4 rounded-full transition hover:bg-red-700 flex items-center space-x-2"
-        >
-          <FaSignOutAlt />
-          <span>Log Out</span>
-        </button>
-      </div>
-
-      {/* Logout Message */}
-      {message && <p className="text-red-500 mt-4 text-center">{message}</p>}
+      <div className="text-center text-sm italic mt-4" style={{ color: "var(--error-text)" }}>{message}</div>
+      <button
+        onClick={handleLogout}
+        className="w-full flex items-center justify-center py-2 rounded-lg font-semibold transition hover:opacity-75 mt-6"
+        style={{ backgroundColor: "var(--cta-active)", color: "var(--cta-text)" }}
+      >
+        <FaSignOutAlt className="mr-2" /> Log Out
+      </button>
     </div>
   );
 };

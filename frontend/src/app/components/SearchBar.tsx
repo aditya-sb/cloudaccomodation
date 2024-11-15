@@ -1,128 +1,181 @@
 "use client";
-import React, { useState, useEffect } from 'react';
 
-const canadianCities = [
-  "Toronto", "Vancouver", "Montreal", "Calgary", "Ottawa", "Edmonton", "Winnipeg", "Quebec City",
-  "Hamilton", "Kitchener", "London", "Halifax", "Victoria", "Oshawa", "St. Catharines", "Regina",
-  "Saskatoon", "Burnaby", "Kelowna", "Chilliwack"
-];
+import Image from "next/image";
+import Link from "next/link";
+import { useState, useEffect } from "react";
+import { FaHome, FaFilter, FaSearch } from "react-icons/fa";
 
 export default function SearchBar() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [imageHeight, setImageHeight] = useState(600);
-  const [selectedCity, setSelectedCity] = useState("");
-  const [adults, setAdults] = useState(1);
-  const [children, setChildren] = useState(0);
-  const [dates, setDates] = useState("");
+  const [imageHeight, setImageHeight] = useState(380);
+  const [propertyType, setPropertyType] = useState("All");
+  const [sortOption, setSortOption] = useState("Date");
+  const [filters, setFilters] = useState({
+    familyType: "Single",
+    members: "2-4",
+    hasKids: false,
+    hasPets: false,
+    city: "",
+  });
 
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
-      setImageHeight(Math.max(200, 600 - scrollPosition / 2));
+      setImageHeight(Math.max(120, 380 - scrollPosition / 2));
     };
 
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
-  const handleSearch = () => {
-    // Instead of navigation, we'll just log the search params
-    console.log({
-      search: searchTerm,
-      city: selectedCity,
-      adults,
-      children,
-      dates
-    });
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      window.location.href = `/properties?search=${searchTerm}`;
+    }
   };
 
   return (
-    <div className="relative w-full" style={{ height: `${imageHeight}px` }}>
-      <div 
-        className="absolute inset-0 bg-cover bg-center"
-        style={{
-          backgroundImage: "url('/api/placeholder/1920/1080')",
-          filter: "brightness(50%)"
-        }}
+    <div
+      className="relative mt-20 transition-all duration-300 ease-in-out"
+      style={{ height: `${imageHeight}px` }}
+    >
+      <Image
+        src="/images/cityscape.jpeg"
+        alt="Cityscape"
+        layout="fill"
+        objectFit="cover"
+        className="opacity-80 transition-all duration-300 ease-in-out"
       />
-      
-      <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
-        {/* Welcome Text */}
-        <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
-          Welcome to <span className="text-yellow-400">Canada</span>
+      <div className="absolute inset-0 flex flex-col justify-center items-center px-4 sm:px-8">
+        <h1
+          className="text-4xl sm:text-5xl font-bold text-center mb-4"
+          style={{ color: "var(--cta-text)" }}
+        >
+          Welcome to <span style={{ color: "var(--crimson)" }}>Canada</span>
         </h1>
-        <h2 className="text-xl md:text-2xl text-white mb-8">Search Your Destination....</h2>
 
-        {/* Main Search Container */}
-        <div className="bg-white rounded-lg shadow-xl w-full max-w-5xl p-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* Destination */}
-            <div className="relative">
-              <label className="text-sm text-gray-600 font-semibold mb-1 block">DESTINATIONS</label>
-              <select
-                value={selectedCity}
-                onChange={(e) => setSelectedCity(e.target.value)}
-                className="w-full p-2 border rounded focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
-              >
-                <option value="">Select City</option>
-                {canadianCities.map((city) => (
-                  <option key={city} value={city}>{city}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Duration/Dates */}
-            <div>
-              <label className="text-sm text-gray-600 font-semibold mb-1 block">DURATION</label>
-              <input
-                type="date"
-                value={dates}
-                onChange={(e) => setDates(e.target.value)}
-                className="w-full p-2 border rounded focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
-              />
-            </div>
-
-            {/* Adults */}
-            <div>
-              <label className="text-sm text-gray-600 font-semibold mb-1 block">ADULT</label>
-              <select
-                value={adults}
-                onChange={(e) => setAdults(Number(e.target.value))}
-                className="w-full p-2 border rounded focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
-              >
-                {[1, 2, 3, 4, 5].map(num => (
-                  <option key={num} value={num}>{num}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Children */}
-            <div>
-              <label className="text-sm text-gray-600 font-semibold mb-1 block">CHILDREN</label>
-              <select
-                value={children}
-                onChange={(e) => setChildren(Number(e.target.value))}
-                className="w-full p-2 border rounded focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
-              >
-                {[0, 1, 2, 3, 4].map(num => (
-                  <option key={num} value={num}>{num}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Search Button */}
-          <div className="mt-4 flex justify-end">
+        {/* Search Bar */}
+        <div
+          className="bg-cta p-4 rounded-full shadow-lg flex items-center space-x-2 transform transition-transform duration-300 hover:scale-105 w-full max-w-md sm:max-w-lg lg:max-w-2xl"
+          style={{ backgroundColor: "var(--border)", color: "var(--cta-text)" }}
+        >
+          <input
+            type="text"
+            placeholder="Search for properties..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="px-4 py-2 w-full sm:w-80 rounded-l-full border-none bg-input-bg text-gray-text placeholder-gray-text focus:ring-2 focus:ring-cta focus:outline-none text-sm sm:text-base"
+            style={{
+              backgroundColor: "var(--input-bg)",
+              color: "var(--gray-text)",
+              borderColor: "var(--input-border)",
+            }}
+          />
+          <select
+            value={propertyType}
+            onChange={(e) => setPropertyType(e.target.value)}
+            className="hidden sm:block w-28 px-3 py-2 border-l bg-input-bg text-gray-text focus:outline-none focus:ring-2 focus:ring-cta rounded-r-none shadow-md transition duration-200 ease-in-out"
+            style={{
+              backgroundColor: "var(--input-bg)",
+              color: "var(--gray-text)",
+            }}
+          >
+            <option>All Types</option>
+            <option>Flat</option>
+            <option>Home</option>
+            <option>Apartment</option>
+            <option>Condo</option>
+          </select>
+          <Link href={`/properties?search=${searchTerm}`} passHref>
             <button
-              onClick={handleSearch}
-              className="bg-yellow-500 hover:bg-yellow-600 text-white px-8 py-2 rounded-md transition-colors duration-200 flex items-center space-x-2"
+              className="bg-cta text-cta-text px-4 py-2 rounded-r-full transition-all focus:ring-2 text-sm sm:text-base hover:opacity-75"
+              style={{
+                backgroundColor: "var(--cta)",
+                color: "var(--cta-text)",
+                boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)",
+              }}
             >
-              <span>SEARCH</span>
-              {/* Simple search icon using HTML entities */}
-              <span className="ml-2">🔍</span>
+              <FaSearch className="inline-block mr-2" /> Search
             </button>
-          </div>
+          </Link>
         </div>
+
+
+        {/* Filter and Sort Options */}
+        {/* Filter and Sort Options */}
+        <div className="mt-6 flex flex-wrap justify-center gap-3 text-xs sm:text-sm">
+          {/* City Dropdown */}
+          <select
+            value={filters.city}
+            onChange={(e) => setFilters({ ...filters, city: e.target.value })}
+            className="px-3 py-1 rounded-full shadow-md transition duration-200 ease-in-out hover:opacity-75"
+            style={{ backgroundColor: "var(--crimson)", color: "var(--cta-text)" }}
+          >
+            <option>Choose City</option>
+            <option>Toronto</option>
+            <option>Vancouver</option>
+            <option>Montreal</option>
+            <option>Calgary</option>
+            <option>Ottawa</option>
+          </select>
+
+          {/* Property Type */}
+          {/* <select
+            value={propertyType}
+            onChange={(e) => setPropertyType(e.target.value)}
+            className="px-3 py-1 rounded-full shadow-md transition duration-200 ease-in-out"
+            style={{ backgroundColor: "var(--crimson)", color: "var(--cta-text)" }}
+          >
+            <option>All Types</option>
+            <option>Flat</option>
+            <option>Home</option>
+            <option>Apartment</option>
+            <option>Condo</option>
+          </select> */}
+
+          {/* Sort By */}
+          <select
+            value={sortOption}
+            onChange={(e) => setSortOption(e.target.value)}
+            className="px-3 py-1 rounded-full shadow-md transition duration-200 ease-in-out hover:opacity-75"
+            style={{ backgroundColor: "var(--crimson)", color: "var(--cta-text)" }}
+          >
+            <option>Date</option>
+            <option>Price - Low to High</option>
+            <option>Price - High to Low</option>
+            <option>Distance</option>
+          </select>
+
+          {/* Filters */}
+          <button
+            className="px-3 py-1 rounded-full shadow-md transition duration-200 ease-in-out flex items-center space-x-2 hover:opacity-75"
+            onClick={() => setFilters({ ...filters, hasKids: !filters.hasKids })}
+            style={{ backgroundColor: "var(--crimson)", color: "var(--cta-text)" }}
+          >
+            <FaHome /> <span>{filters.hasKids ? "With Kids" : "No Kids"}</span>
+          </button>
+          <button
+            className="px-3 py-1 rounded-full shadow-md transition duration-200 ease-in-out flex items-center space-x-2 hover:opacity-75"
+            onClick={() => setFilters({ ...filters, hasPets: !filters.hasPets })}
+            style={{ backgroundColor: "var(--crimson)", color: "var(--cta-text)" }}
+          >
+            <FaFilter /> <span>{filters.hasPets ? "With Pets" : "No Pets"}</span>
+          </button>
+          <select
+            value={filters.familyType}
+            onChange={(e) => setFilters({ ...filters, familyType: e.target.value })}
+            className="px-3 py-1 rounded-full shadow-md transition duration-200 ease-in-out hover:opacity-75"
+            style={{ backgroundColor: "var(--crimson)", color: "var(--cta-text)" }}
+          >
+            <option>Single</option>
+            <option>Family</option>
+            <option>Couple</option>
+          </select>
+        </div>
+
       </div>
     </div>
   );

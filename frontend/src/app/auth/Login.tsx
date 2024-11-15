@@ -13,7 +13,7 @@ const Login: React.FC<{ openForgetPassword: () => void }> = ({ openForgetPasswor
       email: formData.get("email"),
       password: formData.get("password"),
     };
-  
+
     try {
       const response = await axios.post("http://localhost:5000/login", data);
       setMessage(response.data.success || "Login successful!");
@@ -28,43 +28,48 @@ const Login: React.FC<{ openForgetPassword: () => void }> = ({ openForgetPasswor
       }
     }
   };
-  
 
   return (
-    <div className="space-y-4 ">
-      <h2 className="text-2xl font-semibold text-gray-800 text-center">Log In</h2>
+    <div className="space-y-4">
+      <h2 className="text-2xl font-semibold text-center" style={{ color: "var(--gray-text)" }}>Log In</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="flex items-center border border-gray-300 rounded-lg p-3 bg-gray-50">
-          <FaEnvelope className="text-gray-500 mr-3" />
+        <div className="flex items-center border rounded-lg p-3" style={{ backgroundColor: "var(--input-bg)", borderColor: "var(--input-border)" }}>
+          <FaEnvelope className="mr-3" style={{ color: "var(--gray-text)" }} />
           <input
             type="email"
             name="email"
             placeholder="Email"
-            className="w-full bg-transparent text-gray-500 focus:outline-none"
+            className="w-full bg-transparent focus:outline-none"
+            style={{ color: "var(--gray-text)" }}
             required
           />
         </div>
-        <div className="flex items-center border border-gray-300 rounded-lg p-3 bg-gray-50">
-          <FaLock className="text-gray-500 mr-3" />
+        <div className="flex items-center border rounded-lg p-3" style={{ backgroundColor: "var(--input-bg)", borderColor: "var(--input-border)" }}>
+          <FaLock className="mr-3" style={{ color: "var(--gray-text)" }} />
           <input
             type="password"
             name="password"
             placeholder="Password"
-            className="w-full bg-transparent text-gray-500 focus:outline-none"
+            className="w-full bg-transparent focus:outline-none"
+            style={{ color: "var(--gray-text)" }}
             required
           />
         </div>
         <button
           type="submit"
-          className="w-full bg-gray-800 text-white py-2 rounded-lg transition hover:bg-gray-700"
+          className="w-full py-2 rounded-lg transition hover:opacity-75"
+          style={{
+            backgroundColor: "var(--cta)",
+            color: "var(--cta-text)",
+          }}
         >
           Log In
         </button>
       </form>
-      <p className="text-center text-blue-600 cursor-pointer" onClick={openForgetPassword}>
+      <p className="text-center cursor-pointer" onClick={openForgetPassword} style={{ color: "var(--link-color)" }}>
         Forgot Password?
       </p>
-      {message && <p className="text-red-500 mt-2 text-center">{message}</p>}
+      {message && <p className="text-center mt-2" style={{ color: "var(--error-text)" }}>{message}</p>}
     </div>
   );
 };
