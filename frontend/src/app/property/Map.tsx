@@ -24,27 +24,27 @@ const Map: React.FC<MapProps> = ({ location, lat, lon }) => {
 
   return (
     <div
-      className={`relative mt-10 bg-gray-800 rounded-lg shadow-lg ${
+      className={`relative mt-10 bg-[var(--card)] rounded-lg shadow-lg ${
         isFullScreen ? "fixed inset-0 z-50" : "p-8"
       }`}
     >
       <div className="flex justify-between items-center mb-4">
-        <div className="text-white">
+        <div className="text-[var(--copy-primary)]">
           <h3 className="text-xl font-semibold">Explore the Area</h3>
           <p className="mt-2 flex items-center">
-            <FaMapMarkerAlt className="mr-2" />
+            <FaMapMarkerAlt className="mr-2 text-[var(--gray-hover-text)]" />
             {location}
           </p>
         </div>
         <button
           onClick={toggleFullScreen}
-          className="text-white bg-blue-600 p-2 rounded-full hover:bg-blue-700 transition"
+          className="text-[var(--cta-text)] bg-[var(--cta)] p-2 rounded-full hover:bg-[var(--cta-active)] transition"
           title={isFullScreen ? "Exit Full Screen" : "Full Screen"}
         >
           {isFullScreen ? <FaCompress /> : <FaExpand />}
         </button>
       </div>
-
+  
       <div
         className={`overflow-hidden transition-all ${
           isFullScreen ? "h-full w-full" : "h-96 w-full"
@@ -60,6 +60,7 @@ const Map: React.FC<MapProps> = ({ location, lat, lon }) => {
       </div>
     </div>
   );
+  
 };
 
 export default Map;

@@ -6,7 +6,6 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import BookingDetails from "./BookingDetails";
 import PropertyCard from "../components/PropertyCard";
-import SearchBar from "../components/SearchBar";
 
 export default function PropertyPage() {
   return (
@@ -14,7 +13,10 @@ export default function PropertyPage() {
       <Header />
       {/* <SearchBar /> */}
       <br/><br/><br/>
-      <div className="bg-gray-950 min-h-screen text-white p-10">
+      <div className=" min-h-screen p-10" style={{
+        backgroundColor: "var(--background)",
+        color: "var(--foreground)",
+      }}>
         <PropertyGallery images={["/images/cottage.jpeg", "/images/luxuryinside.jpeg", "/images/property-logo.png"]} />
         
         <PropertyDetails
@@ -30,8 +32,12 @@ export default function PropertyPage() {
 
         <BuyerReviews />
         
-        <h2 className="text-2xl mt-7 font-extrabold text-center text-white mb-10">
-          Related Properties
+        <h2
+        className="text-3xl sm:text-4xl mt-7 font-extrabold text-center mb-10"
+        style={{
+          color: "var(--foreground)",
+        }}
+      >          Related Properties
         </h2>
         
         <section className="pb-5 grid grid-cols-1 md:grid-cols-3 gap-8">

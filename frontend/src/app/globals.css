@@ -87,3 +87,11 @@
   --error-text: rgba(239, 68, 68, 1); /* light red for dark mode */
   --success-text: rgba(34, 197, 94, 1); /* green-500 for consistency */
 }
+.custom-date-picker {
+  background-color: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--text-color);
+  padding: 8px; /* Optional: Adjust for better spacing */
+  border-radius: 4px; /* Optional: Adjust for a rounded look */
+}
+

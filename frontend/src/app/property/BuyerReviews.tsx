@@ -12,20 +12,24 @@ const reviews = [
 ];
 
 const BuyerReviews = () => (
-  <div className="mt-10 bg-gray-800 p-6 rounded-lg shadow-lg">
-    <h3 className="text-2xl font-semibold text-white">What Our Buyers Say</h3>
+  <div className="mt-10 bg-[var(--card)] p-6 rounded-lg shadow-lg">
+    <h3 className="text-2xl font-semibold text-[var(--copy-primary)]">
+      What Our Buyers Say
+    </h3>
     <div className="mt-6 space-y-4">
       {reviews.map((review, index) => (
         <div key={index} className="flex items-start space-x-4">
-          <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-white font-semibold">
+          <div className="w-12 h-12 rounded-full bg-[var(--gray-border)] flex items-center justify-center text-[var(--copy-primary)] font-semibold">
             {review.name[0]}
           </div>
           <div>
-            <p className="text-white font-semibold">{review.name}</p>
-            <p className="text-gray-100">{review.review}</p>
+            <p className="text-[var(--copy-primary)] font-semibold">
+              {review.name}
+            </p>
+            <p className="text-[var(--copy-secondary)]">{review.review}</p>
             <div className="flex mt-2">
               {[...Array(review.rating)].map((_, idx) => (
-                <span key={idx} className="text-yellow-400">★</span>
+                <span key={idx} className="text-[var(--rating-star)]">★</span>
               ))}
             </div>
           </div>
@@ -34,5 +38,6 @@ const BuyerReviews = () => (
     </div>
   </div>
 );
+
 
 export default BuyerReviews;

@@ -60,16 +60,18 @@ function PropertyContent() {
         </button>
       </div>
 
-      <div className="text-center mt-4 text-lg font-semibold text-gray-600">
+      <div className="text-center mt-4 text-lg font-semibold" style={{
+          color: "var(--foreground)",
+        }}>
         Showing {filteredProperties.length} properties
       </div>
 
-      <div className="p-8 max-w-7xl mx-auto">
+      <div className="p-4 mx-5">
         {view === "list" ? (
           <ListView properties={filteredProperties} />
         ) : (
-          <div className="mt-6 rounded-lg overflow-hidden shadow-lg">
-            <MapView properties={filteredProperties} mapLocation={""} mapLat={0} mapLon={0} />
+          <div >
+            <MapView properties={filteredProperties} mapLocation="Beverly Hills, CA" mapLat={34.0736204} mapLon={-118.4003563} />
           </div>
         )}
       </div>

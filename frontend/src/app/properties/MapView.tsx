@@ -1,54 +1,68 @@
 "use client";
 
-import React from "react";
-import { Property } from "@/types";  // Make sure the Property type is correctly imported
-import Map from "./Map";
-interface MapViewProps {
-    properties: Property[];
-    mapLocation: string;
-    mapLat: number;
-    mapLon: number;
-  }
+import React, { useEffect, useState } from "react";
+import { Property } from "@/types";
+import PropertyCard from "./PropertyCard";
+import { FaCompress, FaExpand } from "react-icons/fa";
 
-const PropertyList: React.FC<{ properties: Property[] }> = ({ properties }) => {
-    return (
-      <div className="w-full h-full overflow-y-auto p-4 bg-white rounded-l-lg border-l border-gray-200">
-        {properties.map((property, index) => (
-          <div
-            key={index}
-            className="mb-6 flex flex-col bg-white rounded-lg shadow-lg hover:shadow-xl transition-all"
-          >
-            <img
-              src={property.image}
-              alt={property.title}
-              className="w-full h-40 object-cover rounded-t-lg"
+interface MapViewProps {
+  properties: Property[];
+  mapLocation: string;
+  mapLat: number;
+  mapLon: number;
+}
+
+const MapView: React.FC<MapViewProps> = ({ properties,  mapLat, mapLon }) => {
+  const [isFullScreen, setIsFullScreen] = useState(false);
+
+  const toggleFullScreen = () => {
+    setIsFullScreen(!isFullScreen);
+  };
+
+  useEffect(() => {
+    const iframe = document.getElementById("iframeId") as HTMLIFrameElement;
+    if (iframe) {
+      iframe.src = `https://maps.google.com/maps?q=${mapLat},${mapLon}&z=15&hl=en&output=embed`;
+    }
+  }, [mapLat, mapLon]);
+
+  return (
+    <div className="flex h-screen overflow-hidden">
+      {/* Map Section */}
+      <div className={`relative ${isFullScreen ? "w-full" : "w-3/5"} h-full`}>
+      <button
+          onClick={toggleFullScreen}
+          className="text-[var(--cta-text)] bg-[var(--cta)] p-2 rounded-full hover:bg-[var(--cta-active)] transition"
+          title={isFullScreen ? "Exit Full Screen" : "Full Screen"}
+        >
+          {isFullScreen ? <FaCompress /> : <FaExpand />}
+        </button>
+        <iframe
+          id="iframeId"
+          className="w-full h-full"
+          style={{ border: 0 }}
+          loading="lazy"
+        />
+      </div>
+
+      {/* Property List Section */}
+      <div className={`flex-1 h-full overflow-y-scroll p-6 space-y-4 ${isFullScreen ? "hidden" : "block"}`}>
+        <div className="text-xl font-semibold text-gray-500 mb-4">Properties Near You</div>
+        <div className="space-y-4">
+          {properties.map((property) => (
+            <PropertyCard
+              key={property.title}
+              image={property.image}
+              title={property.title}
+              location={property.location}
+              price={property.price}
+              description={property.description}
             />
-            <div className="p-4">
-              <h4 className="text-xl font-semibold text-gray-800">{property.title}</h4>
-              <p className="text-gray-600">{property.location}</p>
-              <p className="text-lg font-bold text-blue-600 mt-2">{property.price}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  };
-  
-  const MapView: React.FC<MapViewProps> = ({ properties, mapLocation, mapLat, mapLon }) => {
-    return (
-      <div className="flex flex-col lg:flex-row bg-blue-50 shadow-lg rounded-lg overflow-hidden w-full">
-        {/* Map Section */}
-        <div className="w-full lg:w-2/3 h-[600px] flex items-center justify-center rounded-t-lg lg:rounded-l-lg">
-          <Map location={mapLocation} lat={mapLat} lon={mapLon} />
-        </div>
-  
-        {/* Properties List Section */}
-        <div className="w-full lg:w-1/3 h-[600px] overflow-y-auto bg-white border-l border-gray-200">
-          <PropertyList properties={properties} />
+          ))}
         </div>
       </div>
-    );
-  };
-  
-  export default MapView;
-  
+    </div>
+  );
+};
+
+export default MapView;
