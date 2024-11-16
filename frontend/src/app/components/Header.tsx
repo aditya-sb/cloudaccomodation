@@ -110,7 +110,7 @@ export default function Header() {
                 width={50}
                 height={50}
               />
-              <h1 className="ml-4 text-2xl font-bold" style={{ color: "var(--copy-primary)" }}>Luxury Properties</h1>
+              <h1 className="ml-4 text-2xl font-bold" style={{ color: "var(--copy-primary)" }}>Cloud Accommodation</h1>
             </a>
           </Link>
 
@@ -123,6 +123,17 @@ export default function Header() {
                 <FaSun className="text-yellow-500" />
               )}
             </button>
+            <Link href="/blogs" passHref>
+              <button
+                className="py-2 px-6 rounded-lg shadow-md transition hover:opacity-75"
+                style={{
+                  backgroundColor: "var(--cta)",
+                  color: "var(--cta-text)",
+                }}
+              >
+                Blogs
+              </button>
+            </Link>
             <Link href="/list_property" passHref>
               <button
                 className="py-2 px-6 rounded-lg shadow-md transition hover:opacity-75"

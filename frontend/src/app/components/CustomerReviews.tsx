@@ -18,7 +18,7 @@ export default function CustomerReviews() {
               <p className="text-xl font-light leading-relaxed mb-4" style={{
         color: "var(--copy-primary)",
       }}>
-                I found my dream home with Luxury Properties. Highly recommend!
+                I found my dream home with Cloud Accommodation. Highly recommend!
               </p>
               <p className="font-semibold" style={{
         color: "var(--copy-secondary)",

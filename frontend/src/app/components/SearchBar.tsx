@@ -91,7 +91,7 @@ export default function SearchBar() {
           </select>
           <Link href={`/properties?search=${searchTerm}`} passHref>
             <button
-              className="bg-cta text-cta-text px-4 py-2 rounded-r-full transition-all focus:ring-2 text-sm sm:text-base hover:opacity-75"
+              className="bg-cta text-cta-text px-4 py-2 rounded-r-full transition-all focus:ring-2 text-sm sm:text-base hover:opacity-85"
               style={{
                 backgroundColor: "var(--cta)",
                 color: "var(--cta-text)",
@@ -111,7 +111,7 @@ export default function SearchBar() {
           <select
             value={filters.city}
             onChange={(e) => setFilters({ ...filters, city: e.target.value })}
-            className="px-3 py-1 rounded-full shadow-md transition duration-200 ease-in-out hover:opacity-75"
+            className="px-3 py-1 rounded-full shadow-md transition duration-200 ease-in-out hover:opacity-85"
             style={{ backgroundColor: "var(--crimson)", color: "var(--cta-text)" }}
           >
             <option>Choose City</option>
@@ -140,7 +140,7 @@ export default function SearchBar() {
           <select
             value={sortOption}
             onChange={(e) => setSortOption(e.target.value)}
-            className="px-3 py-1 rounded-full shadow-md transition duration-200 ease-in-out hover:opacity-75"
+            className="px-3 py-1 rounded-full shadow-md transition duration-200 ease-in-out hover:opacity-85"
             style={{ backgroundColor: "var(--crimson)", color: "var(--cta-text)" }}
           >
             <option>Date</option>
@@ -151,14 +151,14 @@ export default function SearchBar() {
 
           {/* Filters */}
           <button
-            className="px-3 py-1 rounded-full shadow-md transition duration-200 ease-in-out flex items-center space-x-2 hover:opacity-75"
+            className="px-3 py-1 rounded-full shadow-md transition duration-200 ease-in-out flex items-center space-x-2 hover:opacity-85"
             onClick={() => setFilters({ ...filters, hasKids: !filters.hasKids })}
             style={{ backgroundColor: "var(--crimson)", color: "var(--cta-text)" }}
           >
             <FaHome /> <span>{filters.hasKids ? "With Kids" : "No Kids"}</span>
           </button>
           <button
-            className="px-3 py-1 rounded-full shadow-md transition duration-200 ease-in-out flex items-center space-x-2 hover:opacity-75"
+            className="px-3 py-1 rounded-full shadow-md transition duration-200 ease-in-out flex items-center space-x-2 hover:opacity-85"
             onClick={() => setFilters({ ...filters, hasPets: !filters.hasPets })}
             style={{ backgroundColor: "var(--crimson)", color: "var(--cta-text)" }}
           >
@@ -167,7 +167,7 @@ export default function SearchBar() {
           <select
             value={filters.familyType}
             onChange={(e) => setFilters({ ...filters, familyType: e.target.value })}
-            className="px-3 py-1 rounded-full shadow-md transition duration-200 ease-in-out hover:opacity-75"
+            className="px-3 py-1 rounded-full shadow-md transition duration-200 ease-in-out hover:opacity-85"
             style={{ backgroundColor: "var(--crimson)", color: "var(--cta-text)" }}
           >
             <option>Single</option>

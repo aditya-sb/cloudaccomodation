@@ -5,7 +5,7 @@ export default function Footer() {
   return (
     <footer id="footer" className="p-8 bg-gray-800 text-white text-center">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-2xl font-bold mb-4">Luxury Properties</h2>
+        <h2 className="text-2xl font-bold mb-4">Cloud Accommodation</h2>
         <p className="text-gray-400 mb-4">
           Providing premium property listings in all major cities across India.
         </p>
@@ -53,7 +53,7 @@ export default function Footer() {
         </div>
 
         <p className="text-gray-500 mt-4">
-          © 2024 Luxury Properties. All rights reserved.
+          © 2024 Cloud Accommodation. All rights reserved.
         </p>
       </div>
     </footer>

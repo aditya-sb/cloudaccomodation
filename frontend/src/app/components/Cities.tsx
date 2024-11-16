@@ -67,7 +67,7 @@ export default function CityCardSlider() {
                 style={{ width: CARD_WIDTH }}
               >
                 <div
-                  className="cursor-pointer rounded-lg shadow-xl p-8 text-center transform hover:scale-105 duration-300"
+                  className="cursor-pointer rounded-lg shadow-lg p-8 text-center transform hover:scale-105 duration-300"
                   style={{
                     background: "linear-gradient(to right, var(--gray-bg), var(--gray-hover-bg))",
                     color: "var(--cta-text)",
