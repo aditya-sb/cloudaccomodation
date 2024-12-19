@@ -1,34 +1,20 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
-import { useState, useEffect } from "react";
-import { FaHome, FaFilter, FaSearch } from "react-icons/fa";
+import { useState } from "react";
+import { FaSearch, FaBolt } from "react-icons/fa";
 
 export default function SearchBar() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [imageHeight, setImageHeight] = useState(380);
-  const [propertyType, setPropertyType] = useState("All");
-  const [sortOption, setSortOption] = useState("Date");
-  const [filters, setFilters] = useState({
-    familyType: "Single",
-    members: "2-4",
-    hasKids: false,
-    hasPets: false,
-    city: "",
-  });
+  const [showDropdown, setShowDropdown] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-      setImageHeight(Math.max(120, 380 - scrollPosition / 2));
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
+  const cities = [
+    "Toronto", "Montreal", "Vancouver", "Ottawa", "Waterloo", "Calgary", "Edmonton", "Halifax", "Victoria", "Quebec City",
+  ];
+  const universities = [
+    "University of Toronto", "Humber College", "Seneca College", "Polytechnique Montréal", "Toronto Metropolitan University",
+    "McGill University", "University of British Columbia", "University of Waterloo", "University of Alberta", "Dalhousie University",
+  ];
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
@@ -37,10 +23,7 @@ export default function SearchBar() {
   };
 
   return (
-    <div
-      className="relative mt-20 transition-all duration-300 ease-in-out"
-      style={{ height: `${imageHeight}px` }}
-    >
+    <div className="relative transition-all duration-300 ease-in-out" style={{ height: `380px` }}>
       <Image
         src="/images/cityscape.jpeg"
         alt="Cityscape"
@@ -49,133 +32,134 @@ export default function SearchBar() {
         className="opacity-80 transition-all duration-300 ease-in-out"
       />
       <div className="absolute inset-0 flex flex-col justify-center items-center px-4 sm:px-8">
-        <h1
-          className="text-4xl sm:text-5xl font-bold text-center mb-4"
-          style={{ color: "var(--cta-text)" }}
-        >
-          Welcome to <span style={{ color: "var(--crimson)" }}>Canada</span>
+        <div className="flex items-center mb-8">
+          <a className="flex items-center cursor-pointer">
+            <Image
+              src="/images/cloudlogo.png"
+              alt="Property Logo"
+              className="h-12 w-auto rounded-2xl"
+              height={160}
+              width={160}
+            />
+            <h1 className="ml-4 text-2xl font-bold text-white sm:text-3xl">
+              Cloud Accommodation
+            </h1>
+          </a>
+        </div>
+        <h1 className="text-4xl sm:text-5xl font-bold text-center mb-4 text-white">
+          Explore <span className="text-var(--background)">Canada</span>
         </h1>
 
         {/* Search Bar */}
         <div
-          className="bg-cta p-4 rounded-full shadow-lg flex items-center space-x-2 transform transition-transform duration-300 hover:scale-105 w-full max-w-md sm:max-w-lg lg:max-w-2xl"
-          style={{ backgroundColor: "var(--border)", color: "var(--cta-text)" }}
+          className="relative bg-cta p-3 rounded-full shadow-lg flex items-center space-x-2 w-full max-w-md sm:max-w-lg lg:max-w-2xl"
+          style={{
+            backgroundColor: "var(--background)",
+            color: "var(--gray-text)",
+          }}
         >
           <input
             type="text"
-            placeholder="Search for properties..."
+            placeholder="Search by City, University, or Property..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="px-4 py-2 w-full sm:w-80 rounded-l-full border-none bg-input-bg text-gray-text placeholder-gray-text focus:ring-2 focus:ring-cta focus:outline-none text-sm sm:text-base"
+            className="px-4 py-2 w-full rounded-l-full border-none text-sm sm:text-base placeholder-gray-text focus:ring-2 focus:ring-cta focus:outline-none"
             style={{
               backgroundColor: "var(--input-bg)",
-              color: "var(--gray-text)",
-              borderColor: "var(--input-border)",
+              color: "var(--text)",
+            }}
+            onFocus={() => setShowDropdown(true)}
+            onBlur={(e) => {
+              setTimeout(() => {
+                if (!e.relatedTarget) {
+                  setShowDropdown(false);
+                }
+              }, 150);
             }}
           />
-          <select
-            value={propertyType}
-            onChange={(e) => setPropertyType(e.target.value)}
-            className="hidden sm:block w-28 px-3 py-2 border-l bg-input-bg text-gray-text focus:outline-none focus:ring-2 focus:ring-cta rounded-r-none shadow-md transition duration-200 ease-in-out"
+          <button
+            className="bg-cta px-4 py-2 rounded-full transition-all focus:ring-2 text-sm sm:text-base hover:opacity-85"
             style={{
-              backgroundColor: "var(--input-bg)",
-              color: "var(--gray-text)",
+              backgroundColor: "var(--cta)",
+              color: "var(--cta-text)",
+              boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)",
+            }}
+            onClick={() => (window.location.href = `/properties?search=${searchTerm}`)}
+          >
+            <FaSearch className="inline-block" />
+          </button>
+        </div>
+
+        {showDropdown && (
+          <div
+            className="absolute top-full -mt-10 bg-white shadow-lg rounded-xl w-full max-w-xl z-10"
+            style={{
+              backgroundColor: "var(--background)",
+              color: "var(--text)",
             }}
           >
-            <option>All Types</option>
-            <option>Flat</option>
-            <option>Home</option>
-            <option>Apartment</option>
-            <option>Condo</option>
-          </select>
-          <Link href={`/properties?search=${searchTerm}`} passHref>
-            <button
-              className="bg-cta text-cta-text px-4 py-2 rounded-r-full transition-all focus:ring-2 text-sm sm:text-base hover:opacity-85"
-              style={{
-                backgroundColor: "var(--cta)",
-                color: "var(--cta-text)",
-                boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)",
-              }}
+            <div className="p-4">
+              <h2 className="text-lg font-semibold mb-3 flex items-center">
+                <FaBolt className="mr-2 text-cta" /> Top Cities in Canada
+              </h2>
+              <div className="flex flex-wrap gap-2">
+                {cities.map((city) => (
+                  <button
+                    key={city}
+                    onMouseDown={() => (window.location.href = `/properties?search=${city}`)}
+                    className="px-4 py-2 rounded-full text-sm transition-all hover:scale-105"
+                    style={{
+                      backgroundColor: "var(--input-bg)",
+                      color: "var(--text)",
+                      border: "1px solid var(--cta)",
+                    }}
+                  >
+                    {city}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <hr className="border-t border-gray-200 my-2" />
+            <div className="p-4">
+              <h2 className="text-lg font-semibold mb-3 flex items-center">
+                <FaBolt className="mr-2 text-cta" /> Top Universities in Canada
+              </h2>
+              <div className="flex flex-wrap gap-2">
+                {universities.map((university) => (
+                  <button
+                    key={university}
+                    onMouseDown={() => (window.location.href = `/properties?search=${university}`)}
+                    className="px-4 py-2 rounded-full text-sm transition-all hover:scale-105"
+                    style={{
+                      backgroundColor: "var(--input-bg)",
+                      color: "var(--text)",
+                      border: "1px solid var(--cta)",
+                    }}
+                  >
+                    {university}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Scroll Down Arrow */}
+        <div className="absolute bottom-8 flex justify-center items-center w-full">
+          <div className="animate-bounce text-white">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="currentColor"
+              className="bi bi-arrow-down"
+              viewBox="0 0 16 16"
             >
-              <FaSearch className="inline-block mr-2" /> Search
-            </button>
-          </Link>
+              <path d="M8 12a.5.5 0 0 1-.5-.5V3.707l-3.646 3.647a.5.5 0 1 1-.708-.708l4-4a.5.5 0 0 1 .708 0l4 4a.5.5 0 1 1-.708.708L8.5 3.707V11.5a.5.5 0 0 1-.5.5z" />
+            </svg>
+          </div>
         </div>
-
-
-        {/* Filter and Sort Options */}
-        {/* Filter and Sort Options */}
-        <div className="mt-6 flex flex-wrap justify-center gap-3 text-xs sm:text-sm">
-          {/* City Dropdown */}
-          <select
-            value={filters.city}
-            onChange={(e) => setFilters({ ...filters, city: e.target.value })}
-            className="px-3 py-1 rounded-full shadow-md transition duration-200 ease-in-out hover:opacity-85"
-            style={{ backgroundColor: "var(--crimson)", color: "var(--cta-text)" }}
-          >
-            <option>Choose City</option>
-            <option>Toronto</option>
-            <option>Vancouver</option>
-            <option>Montreal</option>
-            <option>Calgary</option>
-            <option>Ottawa</option>
-          </select>
-
-          {/* Property Type */}
-          {/* <select
-            value={propertyType}
-            onChange={(e) => setPropertyType(e.target.value)}
-            className="px-3 py-1 rounded-full shadow-md transition duration-200 ease-in-out"
-            style={{ backgroundColor: "var(--crimson)", color: "var(--cta-text)" }}
-          >
-            <option>All Types</option>
-            <option>Flat</option>
-            <option>Home</option>
-            <option>Apartment</option>
-            <option>Condo</option>
-          </select> */}
-
-          {/* Sort By */}
-          <select
-            value={sortOption}
-            onChange={(e) => setSortOption(e.target.value)}
-            className="px-3 py-1 rounded-full shadow-md transition duration-200 ease-in-out hover:opacity-85"
-            style={{ backgroundColor: "var(--crimson)", color: "var(--cta-text)" }}
-          >
-            <option>Date</option>
-            <option>Price - Low to High</option>
-            <option>Price - High to Low</option>
-            <option>Distance</option>
-          </select>
-
-          {/* Filters */}
-          <button
-            className="px-3 py-1 rounded-full shadow-md transition duration-200 ease-in-out flex items-center space-x-2 hover:opacity-85"
-            onClick={() => setFilters({ ...filters, hasKids: !filters.hasKids })}
-            style={{ backgroundColor: "var(--crimson)", color: "var(--cta-text)" }}
-          >
-            <FaHome /> <span>{filters.hasKids ? "With Kids" : "No Kids"}</span>
-          </button>
-          <button
-            className="px-3 py-1 rounded-full shadow-md transition duration-200 ease-in-out flex items-center space-x-2 hover:opacity-85"
-            onClick={() => setFilters({ ...filters, hasPets: !filters.hasPets })}
-            style={{ backgroundColor: "var(--crimson)", color: "var(--cta-text)" }}
-          >
-            <FaFilter /> <span>{filters.hasPets ? "With Pets" : "No Pets"}</span>
-          </button>
-          <select
-            value={filters.familyType}
-            onChange={(e) => setFilters({ ...filters, familyType: e.target.value })}
-            className="px-3 py-1 rounded-full shadow-md transition duration-200 ease-in-out hover:opacity-85"
-            style={{ backgroundColor: "var(--crimson)", color: "var(--cta-text)" }}
-          >
-            <option>Single</option>
-            <option>Family</option>
-            <option>Couple</option>
-          </select>
-        </div>
-
       </div>
     </div>
   );

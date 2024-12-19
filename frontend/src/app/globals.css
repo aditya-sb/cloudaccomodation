@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 :root {
   /* Existing Variables */
   --background: rgba(255, 255, 255, 1);
@@ -9,90 +10,68 @@
   --card: rgba(255, 255, 255, 1);
   --copy-primary: rgba(23, 23, 23, 1);
   --copy-secondary: rgba(115, 115, 115, 1);
-  --cta: rgba(139, 92, 246, 1);
-  --cta-active: rgba(124, 58, 237, 1);
+  --cta: rgba(56, 115, 255, 1); /* Primary blue */
+  --cta-active: rgba(40, 80, 178, 1); /* Darker shade */
   --cta-text: rgba(255, 255, 255, 1);
-  --grape: rgba(114, 35, 204, 1);
+  --blue-light: rgba(92, 160, 255, 1); /* Lighter shade */
+  --blue-hover: rgba(56, 115, 255, 1);
   --gray-bg: rgba(245, 245, 245, 1);
   --gray-border: rgba(212, 212, 212, 1);
   --gray-hover-bg: rgba(229, 229, 229, 1);
   --gray-text: rgba(75, 85, 99, 1);
   --gray-hover-text: rgba(31, 41, 55, 1);
-  
-  /* New Colors */
-  --crimson: rgba(255, 77, 73, 1);
-  --hover-color: rgba(63, 94, 251, 1); /* premium hover effect */
-  --input-bg: var(--gray-bg); /* use gray background */
-  --input-border: var(--gray-border); /* use gray border */
-  --link-color: rgba(0, 0, 255, 1); /* link color */
-
-  --error-text: rgba(220, 38, 38, 1); /* same as crimson for error in light mode */
-  --success-text: rgba(34, 197, 94, 1); 
+  --error-text: rgba(220, 38, 38, 1);
+  --success-text: rgba(34, 197, 94, 1);
 }
 
 .light {
   /* Variables for Light Mode */
-  --background: rgba(245, 245, 245, 1); /* light background */
+  --background: rgba(245, 245, 245, 1); /* Light background */
   --foreground: rgba(23, 23, 23, 1);
   --border: rgba(212, 212, 212, 1);
   --card: rgba(255, 255, 255, 1);
   --copy-primary: rgba(23, 23, 23, 1);
   --copy-secondary: rgba(115, 115, 115, 1);
-  --cta: rgba(139, 92, 246, 1);
-  --cta-active: rgba(124, 58, 237, 1);
+  --cta: rgba(56, 115, 255, 1); /* Primary blue */
+  --cta-active: rgba(40, 80, 178, 1); /* Darker shade */
   --cta-text: rgba(255, 255, 255, 1);
-  --grape: rgba(114, 35, 204, 1);
-  --crimson: rgba(255, 77, 73, 1); /* red-600 */
-  --hover-color: rgba(63, 94, 251, 1); /* premium hover effect */
-  --input-bg: var(--gray-bg);
-  --input-border: var(--gray-border);
-  --link-color: rgba(0, 0, 255, 1);
-  
-  /* Hover Colors */
-  --gray-hover-bg: rgba(229, 229, 229, 1); /* light hover effect */
+  --blue-light: rgba(92, 160, 255, 1); /* Lighter shade */
+  --blue-hover: rgba(56, 115, 255, 1);
+  --gray-hover-bg: rgba(229, 229, 229, 1);
   --gray-text: rgba(75, 85, 99, 1);
   --gray-hover-text: rgba(31, 41, 55, 1);
-  
-  /* Light Mode Adjustments */
-  --error-text: rgba(220, 38, 38, 1); /* same as crimson for error in light mode */
-  --success-text: rgba(34, 197, 94, 1); /* green-500 for consistency */
+  --error-text: rgba(220, 38, 38, 1);
+  --success-text: rgba(34, 197, 94, 1);
 }
 
 .dark {
   /* Variables for Dark Mode */
-  --background: rgba(12, 12, 12, 1); /* darker background for dark mode */
+  --background: rgba(12, 12, 12, 1); /* Darker background for dark mode */
   --foreground: rgba(255, 255, 255, 1);
   --border: rgba(38, 38, 38, 1);
   --card: rgba(23, 23, 23, 1);
   --copy-primary: rgba(250, 250, 250, 1);
-  --copy-secondary: rgba(115, 115, 115, 1);
-  --cta: rgba(139, 92, 246, 1);
-  --cta-active: rgba(124, 58, 237, 1);
+  --copy-secondary: rgba(169, 169, 169, 1);
+  --cta: rgba(92, 160, 255, 1); /* Lighter blue for dark mode */
+  --cta-active: rgba(56, 115, 255, 1); /* Primary blue */
   --cta-text: rgba(255, 255, 255, 1);
-  --grape: rgba(114, 35, 204, 1);
-  --crimson: rgba(220, 38, 38, 1); /* lighter red for error in dark mode */
-  --hover-color: rgba(63, 94, 251, 1); /* premium hover effect */
-  --input-bg: var(--gray-bg);
-  --input-border: var(--gray-border);
-  --link-color: rgba(0, 153, 255, 1); /* softer blue link color for dark mode */
-  
-  /* Dark Mode Adjustments */
-  --gray-bg: rgba(31, 31, 31, 1); /* darker gray background */
+  --blue-light: rgba(128, 187, 255, 1); /* Softer light shade */
+  --blue-hover: rgba(56, 115, 255, 1);
+  --gray-bg: rgba(31, 31, 31, 1); /* Darker gray background */
   --gray-border: rgba(74, 74, 74, 1);
-  --gray-hover-bg: rgba(51, 51, 51, 1); /* darker hover effect */
-  --gray-text: rgba(229, 231, 235, 1); /* light gray for text */
+  --gray-hover-bg: rgba(51, 51, 51, 1);
+  --gray-text: rgba(229, 231, 235, 1); /* Light gray for text */
   --gray-hover-text: rgba(209, 213, 219, 1);
-  
-  /* Dark Mode Specific Colors */
-  --error-text: rgba(239, 68, 68, 1); /* light red for dark mode */
-  --success-text: rgba(34, 197, 94, 1); /* green-500 for consistency */
+  --error-text: rgba(220, 38, 38, 1);
+  --success-text: rgba(34, 197, 94, 1);
 }
+
 .custom-date-picker {
-  background-color: var(--input-bg);
-  border: 1px solid var(--input-border);
-  color: var(--text-color);
-  padding: 8px; /* Optional: Adjust for better spacing */
-  border-radius: 4px; /* Optional: Adjust for a rounded look */
+  background-color: var(--gray-bg);
+  border: 1px solid var(--gray-border);
+  color: var(--copy-primary);
+  padding: 8px;
+  border-radius: 4px;
 }
 
 body {
@@ -103,19 +82,24 @@ body {
 }
 
 a {
-  color: var(--link-color);
+  color: var(--cta);
   text-decoration: none;
 }
 
 a:hover {
-  color: var(--hover-color);
+  color: var(--blue-hover);
 }
 
 input {
   transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: var(--gray-bg);
+  border: 1px solid var(--gray-border);
+  color: var(--copy-primary);
+  padding: 8px;
+  border-radius: 4px;
 }
 
 input:focus {
   border-color: var(--cta);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+  box-shadow: 0 0 0 3px rgba(56, 115, 255, 0.4);
 }

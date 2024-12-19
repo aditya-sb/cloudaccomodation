@@ -57,7 +57,7 @@ const BookingDetails = ({ price }: { price: string }) => {
           className="text-center font-semibold"
           style={{ color: "var(--cta-text)" }}
         >
-          {price}
+          {price} Book Now
         </div>
       )}
 

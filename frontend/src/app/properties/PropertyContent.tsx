@@ -1,13 +1,13 @@
 // src/app/propertyContent.tsx
 "use client";
 
-import {  useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import ListView from "./ListView";
 import MapView from "./MapView";
-import SearchBar from "../components/SearchBar";
 import { FaThList, FaMapMarkedAlt } from "react-icons/fa";
 import { Property } from "@/types";
+import Filter from "../components/Filter";
 
 // Example properties data
 const mockProperties: Property[] = [
@@ -40,38 +40,45 @@ function PropertyContent() {
 
   return (
     <>
-      <SearchBar />
-      <div className="flex justify-center mt-8 space-x-4">
-        <button
-          onClick={() => setView("list")}
-          className={`flex items-center px-5 py-3 rounded-full shadow-lg transition-colors ${
-            view === "list" ? "bg-gradient-to-r from-green-500 to-teal-500 text-white" : "bg-gray-300 text-gray-700"
-          }`}
-        >
-          <FaThList className="mr-2" /> List View
-        </button>
-        <button
-          onClick={() => setView("map")}
-          className={`flex items-center px-5 py-3 rounded-full shadow-lg transition-colors ${
-            view === "map" ? "bg-gradient-to-r from-green-500 to-teal-500 text-white" : "bg-gray-300 text-gray-700"
-          }`}
-        >
-          <FaMapMarkedAlt className="mr-2" /> Map View
-        </button>
+      <Filter />
+      <div className="flex justify-between items-center mt-8 space-x-4">
+        {/* Showing Properties Text */}
+        <div className="text-lg font-semibold ml-5" style={{ color: "var(--foreground)" }}>
+          Showing {filteredProperties.length} properties
+        </div>
+
+        {/* View Toggle Buttons */}
+        <div className="flex space-x-3 mr-5">
+          <button
+            onClick={() => setView("list")}
+            className={`flex items-center px-4 py-2 rounded-lg shadow-lg text-sm transition-all duration-200 ${
+              view === "list" ? "bg-gradient-to-r from-green-500 to-teal-500 text-white" : "bg-gray-200 text-gray-700"
+            } hover:bg-gradient-to-r hover:from-green-600 hover:to-teal-600`}
+          >
+            <FaThList className="mr-2 text-lg" /> List View
+          </button>
+          <button
+            onClick={() => setView("map")}
+            className={`flex items-center px-4 py-2 rounded-lg shadow-lg text-sm transition-all duration-200 ${
+              view === "map" ? "bg-gradient-to-r from-green-500 to-teal-500 text-white" : "bg-gray-200 text-gray-700"
+            } hover:bg-gradient-to-r hover:from-green-600 hover:to-teal-600`}
+          >
+            <FaMapMarkedAlt className="mr-2 text-lg" /> Map View
+          </button>
+        </div>
       </div>
 
-      <div className="text-center mt-4 text-lg font-semibold" style={{
-          color: "var(--foreground)",
-        }}>
-        Showing {filteredProperties.length} properties
-      </div>
-
-      <div className="p-4 mx-5">
+      <div className="p-4 mx-5 mt-6">
         {view === "list" ? (
           <ListView properties={filteredProperties} />
         ) : (
-          <div >
-            <MapView properties={filteredProperties} mapLocation="Beverly Hills, CA" mapLat={34.0736204} mapLon={-118.4003563} />
+          <div>
+            <MapView
+              properties={filteredProperties}
+              mapLocation="Beverly Hills, CA"
+              mapLat={34.0736204}
+              mapLon={-118.4003563}
+            />
           </div>
         )}
       </div>

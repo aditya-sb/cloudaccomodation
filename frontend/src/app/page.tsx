@@ -1,5 +1,5 @@
-// src/app/page.tsx
-
+"use client";
+import { useEffect, useState, useRef } from "react";
 import SearchBar from "./components/SearchBar";
 import PropertyCard from "./components/PropertyCard";
 import CustomerReviews from "./components/CustomerReviews";
@@ -16,6 +16,28 @@ import Banner from "./components/Banner";
 import Refer from "./components/Refer";
 
 export default function Home() {
+  const [isHeaderVisible, setIsHeaderVisible] = useState(false);
+  const searchBarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsHeaderVisible(!entry.isIntersecting); // Header shows when search bar is out of view
+      },
+      { root: null, threshold: 0 } // Trigger when the search bar is fully out of view
+    );
+
+    if (searchBarRef.current) {
+      observer.observe(searchBarRef.current);
+    }
+
+    return () => {
+      if (searchBarRef.current) {
+        observer.unobserve(searchBarRef.current);
+      }
+    };
+  }, []);
+
   return (
     <div
       className="min-h-screen"
@@ -24,10 +46,23 @@ export default function Home() {
         color: "var(--foreground)",
       }}
     >
-      <Header />
-      <SearchBar />
+      {isHeaderVisible && (
+        <div
+          className="fixed top-0 left-0 w-full z-20 transition-transform duration-300"
+          style={{
+            transform: isHeaderVisible ? "translateY(0)" : "translateY(-100%)",
+          }}
+        >
+          <Header />
+        </div>
+      )}
 
-      <Banner/>
+      {/* Search Bar */}
+      <div ref={searchBarRef}>
+        <SearchBar />
+      </div>
+
+      <Banner />
 
       {/* Explore Properties Section */}
       <h2
@@ -73,7 +108,6 @@ export default function Home() {
         <NestNetworkSection />
       </div>
 
-
       {/* Booking Button */}
       <div className="flex justify-center m-10">
         <BookingButton />
@@ -85,7 +119,7 @@ export default function Home() {
       {/* Customer Reviews */}
       <CustomerReviews />
 
-      <Refer/>
+      <Refer />
 
       {/* Footer */}
       <Footer />

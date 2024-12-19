@@ -1,27 +1,26 @@
-// src/app/components/CityCardSlider.tsx
 "use client";
 import { useState } from "react";
 import { MdArrowBackIos, MdArrowForwardIos } from "react-icons/md";
 
 interface CityCardProps {
   name: string;
-  shortCode: string;
+  image: string;
 }
 
 const cities: CityCardProps[] = [
-  { name: "Toronto", shortCode: "TOR" },
-  { name: "Vancouver", shortCode: "VAN" },
-  { name: "Montreal", shortCode: "MTL" },
-  { name: "Calgary", shortCode: "CAL" },
-  { name: "Ottawa", shortCode: "OTT" },
-  { name: "Edmonton", shortCode: "EDM" },
-  { name: "Winnipeg", shortCode: "WPG" },
-  { name: "Quebec", shortCode: "QUE" },
-  { name: "Halifax", shortCode: "HAL" },
-  { name: "Victoria", shortCode: "VIC" },
+  { name: "Toronto", image: "/images/cities/toronto.png" },
+  { name: "Vancouver", image: "/images/cities/vancouver.png" },
+  { name: "Montreal", image: "/images/cities/montreal.png" },
+  { name: "Calgary", image: "/images/cities/calgary.png" },
+  { name: "Ottawa", image: "/images/cities/ottawa.png" },
+  { name: "Edmonton", image: "/images/cities/edmonton.png" },
+  { name: "Winnipeg", image: "/images/cities/winnipeg.png" },
+  { name: "Quebec", image: "/images/cities/quebec.png" },
+  { name: "Halifax", image: "/images/cities/halifax.png" },
+  { name: "Victoria", image: "/images/cities/victoria.png" },
 ];
 
-const CARD_WIDTH = 240; // width of each card in pixels
+const CARD_WIDTH = 240;
 
 export default function CityCardSlider() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -31,7 +30,7 @@ export default function CityCardSlider() {
   };
 
   const handleNextClick = () => {
-    if (currentIndex < cities.length - 1) setCurrentIndex(currentIndex + 1);
+    if (currentIndex < cities.length - 3) setCurrentIndex(currentIndex + 1); // Show 3 cards at a time
   };
 
   return (
@@ -46,41 +45,46 @@ export default function CityCardSlider() {
               : "hover:opacity-80"
           }`}
           style={{
-            color: currentIndex === 0 ? "var(--gray-text)" : "var(--gray-hover-text)",
+            color: currentIndex === 0
+              ? "var(--gray-text)"
+              : "var(--gray-hover-text)",
           }}
         >
           <MdArrowBackIos />
         </button>
-  
+
         <div className="overflow-hidden w-full">
           <div
-            className="flex transition-transform duration-500 ease-in-out"
+            className="flex gap-x-8 transition-transform duration-500 ease-in-out"
             style={{
               transform: `translateX(-${currentIndex * CARD_WIDTH}px)`,
               width: `${cities.length * CARD_WIDTH}px`,
             }}
           >
+            
             {cities.map((city, index) => (
               <div
                 key={index}
-                className="w-full flex-shrink-0 p-4"
+                className="flex-shrink-0 p-4"
                 style={{ width: CARD_WIDTH }}
               >
-                <div
-                  className="cursor-pointer rounded-lg shadow-lg p-8 text-center transform hover:scale-105 duration-300"
-                  style={{
-                    background: "linear-gradient(to right, var(--gray-bg), var(--gray-hover-bg))",
-                    color: "var(--cta-text)",
-                  }}
-                >
-                  <h2
-                    className="text-5xl font-extrabold tracking-wide"
-                    style={{ color: "var(--grape)" }}
-                  >
-                    {city.shortCode}
-                  </h2>
+                <div className="flex flex-col items-center cursor-pointer" onClick={() =>
+              (window.location.href = `/properties?search=${city.name}`)
+            }>
+                  {/* City Image */}
+                  <div
+                    className="rounded-lg overflow-hidden shadow-lg"
+                    style={{
+                      width: "240px",
+                      height: "240px",
+                      backgroundImage: `url(${city.image})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                    }}
+                  ></div>
+                  {/* City Name */}
                   <p
-                    className="mt-3 text-xl font-semibold tracking-wide"
+                    className="mt-4 text-lg font-semibold text-center"
                     style={{ color: "var(--copy-secondary)" }}
                   >
                     {city.name}
@@ -90,17 +94,17 @@ export default function CityCardSlider() {
             ))}
           </div>
         </div>
-  
+
         <button
           onClick={handleNextClick}
-          disabled={currentIndex === cities.length - 1}
+          disabled={currentIndex === cities.length - 3}
           className={`text-4xl transition duration-200 ${
-            currentIndex === cities.length - 1
+            currentIndex === cities.length - 3
               ? "opacity-50 cursor-not-allowed"
               : "hover:opacity-80"
           }`}
           style={{
-            color: currentIndex === cities.length - 1
+            color: currentIndex === cities.length - 3
               ? "var(--gray-text)"
               : "var(--gray-hover-text)",
           }}
@@ -110,5 +114,4 @@ export default function CityCardSlider() {
       </div>
     </div>
   );
-  
 }
