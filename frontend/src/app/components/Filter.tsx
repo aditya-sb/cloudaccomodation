@@ -81,7 +81,7 @@ export default function Filter() {
 // Render dropdown content dynamically
 function renderDropdownContent(
   filter: Filter,
-  { budget, setBudget, moveInDate, setMoveInDate }: FilterProps
+  { budget, setBudget }: FilterProps
 ) {
   switch (filter) {
     case "Sort":
