@@ -47,15 +47,16 @@ export default function Home() {
       }}
     >
       {isHeaderVisible && (
-        <div
-          className="fixed top-0 left-0 w-full z-20 transition-transform duration-300"
-          style={{
-            transform: isHeaderVisible ? "translateY(0)" : "translateY(-100%)",
-          }}
-        >
-          <Header />
-        </div>
-      )}
+  <div
+    className="fixed top-0 left-0 w-full z-20 transition-transform duration-500 ease-in-out"
+    style={{
+      transform: isHeaderVisible ? "translateY(0)" : "translateY(-100%)",
+    }}
+  >
+    <Header />
+  </div>
+)}
+
 
       {/* Search Bar */}
       <div ref={searchBarRef}>

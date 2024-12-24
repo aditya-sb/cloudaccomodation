@@ -17,7 +17,6 @@ export default function PropertyCard({
   price,
 }: PropertyCardProps) {
   return (
-    <Link href="/property" passHref>
       <div
         className="flex rounded-lg shadow-xl p-4 transition hover:scale-105 hover:shadow-2xl cursor-pointer w-full"
         style={{
@@ -79,6 +78,7 @@ export default function PropertyCard({
             <p style={{ color: "var(--gray-text)" }}>Security Deposit</p>
             <p style={{ color: "var(--gray-text)" }}>Area</p>
           </div>
+          <Link href="/property" passHref>
           <button
             className="mt-4 py-1 px-3 rounded-lg shadow-md transition hover:opacity-75"
             style={{
@@ -88,8 +88,8 @@ export default function PropertyCard({
           >
             View Details
           </button>
+          </Link>
         </div>
       </div>
-    </Link>
   );
 }

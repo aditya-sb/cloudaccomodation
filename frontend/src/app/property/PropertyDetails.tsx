@@ -164,38 +164,49 @@ const PropertyDetails = ({
 
        {/* Modal Popup */}
        {isModalOpen && (
-        <div className="fixed inset-0 bg-[rgba(0,0,0,0.5)] flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] md:w-[60%]">
-            <h3 className="text-2xl font-semibold mb-4">Booking Details</h3>
-            <div className="mb-4">
-              <p className="font-semibold">Check-in Date:</p>
-              <p>{moveInDate ? moveInDate : 'Not selected'}</p>
-            </div>
-            <div className="mb-4">
-              <p className="font-semibold">Price:</p>
-              <p>{price}</p>
-            </div>
-            <div className="mb-4">
-              <p className="font-semibold">Tax:</p>
-              <p>5% (Calculated on total)</p>
-            </div>
-            <div className="flex justify-end space-x-4">
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="bg-[var(--border)] text-white py-2 px-6 rounded-lg"
-              >
-                Close
-              </button>
-              <button
-                className="bg-[var(--cta)] text-white py-2 px-6 rounded-lg"
-                onClick={() => {/* Handle Confirm Booking */}}
-              >
-                Confirm Booking
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+  <div className="fixed inset-0 bg-[rgba(0,0,0,0.6)] flex items-center justify-center z-50">
+    <div className="bg-[var(--card)] text-[var(--copy-primary)] p-8 rounded-lg shadow-2xl w-[90%] md:w-[50%] lg:w-[40%]">
+      <h3 className="text-3xl font-bold mb-6 text-center border-b pb-4 border-[var(--border)]">
+        Booking Details
+      </h3>
+      <div className="mb-6">
+        <p className="font-semibold text-[var(--copy-secondary)] mb-1">
+          Check-in Date:
+        </p>
+        <p className="text-lg">{moveInDate ? moveInDate : 'Not selected'}</p>
+      </div>
+      <div className="mb-6">
+        <p className="font-semibold text-[var(--copy-secondary)] mb-1">
+          Price:
+        </p>
+        <p className="text-lg">{price}</p>
+      </div>
+      <div className="mb-6">
+        <p className="font-semibold text-[var(--copy-secondary)] mb-1">
+          Tax:
+        </p>
+        <p className="text-lg">5% (Calculated on total)</p>
+      </div>
+      <div className="flex justify-end space-x-4">
+        <button
+          onClick={() => setIsModalOpen(false)}
+          className="bg-[var(--card)] text-[var(--cta)] py-2 px-6 rounded-lg border border-[var(--cta)] hover:bg-[var(--cta)] hover:text-white transition duration-300"
+        >
+          Close
+        </button>
+        <button
+          className="bg-[var(--cta)] text-white py-2 px-6 rounded-lg shadow-md hover:shadow-xl transition duration-300"
+          onClick={() => {
+            /* Handle Confirm Booking */
+          }}
+        >
+          Confirm Booking
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };

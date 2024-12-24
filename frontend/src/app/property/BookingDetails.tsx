@@ -9,6 +9,19 @@ const BookingDetails = ({ price }: { price: string }) => {
   const [rentalDays, setRentalDays] = useState(30);
   const [checkInDate, setCheckInDate] = useState<Date | null>(null);
   const [checkOutDate, setCheckOutDate] = useState<Date | null>(null);
+  const [shake, setShake] = useState(false);
+
+  // Shake animation trigger
+  useEffect(() => {
+    if (isMinimized) {
+      const interval = setInterval(() => {
+        setShake(true);
+        setTimeout(() => setShake(false), 500); // Remove shake after animation duration
+      }, 3000); // Trigger every 3 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [isMinimized]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -40,7 +53,9 @@ const BookingDetails = ({ price }: { price: string }) => {
       id="bookingDetails"
       onClick={() => setIsMinimized(false)}
       className={`fixed transition-all duration-500 ease-in-out transform shadow-xl ${isMinimized
-          ? "bottom-6 right-6 w-12 h-12 rounded-full cursor-pointer flex justify-center items-center"
+          ? `bottom-6 right-6 w-12 h-12 rounded-full cursor-pointer flex justify-center items-center ${
+              shake ? "animate-shake" : ""
+            }`
           : "top-20 right-6 w-full max-w-md p-6 rounded-lg"
         } flex flex-col z-20 sm:w-96`}
       style={{
@@ -96,7 +111,6 @@ const BookingDetails = ({ price }: { price: string }) => {
               placeholderText="Select date"
               className="custom-date-picker"
             />
-
           </div>
           <div className="space-y-2">
             <div style={{ color: "var(--copy-secondary)" }}>Check-out:</div>
@@ -106,7 +120,6 @@ const BookingDetails = ({ price }: { price: string }) => {
               placeholderText="Select date"
               className="custom-date-picker"
             />
-
           </div>
         </div>
       )}

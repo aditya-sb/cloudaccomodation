@@ -5,5 +5,7 @@ export interface Property {
     location: string;
     price: string;
     description: string;
+    mapLat: number;
+    mapLon: number;
   }
   

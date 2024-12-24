@@ -93,6 +93,11 @@ export default function Header() {
               placeholder="Search by City, University, or Property"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSearch();
+                }
+              }}
               className="bg-transparent outline-none w-full"
               style={{ color: "var(--gray-text)" }}
             />
@@ -103,6 +108,7 @@ export default function Header() {
             />
           </div>
         </div>
+
 
         {/* Theme Toggle */}
         <button onClick={toggleTheme} className="text-xl transition">
