@@ -32,78 +32,78 @@ const PropertyDetails = ({
   };
 
   return (
-    <div className="mt-8 bg-[var(--border)] text-[var(--copy-primary)] rounded-lg shadow-lg p-4 md:p-6 border border-[var(--border)]">
+    <div className="mt-8 bg-[var(--card)] text-[var(--copy-primary)] rounded-lg boreder shadow-lg p-4 md:p-6 border border-[var(--border)]">
       {/* Title and Location */}
       <h2 className="text-2xl md:text-3xl font-semibold">{title}</h2>
       <p className="text-lg md:text-xl mt-2">{location}</p>
 
       {/* Navigation Tabs */}
-      <div className="flex flex-wrap mt-6 mb-4 border-b border-[var(--gray-border)] space-x-4 md:space-x-6 text-[var(--gray-text)]">
+      <div className="flex flex-wrap mt-6 mb-4 border-b border-[var(--gray-border)] space-x-1 md:space-x-0 text-[var(--gray-text)]">
         <button
           onClick={() => setActiveSection('overview')}
-          className={`flex items-center space-x-2 px-3 py-2 text-sm md:text-lg transition ${
+          className={`flex items-center space-x-2 px-3 py-2 text-sm md:text-[14px] transition ${
             activeSection === 'overview'
               ? 'text-[var(--copy-primary)] font-bold'
               : 'hover:text-[var(--gray-hover-text)]'
           }`}
         >
-          <FaHome />
+          <FaHome className="text-blue-500"/>
           <span>Overview</span>
         </button>
         <button
           onClick={() => setActiveSection('amenities')}
-          className={`flex items-center space-x-2 px-3 py-2 text-sm md:text-lg transition ${
+          className={`flex items-center space-x-2 px-3 py-2 text-sm md:text-[14px] transition ${
             activeSection === 'amenities'
               ? 'text-[var(--copy-primary)] font-bold'
               : 'hover:text-[var(--gray-hover-text)]'
           }`}
         >
-          <FaConciergeBell />
+          <FaConciergeBell className="text-blue-500"/>
           <span>Amenities</span>
         </button>
         <button
           onClick={() => setActiveSection('exploreNearby')}
-          className={`flex items-center space-x-2 px-3 py-2 text-sm md:text-lg transition ${
+          className={`flex items-center space-x-2 px-3 py-2 text-sm md:text-[14px] transition ${
             activeSection === 'exploreNearby'
               ? 'text-[var(--copy-primary)] font-bold'
               : 'hover:text-[var(--gray-hover-text)]'
           }`}
         >
-          <FaMapMarkerAlt />
+          <FaMapMarkerAlt className="text-blue-500" />
           <span>Explore Nearby</span>
         </button>
         <button
           onClick={() => setActiveSection('rentDetails')}
-          className={`flex items-center space-x-2 px-3 py-2 text-sm md:text-lg transition ${
+          className={`flex items-center space-x-2 px-3 py-2 text-sm md:text-[14px] transition ${
             activeSection === 'rentDetails'
               ? 'text-[var(--copy-primary)] font-bold'
               : 'hover:text-[var(--gray-hover-text)]'
           }`}
         >
-          <FaDollarSign />
+          <FaDollarSign className="text-blue-500"/>
           <span>Rent Details</span>
         </button>
         <button
           onClick={() => setActiveSection('termsOfStay')}
-          className={`flex items-center space-x-2 px-3 py-2 text-sm md:text-lg transition ${
+          className={`flex items-center space-x-2 px-3 py-2 text-sm md:text-[14px] transition ${
             activeSection === 'termsOfStay'
               ? 'text-[var(--copy-primary)] font-bold'
               : 'hover:text-[var(--gray-hover-text)]'
           }`}
         >
-          <FaFileContract />
+          <FaFileContract className="text-blue-500"/>
           <span>Terms of Stay</span>
         </button>
         {/* New Move-in Date Tab */}
         <button
           onClick={() => setActiveSection('moveInDate')}
-          className={`flex items-center space-x-2 px-3 py-2 text-sm md:text-lg transition ${
+          className={`flex items-center space-x-2 px-3 py-2 text-sm md:text-[14px] transition ${
             activeSection === 'moveInDate'
               ? 'text-[var(--copy-primary)] font-bold'
               : 'hover:text-[var(--gray-hover-text)]'
           }`}
         >
-          <FaCalendarAlt />
+          <FaCalendarAlt className="text-blue-500"/>
           <span>Move-in Date</span>
         </button>
       </div>
@@ -113,21 +113,21 @@ const PropertyDetails = ({
         {activeSection === 'overview' && (
           <div>
             <h3 className="text-xl font-semibold mb-4">Overview</h3>
-            <div className="flex flex-wrap space-x-4 text-sm md:text-base text-[var(--gray-text)]">
+            <div className="flex flex-wrap space-x-4 text-sm md:text-[14px] text-[var(--gray-text)]">
               <div className="flex items-center mb-2">
-                <FaBed className="mr-2 text-[var(--gray-hover-text)]" />
+                <FaBed className="mr-2 text-blue-500" />
                 <span>2 Bedroom</span>
               </div>
               <div className="flex items-center mb-2">
-                <FaBath className="mr-2 text-[var(--gray-hover-text)]" />
+                <FaBath className="mr-2 text-blue-500" />
                 <span>2 Bathroom</span>
               </div>
               <div className="flex items-center mb-2">
-                <FaRuler className="mr-2 text-[var(--gray-hover-text)]" />
+                <FaRuler className="mr-2 text-blue-500" />
                 <span>1200 sq.ft</span>
               </div>
               <div className="flex items-center mb-2">
-                <FaCalendarAlt className="mr-2 text-[var(--gray-hover-text)]" />
+                <FaCalendarAlt className="mr-2 text-blue-500" />
                 <span>Year of Construction: 2020</span>
               </div>
             </div>

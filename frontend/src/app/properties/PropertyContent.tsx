@@ -9,6 +9,7 @@ import Filter from "../components/Filter";
 // Mock data is unchanged
 const mockProperties: Property[] = [
   {
+    id: 1,
     image: "/images/mordenhouse.webp",
     title: "Modern Family Home",
     location: "Beverly Hills, CA",
@@ -18,6 +19,7 @@ const mockProperties: Property[] = [
     mapLon: -118.4003563,
   },
   {
+    id:2,
     image: "/images/torontohome.webp",
     title: "Luxury Condo",
     location: "Toronto, ON",
@@ -27,6 +29,7 @@ const mockProperties: Property[] = [
     mapLon: -79.347015,
   },
   {
+    id:3,
     image: "/images/vancouverhouse.webp",
     title: "Seaside Villa",
     location: "Vancouver, BC",
@@ -36,6 +39,7 @@ const mockProperties: Property[] = [
     mapLon: -123.120738,
   },
   {
+    id:4,
     image: "/images/montrealhome.webp",
     title: "Charming Stone House",
     location: "Montreal, QC",
@@ -45,7 +49,8 @@ const mockProperties: Property[] = [
     mapLon: -73.567256,
   },
   {
-    image: "/images/ottawahome.webp",
+    id:5,
+    image: "/images/mordenhouse.webp",
     title: "Cozy Suburban Home",
     location: "Ottawa, ON",
     price: "$950,000",
@@ -54,15 +59,17 @@ const mockProperties: Property[] = [
     mapLon: -75.697193,
   },
   {
-    image: "/images/calgaryhome.webp",
+    id:6,
+    image: "/images/mordenhouse.webp",
     title: "Contemporary Townhouse",
-    location: "Calgary, AB",
+    location: "Ottawa, ON",
     price: "$750,000",
     description: "A stylish townhouse with modern interiors and easy access to downtown Calgary.",
-    mapLat: 51.044733,
-    mapLon: -114.071883,
+    mapLat: 45.4025,
+    mapLon: -75.7256,
   },
   {
+    id:7,
     image: "/images/edmontonhome.webp",
     title: "Spacious Bungalow",
     location: "Edmonton, AB",
@@ -72,6 +79,7 @@ const mockProperties: Property[] = [
     mapLon: -113.493823,
   },
   {
+    id:8,
     image: "/images/halifaxhome.webp",
     title: "Coastal Retreat",
     location: "Halifax, NS",
@@ -81,6 +89,7 @@ const mockProperties: Property[] = [
     mapLon: -63.585948,
   },
   {
+    id:9,
     image: "/images/quebeccityhome.webp",
     title: "Colonial-Style House",
     location: "Quebec City, QC",
@@ -90,6 +99,7 @@ const mockProperties: Property[] = [
     mapLon: -71.207981,
   },
   {
+    id:10,
     image: "/images/winnipeghome.webp",
     title: "Family-Friendly Home",
     location: "Winnipeg, MB",
@@ -99,6 +109,7 @@ const mockProperties: Property[] = [
     mapLon: -97.138451,
   },
   {
+    id:11,
     image: "/images/victoriahome.webp",
     title: "Garden View Cottage",
     location: "Victoria, BC",
@@ -114,15 +125,32 @@ function PropertyContent() {
   const search = searchParams.get("search");
   const [filteredProperties, setFilteredProperties] = useState<Property[]>(mockProperties);
   const [view, setView] = useState<"list" | "map">("list");
+  const [mapCenter, setMapCenter] = useState({ lat: 0, lon: 0 });
 
   useEffect(() => {
     if (typeof search === "string" && search.trim() !== "") {
       const filtered = mockProperties.filter((property) =>
-        property.title.toLowerCase().includes(search.toLowerCase())
+        property.title.toLowerCase().includes(search.toLowerCase()) ||
+        property.location.toLowerCase().includes(search.toLowerCase())
       );
-      setFilteredProperties(filtered);
+      
+      if (filtered.length > 0) {
+        setFilteredProperties(filtered);
+        setMapCenter({
+          lat: filtered[0].mapLat,
+          lon: filtered[0].mapLon
+        });
+      } else {
+        setFilteredProperties(mockProperties);
+        const avgLat = mockProperties.reduce((sum, p) => sum + p.mapLat, 0) / mockProperties.length;
+        const avgLon = mockProperties.reduce((sum, p) => sum + p.mapLon, 0) / mockProperties.length;
+        setMapCenter({ lat: avgLat, lon: avgLon });
+      }
     } else {
       setFilteredProperties(mockProperties);
+      const avgLat = mockProperties.reduce((sum, p) => sum + p.mapLat, 0) / mockProperties.length;
+      const avgLon = mockProperties.reduce((sum, p) => sum + p.mapLon, 0) / mockProperties.length;
+      setMapCenter({ lat: avgLat, lon: avgLon });
     }
   }, [search]);
 
@@ -173,7 +201,12 @@ function PropertyContent() {
         {view === "list" ? (
           <ListView properties={filteredProperties} />
         ) : (
-          <MapView properties={filteredProperties} mapLat={mapLat} mapLon={mapLon} mapLocation={title} />
+          <MapView 
+            properties={filteredProperties} 
+            mapLat={mapCenter.lat} 
+            mapLon={mapCenter.lon} 
+            mapLocation={search || "All Properties"} 
+          />
         )}
       </div>
     </div>

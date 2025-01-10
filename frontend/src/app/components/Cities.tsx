@@ -1,6 +1,6 @@
 "use client";
-import { useState } from "react";
-import { MdArrowBackIos, MdArrowForwardIos } from "react-icons/md";
+import { useState, useEffect, useRef } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface CityCardProps {
   name: string;
@@ -24,54 +24,147 @@ const CARD_WIDTH = 240;
 
 export default function CityCardSlider() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const scrollLeft = useRef(0);
+
+  const getVisibleCards = () => {
+    if (typeof window === 'undefined') return 3;
+    if (window.innerWidth < 768) return 1;
+    if (window.innerWidth < 1024) return 2;
+    return 3;
+  };
+
+  const [visibleCards, setVisibleCards] = useState(getVisibleCards());
+
+  useEffect(() => {
+    const handleResize = () => {
+      setVisibleCards(getVisibleCards());
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handlePrevClick = () => {
-    if (currentIndex > 0) setCurrentIndex(currentIndex - 1);
+    if (currentIndex > 0) {
+      setCurrentIndex(prev => Math.max(0, prev - 1));
+    }
   };
 
   const handleNextClick = () => {
-    if (currentIndex < cities.length - 3) setCurrentIndex(currentIndex + 1); // Show 3 cards at a time
+    if (currentIndex < cities.length - visibleCards) {
+      setCurrentIndex(prev => Math.min(cities.length - visibleCards, prev + 1));
+    }
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    isDragging.current = true;
+    startX.current = e.pageX - (sliderRef.current?.offsetLeft || 0);
+    scrollLeft.current = currentIndex * CARD_WIDTH;
+  };
+
+  const handleMouseUp = () => {
+    isDragging.current = false;
+  };
+
+  const handleMouseLeave = () => {
+    isDragging.current = false;
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging.current) return;
+    e.preventDefault();
+    
+    const x = e.pageX - (sliderRef.current?.offsetLeft || 0);
+    const walk = (x - startX.current);
+    const newScrollLeft = scrollLeft.current - walk;
+    const newIndex = newScrollLeft / CARD_WIDTH;
+    
+    setCurrentIndex(Math.max(0, Math.min(cities.length - visibleCards, Math.round(newIndex))));
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    isDragging.current = true;
+    startX.current = e.touches[0].pageX - (sliderRef.current?.offsetLeft || 0);
+    scrollLeft.current = currentIndex * CARD_WIDTH;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging.current) return;
+    
+    const x = e.touches[0].pageX - (sliderRef.current?.offsetLeft || 0);
+    const walk = (x - startX.current);
+    const newScrollLeft = scrollLeft.current - walk;
+    const newIndex = newScrollLeft / CARD_WIDTH;
+    
+    setCurrentIndex(Math.max(0, Math.min(cities.length - visibleCards, Math.round(newIndex))));
+  };
+
+  const handleTouchEnd = () => {
+    isDragging.current = false;
+  };
+
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    // Check if the user is using two fingers for horizontal scrolling
+    if (e.deltaMode === 0) { // 0 means pixels
+      const deltaX = e.deltaX; // Horizontal scroll
+      const newScrollLeft = currentIndex * CARD_WIDTH + deltaX;
+      const newIndex = newScrollLeft / CARD_WIDTH;
+      
+      setCurrentIndex(Math.max(0, Math.min(cities.length - visibleCards, Math.round(newIndex))));
+    }
   };
 
   return (
-    <div className="relative w-full max-w-6xl mx-auto py-8 px-4 lg:px-0">
+    <div className="relative w-full justify-center mx-auto py-8 lg:px-5">
+      <h1 className="text-3xl flex md:p-2 justify-center font-bold mb-4">
+        Popular Cities
+      </h1>
       <div className="flex items-center justify-between mb-6">
         <button
           onClick={handlePrevClick}
           disabled={currentIndex === 0}
-          className={`text-4xl transition duration-200 ${
+          className={`p-2 transition duration-200 ${
             currentIndex === 0
               ? "opacity-50 cursor-not-allowed"
               : "hover:opacity-80"
           }`}
-          style={{
-            color: currentIndex === 0
-              ? "var(--gray-text)"
-              : "var(--gray-hover-text)",
-          }}
         >
-          <MdArrowBackIos />
+          <ChevronLeft size={32} />
         </button>
 
-        <div className="overflow-hidden w-full">
+        <div
+          ref={sliderRef}
+          className="overflow-hidden w-full select-none"
+          onMouseDown={handleMouseDown}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseLeave}
+          onMouseMove={handleMouseMove}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          onWheel={handleWheel}
+        >
           <div
-            className="flex gap-x-8 transition-transform duration-500 ease-in-out"
+            className="flex gap-x-8 transition-transform duration-300 ease-out"
             style={{
               transform: `translateX(-${currentIndex * CARD_WIDTH}px)`,
               width: `${cities.length * CARD_WIDTH}px`,
             }}
           >
-            
             {cities.map((city, index) => (
               <div
                 key={index}
                 className="flex-shrink-0 p-4"
                 style={{ width: CARD_WIDTH }}
               >
-                <div className="flex flex-col items-center cursor-pointer" onClick={() =>
-              (window.location.href = `/properties?search=${city.name}`)
-            }>
-                  {/* City Image */}
+                <div
+                  className="flex flex-col items-center cursor-pointer"
+                  onClick={() => window.location.href = `/properties?search=${city.name}`}
+                >
                   <div
                     className="rounded-lg overflow-hidden shadow-lg"
                     style={{
@@ -81,8 +174,7 @@ export default function CityCardSlider() {
                       backgroundSize: "cover",
                       backgroundPosition: "center",
                     }}
-                  ></div>
-                  {/* City Name */}
+                  />
                   <p
                     className="mt-4 text-lg font-semibold text-center"
                     style={{ color: "var(--copy-secondary)" }}
@@ -97,19 +189,14 @@ export default function CityCardSlider() {
 
         <button
           onClick={handleNextClick}
-          disabled={currentIndex === cities.length - 3}
-          className={`text-4xl transition duration-200 ${
-            currentIndex === cities.length - 3
+          disabled={currentIndex === cities.length - visibleCards}
+          className={`p-2 transition duration-200 ${
+            currentIndex === cities.length - visibleCards
               ? "opacity-50 cursor-not-allowed"
               : "hover:opacity-80"
           }`}
-          style={{
-            color: currentIndex === cities.length - 3
-              ? "var(--gray-text)"
-              : "var(--gray-hover-text)",
-          }}
         >
-          <MdArrowForwardIos />
+          <ChevronRight size={32} />
         </button>
       </div>
     </div>

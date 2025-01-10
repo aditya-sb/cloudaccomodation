@@ -2,8 +2,8 @@ import { FaMoneyBillWave } from 'react-icons/fa';
 
 export default function SecurityDepositSection() {
     return (
-      <div className="p-8 rounded-xl shadow-lg mx-5 mb-10 flex items-center transition transform hover:shadow-2xl" style={{
-        backgroundColor: "var(--border)",
+      <div className=" p-8 rounded-xl dar:bg-gray-800 shadow-lg mx-5 mb-10 flex items-center" style={{
+        backgroundColor: "var(--gray-bg)",
         color: "var(--cta-text)",
       }}>
         <FaMoneyBillWave className="text-5xl text-yellow-400 mr-6" />

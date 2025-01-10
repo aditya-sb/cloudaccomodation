@@ -1,75 +1,146 @@
 "use client";
 import React, { useState } from "react";
-import { FaEnvelope, FaLock } from "react-icons/fa";
-import axios from "axios";
+import { Mail, Lock, Loader2 } from "lucide-react";
 
-const Login: React.FC<{ openForgetPassword: () => void }> = ({ openForgetPassword }) => {
-  const [message, setMessage] = useState("");
+interface LoginProps {
+  openForgetPassword: () => void;
+}
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+const Login: React.FC<LoginProps> = ({ openForgetPassword }) => {
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState({ type: "", text: "" });
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleSubmit = async (event:any) => {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const data = {
-      email: formData.get("email"),
-      password: formData.get("password"),
-    };
+    setLoading(true);
+    setMessage({ type: "", text: "" });
+
+    const form = event.currentTarget;
+    const email = form.email.value.trim();
+    const password = form.password.value;
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setMessage({ type: "error", text: "Please enter a valid email address" });
+      setLoading(false);
+      return;
+    }
 
     try {
-      const response = await axios.post("http://localhost:5000/login", data);
-      setMessage(response.data.success || "Login successful!");
-      sessionStorage.setItem('userId', response.data.userId);
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        setMessage(error.response.data.error);
-      } else if (error instanceof Error) {
-        setMessage(error.message);
-      } else {
-        setMessage("An unknown error occurred.");
+      // Using fetch instead of axios for lighter bundle
+      const response = await fetch("http://localhost:8000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+        credentials: "include", // For handling cookies properly
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Login failed");
       }
+
+      setMessage({ type: "success", text: "Login successful!" });
+      sessionStorage.setItem("userId", data.userId);
+      
+      // Optional: Redirect after successful login
+      // router.push("/dashboard");
+    } catch (error) {
+      setMessage({ 
+        type: "error", 
+        text: error?.message || "An error occurred during login"
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-semibold text-center" style={{ color: "var(--gray-text)" }}>Log In</h2>
+    <div className="w-full space-y-6 p-8 rounded-xl bg-card/50  ">
+      <div className="space-y-2 text-center">
+        <h1 className="text-2xl font-bold tracking-tight">Welcome Back</h1>
+        <p className="text-sm text-muted-foreground">
+          Please sign in to continue
+        </p>
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="flex items-center border rounded-lg p-3" style={{ backgroundColor: "var(--input-bg)", borderColor: "var(--input-border)" }}>
-          <FaEnvelope className="mr-3" style={{ color: "var(--gray-text)" }} />
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            className="w-full bg-transparent focus:outline-none"
-            style={{ color: "var(--gray-text)" }}
-            required
-          />
+        <div className="space-y-2">
+          <label 
+            htmlFor="email"
+            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            Email
+          </label>
+          <div className="relative">
+            <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <input
+              id="email"
+              type="email"
+              name="email"
+              autoComplete="email"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 pl-10 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              placeholder="name@example.com"
+              required
+            />
+          </div>
         </div>
-        <div className="flex items-center border rounded-lg p-3" style={{ backgroundColor: "var(--input-bg)", borderColor: "var(--input-border)" }}>
-          <FaLock className="mr-3" style={{ color: "var(--gray-text)" }} />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            className="w-full bg-transparent focus:outline-none"
-            style={{ color: "var(--gray-text)" }}
-            required
-          />
+
+        <div className="space-y-2">
+          <label
+            htmlFor="password"
+            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            Password
+          </label>
+          <div className="relative">
+            <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              name="password"
+              autoComplete="current-password"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 pl-10 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              placeholder="Enter your password"
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-3 text-sm text-muted-foreground hover:text-foreground"
+            >
+              {showPassword ? "Hide" : "Show"}
+            </button>
+          </div>
         </div>
+
         <button
           type="submit"
-          className="w-full py-2 rounded-lg transition hover:opacity-75"
-          style={{
-            backgroundColor: "var(--cta)",
-            color: "var(--cta-text)",
-          }}
+          disabled={loading}
+          className="inline-flex w-full items-center justify-center rounded-md text-white px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+          style={{ backgroundColor: loading ? "var(--cta/90)" : "var(--cta)" }}
         >
-          Log In
+          {loading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Signing in...
+            </>
+          ) : (
+            "Sign in"
+          )}
         </button>
       </form>
-      <p className="text-center cursor-pointer" onClick={openForgetPassword} style={{ color: "var(--link-color)" }}>
-        Forgot Password?
-      </p>
-      {message && <p className="text-center mt-2" style={{ color: "var(--error-text)" }}>{message}</p>}
+
+      <button
+        type="button"
+        onClick={openForgetPassword}
+        className="w-full text-center text-sm text-muted-foreground hover:text-foreground"
+      >
+        Forgot your password?
+      </button>
     </div>
   );
 };

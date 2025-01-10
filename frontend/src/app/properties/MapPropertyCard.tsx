@@ -1,4 +1,3 @@
-// src/components/MapPropertyCard.tsx
 import React from "react";
 import Image from "next/image";
 
@@ -7,33 +6,55 @@ interface MapPropertyCardProps {
   title: string;
   location: string;
   price: string;
-  onClick: () => void;
+  onClick?: () => void;
+  isMapPopup?: boolean;
 }
 
-export default function MapPropertyCard({
+const MapPropertyCard: React.FC<MapPropertyCardProps> = ({
   image,
   title,
   location,
   price,
   onClick,
-}: MapPropertyCardProps) {
+  isMapPopup = false,
+}) => {
+  const containerClasses = isMapPopup
+    ? "max-w-[250px]"
+    : "cursor-pointer rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 mb-6";
+
+  const imageClasses = isMapPopup
+    ? "rounded-lg object-cover w-full h-23"
+    : "rounded-xl object-cover w-full h-23";
+
+  const contentClasses = isMapPopup
+    ? "mt-1 space-y-0.5"
+    : "mt-3 space-y-2";
+
   return (
     <div
       onClick={onClick}
-      className="cursor-pointer bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 mb-6"
+      className={containerClasses}
+      role="button"
+      tabIndex={0}
     >
-      <Image
-        src={image}
-        alt={title}
-        width={300}
-        height={200}
-        className="rounded-xl object-cover w-full h-48"
-      />
-      <div className="mt-4">
-        <h3 className="font-semibold text-xl text-gray-800">{title}</h3>
-        <p className="text-gray-500 text-sm mt-2">{location}</p>
-        <p className="text-teal-600 font-semibold text-lg mt-2">{price}</p>
+      <div className="relative">
+        <Image
+          src={image}
+          alt={title}
+          width={isMapPopup ? 250 : 300}
+          height={isMapPopup ? 150 : 200}
+          className={imageClasses}
+        />
+      </div>
+      <div className={contentClasses}>
+        <h3 className={`font-semibold ${isMapPopup ? 'text-base leading-tight' : 'text-xl'} text-gray-800`}>
+          {title}
+        </h3>
+        <p className="text-gray-500 text-sm leading-tight">{location}</p>
+        <p className="text-teal-600 font-semibold text-sm leading-tight">{price}/month</p>
       </div>
     </div>
   );
-}
+};
+
+export default MapPropertyCard;

@@ -25,7 +25,7 @@ export default function SearchBar() {
   return (
     <div
       className="relative transition-all duration-300 ease-in-out"
-      style={{ height: "380px" }}
+      style={{ height: "540px" }}
     >
       <Image
         src="/images/cityscape.jpeg"
@@ -36,7 +36,7 @@ export default function SearchBar() {
       />
       <div className="absolute inset-0 flex flex-col justify-center items-center px-4 sm:px-8">
         {/* Logo and Header */}
-        <div className="flex items-center mb-8">
+        {/* <div className="flex items-center mb-8">
           <a className="flex items-center cursor-pointer">
             <Image
               src="/images/cloudlogo.png"
@@ -52,7 +52,7 @@ export default function SearchBar() {
               Cloud Accommodation
             </h1>
           </a>
-        </div>
+        </div> */}
   
         {/* Headline */}
         <h1

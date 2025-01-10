@@ -1,5 +1,6 @@
 // src/types/index.ts
 export interface Property {
+    id: number;
     image: string;
     title: string;
     location: string;

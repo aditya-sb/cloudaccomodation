@@ -19,9 +19,9 @@ export default function PropertyCard({
   return (
     <Link href="/property" passHref>
       <div
-        className="rounded-lg shadow-xl p-5 transition hover:scale-105 hover:shadow-2xl cursor-pointer w-full max-w-md mx-auto sm:w-[95%] sm:mx-2"
+        className="rounded-lg hover:shadow-2xl hover:border-gray-300 transition-all  border p-5 cursor-pointer w-full max-w-md mx-auto sm:w-[95%] sm:mx-2"
         style={{
-          backgroundColor: "var(--border)",
+          backgroundColor: "var(--gray-bg)",
           color: "var(--cta-text)",
         }}
       >
@@ -65,7 +65,7 @@ export default function PropertyCard({
           >
             {location}
           </p>
-          <div className="flex items-center mt-3">
+          <div className="flex text-gray-400 items-center mt-3">
             <FaUserFriends
               className="mr-2"
               style={{ color: "var(--hover-color)" }}

@@ -14,6 +14,7 @@ import BookingButton from "./components/BookingButton";
 import Header from "./components/Header";
 import Banner from "./components/Banner";
 import Refer from "./components/Refer";
+import LightHeader from "./components/light-header";
 
 export default function Home() {
   const [isHeaderVisible, setIsHeaderVisible] = useState(false);
@@ -24,7 +25,7 @@ export default function Home() {
       ([entry]) => {
         setIsHeaderVisible(!entry.isIntersecting); // Header shows when search bar is out of view
       },
-      { root: null, threshold: 0 } // Trigger when the search bar is fully out of view
+      { root: null, threshold: 0.5 } // Trigger when the search bar is fully out of view
     );
 
     if (searchBarRef.current) {
@@ -40,30 +41,26 @@ export default function Home() {
 
   return (
     <div
-      className="min-h-screen"
+      className="min-h-screen "
       style={{
         backgroundColor: "var(--background)",
         color: "var(--foreground)",
       }}
     >
-      {isHeaderVisible && (
-  <div
-    className="fixed top-0 left-0 w-full z-20 transition-transform duration-500 ease-in-out"
-    style={{
-      transform: isHeaderVisible ? "translateY(0)" : "translateY(-100%)",
-    }}
-  >
-    <Header />
-  </div>
-)}
-
+      {isHeaderVisible ? (
+        <div className="fixed top-0 left-0 w-full z-20 transition-transform duration-500 ease-in-out">
+          <Header />
+        </div>
+      ) : (
+        <LightHeader />
+      )}
 
       {/* Search Bar */}
       <div ref={searchBarRef}>
         <SearchBar />
       </div>
 
-      <Banner />
+      {/* <Banner /> */}
 
       {/* Explore Properties Section */}
       <h2
@@ -74,7 +71,7 @@ export default function Home() {
       >
         Explore Properties
       </h2>
-      <section className="px-4 sm:px-6 pb-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+      <section className="px-4 sm:px-6 mb-10 pb-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
         <PropertyCard
           image="/images/mordenhouse.webp"
           title="Modern Family Home"
@@ -88,6 +85,27 @@ export default function Home() {
           location="New York, NY"
           price="$1,800,000"
           description="Stylish two-bedroom apartment with stunning views of the skyline."
+        />
+        <PropertyCard
+          image="/images/cottage.jpeg"
+          title="Cozy Country Cottage"
+          location="Aspen, CO"
+          price="$850,000"
+          description="Charming cottage with two bedrooms and a beautiful garden in a tranquil setting."
+        />
+        <PropertyCard
+          image="/images/cottage.jpeg"
+          title="Cozy Country Cottage"
+          location="Aspen, CO"
+          price="$850,000"
+          description="Charming cottage with two bedrooms and a beautiful garden in a tranquil setting."
+        />
+        <PropertyCard
+          image="/images/cottage.jpeg"
+          title="Cozy Country Cottage"
+          location="Aspen, CO"
+          price="$850,000"
+          description="Charming cottage with two bedrooms and a beautiful garden in a tranquil setting."
         />
         <PropertyCard
           image="/images/cottage.jpeg"
