@@ -138,7 +138,7 @@ export default function Home() {
       {/* Customer Reviews */}
       <CustomerReviews />
 
-      {/* <Refer /> */}
+      <Refer />
 
       {/* Footer */}
       <Footer />
