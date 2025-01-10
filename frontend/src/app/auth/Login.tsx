@@ -51,7 +51,7 @@ const Login: React.FC<LoginProps> = ({ openForgetPassword }) => {
     } catch (error) {
       setMessage({ 
         type: "error", 
-        text: error?.message || "An error occurred during login"
+        text: (error as any)?.message || "An error occurred during login"
       });
     } finally {
       setLoading(false);

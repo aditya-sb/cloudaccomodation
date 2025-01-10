@@ -80,7 +80,7 @@ const Register = () => {
     } catch (error) {
       setMessage({ 
         type: "error", 
-        text: error?.message || "An error occurred during registration" 
+        text: (error as any)?.message || "An error occurred during login"
       });
     } finally {
       setLoading(false);
