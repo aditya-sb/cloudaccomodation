@@ -154,14 +154,6 @@ function PropertyContent() {
     }
   }, [search]);
 
-  // Calculate average latitude and longitude for the filtered properties
-  const mapLat =
-    filteredProperties.reduce((sum, property) => sum + property.mapLat, 0) /
-    filteredProperties.length;
-  const mapLon =
-    filteredProperties.reduce((sum, property) => sum + property.mapLon, 0) /
-    filteredProperties.length;
-  const title = search || "Properties";
 
   return (
     <div className="mb-10">

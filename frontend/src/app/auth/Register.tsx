@@ -8,8 +8,8 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
-
-  const checkPasswordStrength = (password:any) => {
+  console.log("message", message);
+  const checkPasswordStrength = (password:string) => {
     let strength = 0;
     if (password.length >= 8) strength++;
     if (/[A-Z]/.test(password)) strength++;
@@ -18,7 +18,7 @@ const Register = () => {
     setPasswordStrength(strength);
   };
 
-  const handleSubmit = async (event:any) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
     setMessage({ type: "", text: "" });

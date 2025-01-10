@@ -8,10 +8,9 @@ interface DropdownProps {
   children: ReactNode;
   icon?: ReactNode;
   className?: string;
-  booking?: boolean;
 }
 
-export default function Dropdown({ title, children, icon, className = '', booking = false }: DropdownProps) {
+export default function Dropdown({ title, children, icon, className = '' }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
 

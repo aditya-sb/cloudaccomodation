@@ -10,8 +10,8 @@ const Login: React.FC<LoginProps> = ({ openForgetPassword }) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
   const [showPassword, setShowPassword] = useState(false);
-
-  const handleSubmit = async (event:any) => {
+  console.log("message", message);
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
     setMessage({ type: "", text: "" });

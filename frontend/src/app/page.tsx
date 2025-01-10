@@ -12,7 +12,6 @@ import SecurityDepositSection from "./components/SecurityDepositSection";
 import NestNetworkSection from "./components/NestNetworkSection";
 import BookingButton from "./components/BookingButton";
 import Header from "./components/Header";
-import Banner from "./components/Banner";
 import Refer from "./components/Refer";
 import LightHeader from "./components/light-header";
 

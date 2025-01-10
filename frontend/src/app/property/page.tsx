@@ -12,7 +12,6 @@ import {
   FaDollarSign,
   FaHeadset,
   FaUndo,
-  FaLock,
   FaCheck,
 } from "react-icons/fa";
 

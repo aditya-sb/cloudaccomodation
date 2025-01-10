@@ -10,7 +10,6 @@ import {
   FaComments,
   FaMoon,
   FaSun,
-  FaSearch,
   FaTimes,
 } from "react-icons/fa";
 import Login from "../auth/Login";
@@ -25,7 +24,6 @@ export default function LightHeader() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState<React.ReactNode>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const userId = sessionStorage.getItem("userId");
@@ -44,11 +42,6 @@ export default function LightHeader() {
     setModalContent(null);
   };
 
-  const handleSearch = () => {
-    if (searchTerm.trim()) {
-      window.location.href = `/properties?search=${searchTerm}`;
-    }
-  };
 
   return (
     <>

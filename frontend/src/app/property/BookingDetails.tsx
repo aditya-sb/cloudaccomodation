@@ -3,16 +3,13 @@ import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaAngleDown, FaArrowRight, FaMoneyBillWave, FaMoneyCheck, FaQuestion, FaQuestionCircle } from "react-icons/fa";
-import { FaMoneyBill, FaMoneyBillTransfer } from "react-icons/fa6";
+import {  FaMoneyBillTransfer } from "react-icons/fa6";
 
 const BookingForm = ({ price }: { price: string }) => {
   const [rentalDays, setRentalDays] = useState(30);
   const [checkInDate, setCheckInDate] = useState<Date | null>(null);
   const [checkOutDate, setCheckOutDate] = useState<Date | null>(null);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-
+  console.log("price", price);
   const handleBookingSubmit = () => {
     alert(`Booking submitted!\nName: ${name}\nEmail: ${email}\nPhone: ${phone}\nCheck-in: ${checkInDate}\nCheck-out: ${checkOutDate}\nRental Days: ${rentalDays}`);
   };
@@ -79,7 +76,7 @@ const EnquiryForm = ({ price }: { price: string }) => {
   const handleEnquirySubmit = () => {
     alert(`Enquiry submitted!\nName: ${name}\nEmail: ${email}\nPhone: ${phone}\nMessage: ${message}`);
   };
-
+  console.log("price", price);
   return (
     <div className="flex flex-col text-sm space-y-4">
       <div className="flex flex-col sm:flex-row gap-4">
