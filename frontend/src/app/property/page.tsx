@@ -18,7 +18,7 @@ import {
 export default function PropertyPage() {
   return (
     <>
-      <Header />
+      <Header isPropertyPage={true} />
       <div
         className="min-h-screen p-5 max-sm:p-0 flex flex-col md:flex-row gap-8"
         style={{

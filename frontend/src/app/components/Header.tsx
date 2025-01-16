@@ -19,7 +19,11 @@ import Register from "../auth/Register";
 import ForgetPassword from "../auth/ForgetPassword";
 import { useTheme } from "../ThemeContext";
 
-export default function Header() {
+interface HeaderProps {
+  isPropertyPage: boolean;
+}
+
+export default function Header({ isPropertyPage, ...props }: HeaderProps) {
   const { isDarkTheme, toggleTheme } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,7 +57,7 @@ export default function Header() {
   return (
     <>
       <header
-        className="fixed top-0 left-0 w-full h-16 z-50 backdrop-blur bg-white/80 dark:bg-gray-900/80 text-gray-900 dark:text-gray-100 flex items-center px-4 py-4 border-b shadow-sm"
+        className="fixed top-0 left-0 w-full h-16 z-50 backdrop-blur bg-white/80 dark:bg-gray-900/80 text-gray-900 dark:text-gray-100 flex items-center justify-between px-4 py-4 border-b shadow-sm"
         style={{
           color: "var(--foreground)",
           borderBottomColor: "var(--gray-border)",
@@ -66,24 +70,24 @@ export default function Header() {
       >
         {/* Logo - Updated styling */}
         <Link href="/" passHref legacyBehavior>
-          <a className="hidden md:flex items-center cursor-pointer hover:opacity-80 transition-opacity">
+          <a className="flex items-center cursor-pointer hover:opacity-80 transition-opacity">
             <Image
               src="/images/cloudlogo.png"
               alt="Property Logo"
-              className="h-12 w-auto rounded-xl"
+              className="h-8 w-auto rounded-xl"
               height={160}
               width={160}
             />
-            <span className="md:hidden">CA</span>
 
-            <h1 className="ml-4 text-2xl font-bold tracking-tight">
+            <h1 className="ml-4 text-2xl max-sm:text-lg  font-bold tracking-tight">
               Cloud Accommodation
             </h1>
           </a>
         </Link>
 
         {/* Search Bar - Updated styling */}
-        <div className="flex-grow h-10 mx-8 max-sm:mx-0">
+        {!isPropertyPage? (
+          <div className="flex-grow h-10 mx-8 max-sm:mx-0">
           <div className="flex items-center w-full h-10 bg-gray-100 dark:bg-gray-800 rounded-full hover:shadow-md transition-shadow duration-200 border border-gray-200 dark:border-gray-700">
             <input
               type="text"
@@ -100,8 +104,13 @@ export default function Header() {
             />
           </div>
         </div>
+        ): null}
 
-        {/* Theme Toggle - Updated styling */}
+        
+
+        {/* Desktop Navigation - Updated styling */}
+        <nav className="hidden md:flex items-center space-x-3">
+          {/* Theme Toggle - Updated styling */}
         <button
           onClick={toggleTheme}
           className="p-2 rounded-full hover:bg-gray-100 ml-4 mr-4 dark:hover:bg-gray-800 transition-colors"
@@ -112,9 +121,6 @@ export default function Header() {
             <FaSun className="text-xl text-yellow-500" />
           )}
         </button>
-
-        {/* Desktop Navigation - Updated styling */}
-        <nav className="hidden md:flex items-center space-x-3">
           {isLoggedIn ? (
             <>
               <button
