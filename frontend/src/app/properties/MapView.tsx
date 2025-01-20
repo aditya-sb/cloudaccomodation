@@ -12,9 +12,10 @@ interface MapViewProps {
   properties: Property[];
   mapLat: number;
   mapLon: number;
+  mapLocation: string;
 }
 
-const MapView: React.FC<MapViewProps> = ({ properties, mapLat, mapLon }) => {
+const MapView: React.FC<MapViewProps> = ({ properties, mapLat, mapLon, mapLocation }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
@@ -24,13 +25,14 @@ const MapView: React.FC<MapViewProps> = ({ properties, mapLat, mapLon }) => {
 
     // Initialize the map if it hasn't been initialized yet
     if (!mapInstanceRef.current) {
-      mapInstanceRef.current = L.map(mapRef.current).setView([mapLat, mapLon], 12);
+      mapInstanceRef.current = L.map(mapRef.current).setView([mapLat || 0, mapLon || 0], 13);
       if (mapRef.current) {
         mapRef.current.style.zIndex = "0";
       }
       // Add OpenStreetMap tiles
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19,
       }).addTo(mapInstanceRef.current);
     }
 
@@ -42,38 +44,40 @@ const MapView: React.FC<MapViewProps> = ({ properties, mapLat, mapLon }) => {
 
     // Add markers for each property
     properties.forEach((property) => {
-      // Create custom marker content with Tailwind classes
-      const markerHtml = document.createElement('div');
-      markerHtml.className = 'bg-black text-white w-fit px-2 py-1 rounded-lg text-sm whitespace-nowrap';
-      markerHtml.textContent = property.price;
+      if (property.latitude && property.longitude) {
+        // Create custom marker content with Tailwind classes
+        const markerHtml = document.createElement('div');
+        markerHtml.className = 'bg-black text-white w-fit px-2 py-1 rounded-lg text-sm whitespace-nowrap';
+        markerHtml.textContent = property.price;
 
-      // Create custom icon
-      const customIcon = L.divIcon({
-        html: markerHtml.outerHTML,
-        className: 'custom-marker',
-      });
+        // Create custom icon
+        const customIcon = L.divIcon({
+          html: markerHtml.outerHTML,
+          className: 'custom-marker',
+        });
 
-      // Create marker
-      const marker = L.marker([property.mapLat, property.mapLon], {
-        icon: customIcon
-      }).addTo(mapInstanceRef.current!);
+        // Create marker
+        const marker = L.marker([property.latitude, property.longitude], {
+          icon: customIcon
+        }).addTo(mapInstanceRef.current!);
 
-      // Create popup content with React
-      const popupContent = document.createElement('div');
-      const root = createRoot(popupContent);
-      root.render(
-        <MapPropertyCard
-          image={property.image}
-          title={property.title}
-          location={property.location}
-          price={property.price}
-          isMapPopup={true}
-        />
-      );
+        // Create popup content with React
+        const popupContent = document.createElement('div');
+        const root = createRoot(popupContent);
+        root.render(
+          <MapPropertyCard
+            image={property.image}
+            title={property.title}
+            location={property.location}
+            price={property.price}
+            isMapPopup={true}
+          />
+        );
 
-      // Add popup
-      marker.bindPopup(popupContent);
-      markersRef.current.push(marker);
+        // Add popup
+        marker.bindPopup(popupContent);
+        markersRef.current.push(marker);
+      }
     });
 
     // Cleanup function
@@ -86,7 +90,7 @@ const MapView: React.FC<MapViewProps> = ({ properties, mapLat, mapLon }) => {
         mapInstanceRef.current = null;
       }
     };
-  }, [mapLat, mapLon, properties]);
+  }, [properties, mapLat, mapLon]);
 
   return (
     <div className="flex h-screen">

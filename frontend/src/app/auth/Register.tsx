@@ -1,15 +1,26 @@
 "use client";
 import React, { useState } from "react";
-import { Mail, User, Lock, CheckCircle2, Loader2, Eye, EyeOff } from "lucide-react";
-
+import {
+  Mail,
+  User,
+  Lock,
+  CheckCircle2,
+  Loader2,
+  Eye,
+  EyeOff,
+} from "lucide-react";
+import { useRegisterMutation } from "../redux/slices/apiSlice";
+import { useRouter } from "next/navigation";
 const Register = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
-  console.log("message", message);
-  const checkPasswordStrength = (password:string) => {
+
+  const [register, { isLoading }] = useRegisterMutation();
+  const router = useRouter();
+  const checkPasswordStrength = (password: string) => {
     let strength = 0;
     if (password.length >= 8) strength++;
     if (/[A-Z]/.test(password)) strength++;
@@ -18,9 +29,8 @@ const Register = () => {
     setPasswordStrength(strength);
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setLoading(true);
     setMessage({ type: "", text: "" });
 
     const form = event.currentTarget;
@@ -35,56 +45,56 @@ const Register = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(data.email)) {
       setMessage({ type: "error", text: "Please enter a valid email address" });
-      setLoading(false);
       return;
     }
 
     if (data.username.length < 3) {
-      setMessage({ type: "error", text: "Username must be at least 3 characters" });
-      setLoading(false);
+      setMessage({
+        type: "error",
+        text: "Username must be at least 3 characters",
+      });
       return;
     }
 
     if (data.password !== data.passwordConf) {
       setMessage({ type: "error", text: "Passwords do not match" });
-      setLoading(false);
       return;
     }
 
     if (passwordStrength < 3) {
-      setMessage({ 
-        type: "error", 
-        text: "Password must be stronger (use uppercase, numbers, and special characters)" 
+      setMessage({
+        type: "error",
+        text: "Password must be stronger (use uppercase, numbers, and special characters)",
       });
-      setLoading(false);
       return;
     }
 
-    try {
-      const response = await fetch("http://localhost:5000/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-        credentials: "include",
+    // Call the mutation
+    register({
+      email: data.email,
+      username: data.username,
+      password: data.password,
+    })
+      .unwrap()
+      .then((response) => {
+        if (response.message === "User already registered") {
+          setMessage({ type: "error", text: response.message });
+          form.reset();
+        } else {
+          setMessage({ type: "success", text: response.message });
+
+          // Optional: Redirect to login page
+          setTimeout(() => {router.push("/");window.location.reload()
+            localStorage.setItem("auth_Token", response.signature);
+          }, 1000); 
+        }
+      })
+      .catch((error: any) => {
+        setMessage({
+          type: "error",
+          text: error.response?.data?.message || "Registration failed",
+        });
       });
-
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        throw new Error(responseData.error || "Registration failed");
-      }
-
-      setMessage({ type: "success", text: "Registration successful! Redirecting..." });
-      // Optional: Redirect after successful registration
-      // setTimeout(() => router.push("/login"), 2000);
-    } catch (error) {
-      setMessage({ 
-        type: "error", 
-        text: (error as any)?.message || "An error occurred during login"
-      });
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (
@@ -97,10 +107,11 @@ const Register = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Username */}
         <div className="space-y-2">
           <label
             htmlFor="username"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            className="text-sm font-medium leading-none"
           >
             Username
           </label>
@@ -111,7 +122,7 @@ const Register = () => {
               name="username"
               type="text"
               autoComplete="username"
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 pl-10 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-10 w-full rounded-md border px-3 py-2 pl-10 text-sm"
               placeholder="johndoe"
               required
               minLength={3}
@@ -119,11 +130,9 @@ const Register = () => {
           </div>
         </div>
 
+        {/* Email */}
         <div className="space-y-2">
-          <label
-            htmlFor="email"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-          >
+          <label htmlFor="email" className="text-sm font-medium leading-none">
             Email
           </label>
           <div className="relative">
@@ -133,17 +142,18 @@ const Register = () => {
               name="email"
               type="email"
               autoComplete="email"
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 pl-10 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-10 w-full rounded-md border px-3 py-2 pl-10 text-sm"
               placeholder="name@example.com"
               required
             />
           </div>
         </div>
 
+        {/* Password */}
         <div className="space-y-2">
           <label
             htmlFor="password"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            className="text-sm font-medium leading-none"
           >
             Password
           </label>
@@ -154,7 +164,7 @@ const Register = () => {
               name="password"
               type={showPassword ? "text" : "password"}
               autoComplete="new-password"
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 pl-10 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-10 w-full rounded-md border px-3 py-2 pl-10 text-sm"
               placeholder="Create a strong password"
               required
               minLength={8}
@@ -163,9 +173,9 @@ const Register = () => {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-3 text-sm text-muted-foreground hover:text-foreground"
+              className="absolute right-3 top-3 text-muted-foreground"
             >
-              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              {showPassword ? <EyeOff /> : <Eye />}
             </button>
           </div>
           <div className="flex gap-1 mt-1">
@@ -173,19 +183,18 @@ const Register = () => {
               <div
                 key={i}
                 className={`h-1 w-full rounded-full ${
-                  i < passwordStrength
-                    ? "bg-primary"
-                    : "bg-muted"
+                  i < passwordStrength ? "bg-primary" : "bg-muted"
                 }`}
               />
             ))}
           </div>
         </div>
 
+        {/* Confirm Password */}
         <div className="space-y-2">
           <label
             htmlFor="passwordConf"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            className="text-sm font-medium leading-none"
           >
             Confirm Password
           </label>
@@ -196,7 +205,7 @@ const Register = () => {
               name="passwordConf"
               type={showConfirmPassword ? "text" : "password"}
               autoComplete="new-password"
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 pl-10 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-10 w-full rounded-md border px-3 py-2 pl-10 text-sm"
               placeholder="Confirm your password"
               required
               minLength={8}
@@ -204,20 +213,20 @@ const Register = () => {
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-3 top-3 text-sm text-muted-foreground hover:text-foreground"
+              className="absolute right-3 top-3 text-muted-foreground"
             >
-              {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              {showConfirmPassword ? <EyeOff /> : <Eye />}
             </button>
           </div>
         </div>
 
+        {/* Submit Button */}
         <button
           type="submit"
-          disabled={loading}
-          className="inline-flex w-full items-center justify-center text-white rounded-md px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
-          style={{ backgroundColor: loading ? "var(--cta/90)" : "var(--cta)" }}
+          disabled={isLoading}
+          className="inline-flex w-full justify-center px-4 py-2 text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 disabled:opacity-50"
         >
-          {loading ? (
+          {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Creating account...
@@ -228,11 +237,18 @@ const Register = () => {
         </button>
       </form>
 
-      {/* {message.text && (
-        <Alert variant={message.type === "error" ? "destructive" : "default"}>
-          <AlertDescription>{message.text}</AlertDescription>
-        </Alert>
-      )} */}
+      {/* Error Message */}
+      {message.text && (
+        <div
+          className={`text-sm mt-4 p-2 rounded ${
+            message.type === "error"
+              ? "bg-red-100 text-red-700"
+              : "bg-green-100 text-green-700"
+          }`}
+        >
+          {message.text}
+        </div>
+      )}
     </div>
   );
 };

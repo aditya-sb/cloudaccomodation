@@ -18,6 +18,9 @@ import Profile from "../auth/Profile";
 import Register from "../auth/Register";
 import ForgetPassword from "../auth/ForgetPassword";
 import { useTheme } from "../ThemeContext";
+import isAuthenticated from "@/utils/auth-util";
+import { useGetUserDetailsQuery } from "../redux/slices/apiSlice";
+import Loader from "@/loader/loader";
 
 interface HeaderProps {
   isPropertyPage: boolean;
@@ -28,14 +31,19 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState<React.ReactNode>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [isAuthenticatedUser, setIsAuthenticatedUser] = useState(isAuthenticated());
+  const { data, isLoading: isLoadingData, error: dataError, refetch } = useGetUserDetailsQuery({}, {
+    skip: !isAuthenticatedUser
+  });
+  console.log(data);
   useEffect(() => {
-    const userId = sessionStorage.getItem("userId");
-    setIsLoggedIn(!!userId);
+    setIsAuthenticatedUser(isAuthenticated());
+    if (isAuthenticatedUser) {
+      closeModal();
+    }
   }, []);
-
+  
   const toggleMenu = () => setMenuOpen(!menuOpen);
 
   const openModal = (content: React.ReactNode) => {
@@ -53,6 +61,9 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
       window.location.href = `/properties?search=${searchTerm}`;
     }
   };
+  if(isLoadingData){
+    <Loader/>;
+  }
 
   return (
     <>
@@ -70,7 +81,7 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
       >
         {/* Logo - Updated styling */}
         <Link href="/" passHref legacyBehavior>
-          <a className="flex items-center cursor-pointer hover:opacity-80 transition-opacity">
+          <a className="max-sm:hidden flex items-center cursor-pointer hover:opacity-80 transition-opacity">
             <Image
               src="/images/cloudlogo.png"
               alt="Property Logo"
@@ -107,7 +118,16 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
         ): null}
 
         
-
+        <button
+          onClick={toggleTheme}
+          className="md:hidden p-2 rounded-full hover:bg-gray-100 ml-4 mr-4 dark:hover:bg-gray-800 transition-colors"
+        >
+          {isDarkTheme ? (
+            <FaMoon className="text-xl text-blue-500" />
+          ) : (
+            <FaSun className="text-xl text-yellow-500" />
+          )}
+        </button>
         {/* Desktop Navigation - Updated styling */}
         <nav className="hidden md:flex items-center space-x-3">
           {/* Theme Toggle - Updated styling */}
@@ -121,7 +141,7 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
             <FaSun className="text-xl text-yellow-500" />
           )}
         </button>
-          {isLoggedIn ? (
+          {isAuthenticatedUser ? (
             <>
               <button
                 onClick={() => openModal(<Profile />)}
@@ -200,7 +220,7 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
               </button>
             </Link>
 
-            {isLoggedIn ? (
+            {isAuthenticatedUser ? (
               <>
                 <button
                   onClick={() => openModal(<Profile />)}

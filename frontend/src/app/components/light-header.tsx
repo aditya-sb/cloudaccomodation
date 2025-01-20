@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import {
   FaUser,
   FaSignInAlt,
@@ -17,17 +17,22 @@ import Profile from "../auth/Profile";
 import Register from "../auth/Register";
 import ForgetPassword from "../auth/ForgetPassword";
 import { useTheme } from "../ThemeContext";
+import isAuthenticated from "@/utils/auth-util";
+import { useGetUserDetailsQuery } from "../redux/slices/apiSlice";
+import Loader from "@/loader/loader";
 
 export default function LightHeader() {
   const { isDarkTheme, toggleTheme } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState<React.ReactNode>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+  const [isAuthenticatedUser, setIsAuthenticatedUser] = useState(isAuthenticated());
+  const { data, isLoading: isLoadingData, error: dataError, refetch } = useGetUserDetailsQuery({}, {
+    skip: !isAuthenticatedUser
+  });
+  console.log(data);
   useEffect(() => {
-    const userId = sessionStorage.getItem("userId");
-    setIsLoggedIn(!!userId);
+    setIsAuthenticatedUser(isAuthenticated());
   }, []);
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
@@ -41,6 +46,8 @@ export default function LightHeader() {
     setIsModalOpen(false);
     setModalContent(null);
   };
+
+  if (isLoadingData) return <Loader />;
 
 
   return (
@@ -86,7 +93,7 @@ export default function LightHeader() {
             )}
           </button>
           
-          {isLoggedIn ? (
+          {isAuthenticatedUser ? (
             <>
               <button
                 onClick={() => openModal(<Profile />)}
@@ -152,7 +159,7 @@ export default function LightHeader() {
               </button>
             </Link>
 
-            {isLoggedIn ? (
+            {isAuthenticatedUser ? (
               <>
                 <button
                   onClick={() => openModal(<Profile />)}
@@ -166,7 +173,7 @@ export default function LightHeader() {
                   className="flex items-center transition"
                   style={{ color: "var(--gray-text)" }}
                 >
-                  <FaHistory className="mr-3" /> History
+                  <FaHistory style={{ color: "var(--gray-text)" }} className="mr-3" /> History
                 </button>
                 <button
                   onClick={() => openModal(<div>Chat Content</div>)}

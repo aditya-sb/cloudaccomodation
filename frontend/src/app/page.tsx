@@ -48,7 +48,7 @@ export default function Home() {
     >
       {isHeaderVisible ? (
         <div className="fixed top-0 left-0 w-full z-20 transition-transform duration-500 ease-in-out">
-          <Header />
+          <Header isPropertyPage={false} />
         </div>
       ) : (
         <LightHeader />

@@ -1,6 +1,8 @@
 "use client";
 import React, { useState } from "react";
 import { Mail, Lock, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useLoginMutation } from "../redux/slices/apiSlice";
 
 interface LoginProps {
   openForgetPassword: () => void;
@@ -10,6 +12,8 @@ const Login: React.FC<LoginProps> = ({ openForgetPassword }) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
   const [showPassword, setShowPassword] = useState(false);
+  const [login, { isLoading }] = useLoginMutation();
+  const router = useRouter();
   console.log("message", message);
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -28,34 +32,24 @@ const Login: React.FC<LoginProps> = ({ openForgetPassword }) => {
       return;
     }
 
-    try {
-      // Using fetch instead of axios for lighter bundle
-      const response = await fetch("http://localhost:8000/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-        credentials: "include", // For handling cookies properly
+    login({
+      email: email,
+      password: password,
+    })
+      .unwrap()
+      .then((response) => {
+        setMessage({ type: "success", text: response.message });
+        setLoading(false);
+        setTimeout(() => {router.push("/");window.location.reload()
+          localStorage.setItem("auth_Token", response.signature);
+        }, 1000); // Navigate to the home page after a delay
+      })
+      .catch((error: any) => {
+        setMessage({
+          type: "error",
+          text: error.response?.data?.message || "Registration failed",
+        });
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Login failed");
-      }
-
-      setMessage({ type: "success", text: "Login successful!" });
-      sessionStorage.setItem("userId", data.userId);
-      
-      // Optional: Redirect after successful login
-      // router.push("/dashboard");
-    } catch (error) {
-      setMessage({ 
-        type: "error", 
-        text: (error as any)?.message || "An error occurred during login"
-      });
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (
@@ -69,7 +63,7 @@ const Login: React.FC<LoginProps> = ({ openForgetPassword }) => {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <label 
+          <label
             htmlFor="email"
             className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           >
