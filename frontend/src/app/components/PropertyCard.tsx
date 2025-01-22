@@ -1,9 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FaHeart, FaUserFriends } from "react-icons/fa";
+import ImageSlider from "../components/ImageSlider"; // Adjust the path as necessary
 
 interface PropertyCardProps {
-  image: string;
+  images: string;
   title: string;
   location: string;
   price: string;
@@ -11,33 +12,29 @@ interface PropertyCardProps {
 }
 
 export default function PropertyCard({
-  image,
+  images,
   title,
   location,
   price,
+  description,
 }: PropertyCardProps) {
   return (
     <Link href="/property" passHref>
       <div
-        className="rounded-lg hover:shadow-2xl hover:border-gray-300 transition-all  border p-5 cursor-pointer w-full max-w-md mx-auto sm:w-[95%] sm:mx-2"
+        className="rounded-lg hover:shadow-2xl hover:border-gray-300 transition-all border cursor-pointer w-full max-w-md mx-auto sm:w-[95%] sm:mx-2"
         style={{
-          backgroundColor: "var(--gray-bg)",
-          color: "var(--cta-text)",
+          backgroundColor: "var(--white)",
+          color: "var(--dark-text)",
         }}
       >
         <div className="relative">
-          <Image
-            src={image}
-            alt={title}
-            width={400}
-            height={250}
-            className="rounded-lg object-cover w-full h-56"
-          />
+          <ImageSlider images={images} />
+
           <div
-            className="absolute top-3 left-3 px-3 py-1 rounded-full text-sm font-semibold shadow"
+            className="absolute top-3 left-3 px-3 py-1 rounded-full text-sm font-semibold shadow-lg"
             style={{
               backgroundColor: "var(--success-text)",
-              color: "var(--cta-text)",
+              color: "var(--white)",
             }}
           >
             3 Houses
@@ -52,7 +49,7 @@ export default function PropertyCard({
             <FaHeart />
           </button>
         </div>
-        <div className="mt-4">
+        <div className="mt-4 p-4">
           <h2
             className="text-lg sm:text-xl font-semibold"
             style={{ color: "var(--copy-primary)" }}
@@ -82,7 +79,7 @@ export default function PropertyCard({
             <p style={{ color: "var(--gray-text)" }}>Area</p>
           </div>
           <button
-            className="mt-4 py-2 px-4 rounded-lg shadow-md transition  hover:opacity-75"
+            className="mt-4 py-2 px-4 rounded-lg shadow-md transition hover:bg-opacity-80"
             style={{
               background: "linear-gradient(to right, var(--cta), var(--cta-active))",
               color: "var(--cta-text)",

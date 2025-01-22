@@ -14,8 +14,7 @@ function PropertyContent() {
   const [mapCenter, setMapCenter] = useState({ lat: 0, lon: 0 });
 
   const { data: properties = [], isLoading, isError } = useGetPropertiesQuery({
-    title: search || "",
-    location: location || "",
+    location: search || "",
   });
   // Only update map center when properties change AND when the first property exists
   useEffect(() => {

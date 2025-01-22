@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, Key } from "react";
 import SearchBar from "./components/SearchBar";
 import PropertyCard from "./components/PropertyCard";
 import CustomerReviews from "./components/CustomerReviews";
@@ -14,10 +14,12 @@ import BookingButton from "./components/BookingButton";
 import Header from "./components/Header";
 import Refer from "./components/Refer";
 import LightHeader from "./components/light-header";
+import { useGetPropertiesQuery } from "./redux/slices/apiSlice";
 
 export default function Home() {
   const [isHeaderVisible, setIsHeaderVisible] = useState(false);
   const searchBarRef = useRef<HTMLDivElement>(null);
+  const { data: properties, error, isLoading } = useGetPropertiesQuery({});
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -71,48 +73,23 @@ export default function Home() {
         Explore Properties
       </h2>
       <section className="px-4 sm:px-6 mb-10 pb-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-        <PropertyCard
-          image="/images/mordenhouse.webp"
-          title="Modern Family Home"
-          location="Beverly Hills, CA"
-          price="$2,500,000"
-          description="A beautiful home with four bedrooms, a spacious living area, and a private pool."
-        />
-        <PropertyCard
-          image="/images/luxuryinside.jpeg"
-          title="Luxury City Apartment"
-          location="New York, NY"
-          price="$1,800,000"
-          description="Stylish two-bedroom apartment with stunning views of the skyline."
-        />
-        <PropertyCard
-          image="/images/cottage.jpeg"
-          title="Cozy Country Cottage"
-          location="Aspen, CO"
-          price="$850,000"
-          description="Charming cottage with two bedrooms and a beautiful garden in a tranquil setting."
-        />
-        <PropertyCard
-          image="/images/cottage.jpeg"
-          title="Cozy Country Cottage"
-          location="Aspen, CO"
-          price="$850,000"
-          description="Charming cottage with two bedrooms and a beautiful garden in a tranquil setting."
-        />
-        <PropertyCard
-          image="/images/cottage.jpeg"
-          title="Cozy Country Cottage"
-          location="Aspen, CO"
-          price="$850,000"
-          description="Charming cottage with two bedrooms and a beautiful garden in a tranquil setting."
-        />
-        <PropertyCard
-          image="/images/cottage.jpeg"
-          title="Cozy Country Cottage"
-          location="Aspen, CO"
-          price="$850,000"
-          description="Charming cottage with two bedrooms and a beautiful garden in a tranquil setting."
-        />
+        {isLoading && <p>Loading properties...</p>}
+        {error && (
+          <p>
+            Error loading properties:{" "}
+            {"status" in error ? error.status : error.message}
+          </p>
+        )}
+        {properties && properties.map((property: { _id: Key | null | undefined; images: string[]; title: string; location: string; price: { toLocaleString: () => any; }; description: string; }) => (
+          <PropertyCard
+            key={property._id}
+            images={property.images}
+            title={property.title}
+            location={property.location}
+            price={`$${property.price.toLocaleString()}`}
+            description={property.description}
+          />
+        ))}
       </section>
 
       {/* Cities Section */}

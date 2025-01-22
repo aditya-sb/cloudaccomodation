@@ -12,7 +12,7 @@ const ListView: React.FC<ListViewProps> = ({ properties }) => {
       {properties.map((property, index) => (
         <PropertyCard
           key={index}
-          image={property.image}
+          images={property.images}
           title={property.title}
           location={property.location}
           price={property.price}

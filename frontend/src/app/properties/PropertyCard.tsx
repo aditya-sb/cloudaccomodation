@@ -1,9 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FaHeart, FaUserFriends } from "react-icons/fa";
+import ImageSlider from "../components/ImageSlider"; // Adjust the path as necessary
 
 interface PropertyCardProps {
-  image: string;
+  images: Array<string>;
   title: string;
   location: string;
   price: string;
@@ -11,7 +12,7 @@ interface PropertyCardProps {
 }
 
 export default function PropertyCard({
-  image,
+  images,
   title,
   location,
   price,
@@ -26,13 +27,8 @@ export default function PropertyCard({
       >
         {/* Left: Image */}
         <div className="w-1/3 relative">
-          <Image
-            src={image}
-            alt={title}
-            width={150}
-            height={100}
-            className="rounded-lg object-cover w-full h-full"
-          />
+        <ImageSlider images={images} />
+
           <div
             className="absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-semibold shadow"
             style={{
