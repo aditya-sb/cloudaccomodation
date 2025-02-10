@@ -21,13 +21,13 @@ export default function PropertyCard({
   return (
     <Link href="/property" passHref>
       <div
-        className="rounded-lg hover:shadow-2xl hover:border-gray-300 transition-all border cursor-pointer w-full max-w-md mx-auto sm:w-[95%] sm:mx-2"
+        className="rounded-lg hover:shadow-2xl hover:border-gray-300 transition-all border cursor-pointer sm:w-[95%] sm:mx-2 w-64"
         style={{
           backgroundColor: "var(--white)",
           color: "var(--dark-text)",
         }}
       >
-        <div className="relative">
+        <div className="relative w-full h-[200px]">
           <ImageSlider images={images} />
 
           <div
@@ -49,7 +49,7 @@ export default function PropertyCard({
             <FaHeart />
           </button>
         </div>
-        <div className="mt-4 p-4">
+        <div className="p-4">
           <h2
             className="text-lg sm:text-xl font-semibold"
             style={{ color: "var(--copy-primary)" }}

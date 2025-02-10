@@ -2,10 +2,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 200px;
+  overflow: hidden;
 }
 
 .image {
   width: 100%;
   height: auto;
+  max-height: 100%;
   object-fit: cover;
 } 

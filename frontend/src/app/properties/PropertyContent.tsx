@@ -9,12 +9,12 @@ import { useGetPropertiesQuery, useCreatePropertyMutation } from "../redux/slice
 function PropertyContent() {
   const searchParams = useSearchParams();
   const search = searchParams.get("search");
-  const location = searchParams.get("location");
+  const city = searchParams.get("city");
   const [view, setView] = useState<"list" | "map">("list");
   const [mapCenter, setMapCenter] = useState({ lat: 0, lon: 0 });
 
   const { data: properties = [], isLoading, isError } = useGetPropertiesQuery({
-    location: search || "",
+    city: search || "",
   });
   // Only update map center when properties change AND when the first property exists
   useEffect(() => {
