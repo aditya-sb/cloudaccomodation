@@ -122,3 +122,20 @@ input:focus {
 .animate-shake {
   animation: shake 0.5s ease-in-out;
 }
+
+
+.slider-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.slider-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 50px;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, white 100%);
+  pointer-events: none;
+  z-index: 1;
+}

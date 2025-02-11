@@ -4,7 +4,7 @@ import styles from "./ImageSlider.module.css"; // Create a CSS module for stylin
 
 const ImageSlider = ({ images }) => {
   return (
-    <Carousel autoplay>
+    <Carousel autoplay dots={false}>
       {Array.isArray(images) && images.length > 0 ? (
         images.map((image, index) => (
           <div key={index} className={styles.imageContainer}>

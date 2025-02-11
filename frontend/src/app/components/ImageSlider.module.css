@@ -1,14 +1,40 @@
 .imageContainer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%; /* Creates a perfect square */
   overflow: hidden;
 }
 
 .image {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: auto;
-  max-height: 100%;
+  height: 100%;
   object-fit: cover;
-} 
+}
+
+.infoOverlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: transparent;
+  padding: 10px;
+  text-align: center;
+}
+
+.infoText {
+  display: flex;
+  justify-content: space-around;
+}
+
+.infoItem {
+  background: white;
+  color: black;
+  padding: 4px 8px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}

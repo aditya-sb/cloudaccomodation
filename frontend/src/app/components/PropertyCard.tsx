@@ -1,14 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
-import { FaHeart, FaUserFriends } from "react-icons/fa";
-import ImageSlider from "../components/ImageSlider"; // Adjust the path as necessary
+import { FaHeart, FaBed, FaBath, FaVectorSquare, FaStar } from "react-icons/fa";
+import ImageSlider from "./ImageSlider";
+import styles from "./ImageSlider.module.css";
 
 interface PropertyCardProps {
-  images: string;
+  images: string[];
   title: string;
   location: string;
   price: string;
-  description: string;
+  beds: number;
+  baths: number;
+  area: number;
+  rating: number;
+  reviewsCount: number;
 }
 
 export default function PropertyCard({
@@ -16,77 +21,53 @@ export default function PropertyCard({
   title,
   location,
   price,
-  description,
+  beds,
+  baths,
+  area,
+  rating,
+  reviewsCount,
 }: PropertyCardProps) {
   return (
-    <Link href="/property" passHref>
-      <div
-        className="rounded-lg hover:shadow-2xl hover:border-gray-300 transition-all border cursor-pointer sm:w-[95%] sm:mx-2 w-64"
-        style={{
-          backgroundColor: "var(--white)",
-          color: "var(--dark-text)",
-        }}
-      >
-        <div className="relative w-full h-[200px]">
+    <Link href="/property" className="flex-shrink-0">
+      <div className="rounded-2xl shadow-lg hover:shadow-xl transition-all border bg-white cursor-pointer w-64 relative flex-shrink-0">
+        {/* Image Slider */}
+        <div className="relative w-full text-[10px] overflow-hidden rounded-t-2xl">
           <ImageSlider images={images} />
-
-          <div
-            className="absolute top-3 left-3 px-3 py-1 rounded-full text-sm font-semibold shadow-lg"
-            style={{
-              backgroundColor: "var(--success-text)",
-              color: "var(--white)",
-            }}
-          >
-            3 Houses
+          <div className={styles.infoOverlay}>
+            <div className={styles.infoText}>
+              <div className={styles.infoItem}>
+                <FaBed />
+                <span>{beds} Beds</span>
+              </div>
+              <div className={styles.infoItem}>
+                <FaBath />
+                <span>{baths} Baths</span>
+              </div>
+              <div className={styles.infoItem}>
+                <FaVectorSquare />
+                <span>{area} sq ft</span>
+              </div>
+            </div>
           </div>
-          <button
-            className="absolute top-3 right-3 p-2 rounded-full shadow transition hover:opacity-75"
-            style={{
-              backgroundColor: "var(--gray-hover-bg)",
-              color: "var(--cta-text)",
-            }}
-          >
-            <FaHeart />
+          <button className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-md hover:opacity-80">
+            <FaHeart className="text-gray-500" />
           </button>
         </div>
+
+        {/* Property Details */}
         <div className="p-4">
-          <h2
-            className="text-lg sm:text-xl font-semibold"
-            style={{ color: "var(--copy-primary)" }}
-          >
-            {title}
-          </h2>
-          <p
-            className="text-sm mt-1 truncate"
-            style={{ color: "var(--gray-text)" }}
-          >
-            {location}
-          </p>
-          <div className="flex text-gray-400 items-center mt-3">
-            <FaUserFriends
-              className="mr-2"
-              style={{ color: "var(--hover-color)" }}
-            />
-            <span style={{ color: "var(--gray-text)" }}>
-              Boys, Girls, Family
-            </span>
+          <h2 className="text-lg font-semibold text-gray-800 truncate">{title}</h2>
+          <p className="text-sm text-gray-500 mt-1">{location}</p>
+
+          {/* Price and Ratings */}
+          <div className="flex items-center justify-between mt-4">
+            <span className="text-lg font-bold text-gray-800">CAD {price}</span>
+            <div className="flex items-center space-x-1">
+              <FaStar className="text-yellow-500" />
+              <span className="text-sm text-gray-700 font-medium">{4.1}</span>
+              <span className="text-sm text-gray-500">({12} reviews)</span>
+            </div>
           </div>
-          <div className="grid grid-cols-3 gap-2 mt-4 text-xs sm:text-sm">
-            <p className="font-bold" style={{ color: "var(--gray-text)" }}>
-              {price} /month
-            </p>
-            <p style={{ color: "var(--gray-text)" }}>Security Deposit</p>
-            <p style={{ color: "var(--gray-text)" }}>Area</p>
-          </div>
-          <button
-            className="mt-4 py-2 px-4 rounded-lg shadow-md transition hover:bg-opacity-80"
-            style={{
-              background: "linear-gradient(to right, var(--cta), var(--cta-active))",
-              color: "var(--cta-text)",
-            }}
-          >
-            View Details
-          </button>
         </div>
       </div>
     </Link>

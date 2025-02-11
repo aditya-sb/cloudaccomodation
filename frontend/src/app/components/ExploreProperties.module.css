@@ -1,0 +1,27 @@
+/* Ensure proper spacing and prevent overlap */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Adjust the min width as needed */
+  gap: 16px; /* Space between items */
+} 
+
+.arrow {
+  cursor: pointer;
+  font-size: 24px; /* Adjust size as needed */
+  color: #000; /* Change color as needed */
+  padding: 10px; /* Add padding for better click area */
+}
+
+.left-arrow {
+  position: absolute;
+  left: 10px; /* Adjust position */
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.right-arrow {
+  position: absolute;
+  right: 10px; /* Adjust position */
+  top: 50%;
+  transform: translateY(-50%);
+}
