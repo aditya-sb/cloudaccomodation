@@ -9,11 +9,28 @@ export default function SearchBar() {
   const [showDropdown, setShowDropdown] = useState(false);
 
   const cities = [
-    "Toronto", "Montreal", "Vancouver", "Ottawa", "Waterloo", "Calgary", "Edmonton", "Halifax", "Victoria", "Quebec City",
+    "Toronto",
+    "Montreal",
+    "Vancouver",
+    "Ottawa",
+    "Waterloo",
+    "Calgary",
+    "Edmonton",
+    "Halifax",
+    "Victoria",
+    "Quebec City",
   ];
   const universities = [
-    "University of Toronto", "Humber College", "Seneca College", "Polytechnique Montréal", "Toronto Metropolitan University",
-    "McGill University", "University of British Columbia", "University of Waterloo", "University of Alberta", "Dalhousie University",
+    "University of Toronto",
+    "Humber College",
+    "Seneca College",
+    "Polytechnique Montréal",
+    "Toronto Metropolitan University",
+    "McGill University",
+    "University of British Columbia",
+    "University of Waterloo",
+    "University of Alberta",
+    "Dalhousie University",
   ];
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -53,18 +70,15 @@ export default function SearchBar() {
             </h1>
           </a>
         </div> */}
-  
+
         {/* Headline */}
         <h1
           className="text-4xl sm:text-5xl font-bold text-center mb-4"
           style={{ color: "var(--cta-text)" }}
         >
-          Explore{" "}
-          <span style={{ color: "var(--background)" }}>
-            Canada
-          </span>
+          Explore <span style={{ color: "var(--background)" }}>Canada</span>
         </h1>
-  
+
         {/* Search Bar */}
         <div
           className="relative p-3 rounded-full shadow-lg flex items-center space-x-2 w-full max-w-md sm:max-w-lg lg:max-w-2xl"
@@ -102,66 +116,87 @@ export default function SearchBar() {
               color: "var(--cta-text)",
               boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)",
             }}
-            onClick={() => (window.location.href = `/properties?search=${searchTerm}`)}
+            onClick={() =>
+              (window.location.href = `/properties?search=${searchTerm}`)
+            }
           >
             <FaSearch className="inline-block" />
           </button>
         </div>
-  
-        {showDropdown && (
-          <div
-            className="absolute top-full -mt-10 shadow-lg rounded-xl w-full max-w-xl z-10"
-            style={{
-              backgroundColor: "var(--card)",
-              color: "var(--copy-primary)",
-            }}
-          >
-            <div className="p-4">
-              <h2 className="text-lg font-semibold mb-3 flex items-center">
-                <FaBolt className="mr-2" style={{ color: "var(--cta)" }} /> Top Cities in Canada
-              </h2>
-              <div className="flex flex-wrap gap-2">
-                {cities.map((city) => (
-                  <button
-                    key={city}
-                    onMouseDown={() => (window.location.href = `/properties?search=${city}`)}
-                    className="px-4 py-2 rounded-full text-sm transition-all hover:scale-105"
-                    style={{
-                      backgroundColor: "var(--gray-bg)",
-                      color: "var(--copy-primary)",
-                      border: "1px solid var(--cta)",
-                    }}
-                  >
-                    {city}
-                  </button>
-                ))}
+
+        <div
+          className="relative rounded-full shadow-xl flex items-center space-x-2 w-full max-w-md sm:max-w-lg lg:max-w-2xl"
+          style={{
+         
+          }}
+        >
+          {/* ... existing search input and button code ... */}
+
+          {showDropdown && (
+            <div
+              className="absolute mt-2 shadow-xl rounded-xl w-full z-10"
+              style={{
+                backgroundColor: "var(--card)",
+                color: "var(--copy-primary)",
+                top: "100%",
+                left: 0,
+              }}
+            >
+              <div className="p-4">
+                <h2 className="text-lg font-semibold mb-3 flex items-center">
+                  <FaBolt className="mr-2" style={{ color: "var(--cta)" }} />{" "}
+                  Top Cities in Canada
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                  {cities.map((city) => (
+                    <button
+                      key={city}
+                      onMouseDown={() =>
+                        (window.location.href = `/properties?search=${city}`)
+                      }
+                      className="px-4 py-2 rounded-full text-sm transition-all hover:scale-105"
+                      style={{
+                        backgroundColor: "var(--gray-bg)",
+                        color: "var(--copy-primary)",
+                        border: "1px solid var(--cta)",
+                      }}
+                    >
+                      {city}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <hr
+                className="border-t"
+                style={{ borderColor: "var(--gray-border)" }}
+              />
+              <div className="p-4">
+                <h2 className="text-lg font-semibold mb-3 flex items-center">
+                  <FaBolt className="mr-2" style={{ color: "var(--cta)" }} />{" "}
+                  Top Universities in Canada
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                  {universities.map((university) => (
+                    <button
+                      key={university}
+                      onMouseDown={() =>
+                        (window.location.href = `/properties?search=${university}`)
+                      }
+                      className="px-4 py-2 rounded-full text-sm transition-all hover:scale-105"
+                      style={{
+                        backgroundColor: "var(--gray-bg)",
+                        color: "var(--copy-primary)",
+                        border: "1px solid var(--cta)",
+                      }}
+                    >
+                      {university}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
-            <hr className="border-t" style={{ borderColor: "var(--gray-border)" }} />
-            <div className="p-4">
-              <h2 className="text-lg font-semibold mb-3 flex items-center">
-                <FaBolt className="mr-2" style={{ color: "var(--cta)" }} /> Top Universities in Canada
-              </h2>
-              <div className="flex flex-wrap gap-2">
-                {universities.map((university) => (
-                  <button
-                    key={university}
-                    onMouseDown={() => (window.location.href = `/properties?search=${university}`)}
-                    className="px-4 py-2 rounded-full text-sm transition-all hover:scale-105"
-                    style={{
-                      backgroundColor: "var(--gray-bg)",
-                      color: "var(--copy-primary)",
-                      border: "1px solid var(--cta)",
-                    }}
-                  >
-                    {university}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-  
+          )}
+        </div>
         {/* Scroll Down Arrow */}
         <div className="absolute right-8 bottom-8">
           <div
@@ -187,5 +222,4 @@ export default function SearchBar() {
       </div>
     </div>
   );
-  
 }

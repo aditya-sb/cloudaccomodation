@@ -1,22 +1,20 @@
-import { FaDoorOpen } from 'react-icons/fa';
+import Image from "next/image";
 
-export default function MoveInSection() {
-    return (
-      <div className="p-8 rounded-xl shadow-lg mx-5 mb-10 flex items-center" style={{
-        backgroundColor: "var(--gray-bg)",
-        color: "var(--cta-text)",
-      }}>
-        <FaDoorOpen className="text-5xl text-purple-400 mr-6" />
-        <div>
-          <h3 className="text-2xl font-semibold" style={{
-        color: "var(--copy-primary)",
-      }}>Instant Move-In</h3>
-          <p className="mt-2" style={{
-        color: "var(--copy-secondary)",
-      }}>
-            Say goodbye to lengthy waits. Find, finalize, and move into your dream home without any delay.
-          </p>
-        </div>
-      </div>
-    );
+export default function VerifiedListingsSection() {
+  return (
+    <div className="w-4/5 md:w-2/3 p-4 md:text-base md:px-20 rounded-xl md:py-8 border border-blue-500 mx-auto mb-6 flex flex-col md:flex-row items-center shadow-[0_0_20px_20px_rgba(59,130,246,0.1)]">
+      <Image
+        src="/images/icons/CashInHand.png"
+        alt="Verification Medal"
+        width={40}
+        height={40}
+        className="mr-4"
+      />
+      <p>
+        <strong className="font-bold">No Full Payments Upfront:</strong> Pay a
+        security deposit to reserve your accommodation and settle the rest
+        directly with the owner upon arrival.
+      </p>
+    </div>
+  );
 }

@@ -1,29 +1,31 @@
-export default function Refer() {
-    return(
-        <section
-        className="relative w-full h-[300px] sm:h-[400px] overflow-hidden flex items-center justify-center"
-        style={{
-          backgroundColor: "var(--background)",
-          color: "var(--foreground) ",
-        }}
-      >
-        <img
-          src="/images/refer.png"
-          alt="Refer and Earn"
-          className="w-full h-full object-cover opacity-60"
-        />
-        <div className="absolute inset-0 flex flex-col justify-center items-center px-6 sm:px-10 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">Refer and Earn</h2>
-          <p className="text-sm sm:text-lg mb-6">
-            Share the joy of premium living! Refer your friends to join, and for
-            every successful referral, receive exclusive rewards.
+import React from 'react';
+
+const Refer = () => {
+  return (
+    <div className="p-8  max-sm:w-full bg-gray-100  ">
+      <h2 className='text-2xl  font-bold md:ml-4'>Referral Programs and Offers</h2>
+      <div className="flex md:w-1/2 justify-between border border-black/40 rounded-lg shadow-sm items-start mb-8 mt-6 p-6  md:ml-5">
+        <div className="flex flex-col md:w-3/5">
+          <h2 className="text-lg font-semibold mb-2">
+            Refer & Earn with Cloud Accommodation!
+          </h2>
+          <p className="text-sm text-gray-600 mb-4">
+            Refer your friends to book their housing through us. They enjoy hassle-free accommodation, and you earn 50 Canadian dollars.
           </p>
-          <ul className="text-sm sm:text-lg list-disc list-inside">
-            <li>Sign up and get your unique referral link</li>
-            <li>Share with friends who are looking for a new home</li>
-            <li>Earn rewards for each successful referral</li>
-          </ul>
+          <button className="w-fit bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-md text-sm">
+            Refer now
+          </button>
         </div>
-      </section>
-    );
-}
+        <div className="ml-4 md:flex hidden">
+          <img 
+            src="/images/refer.png" 
+            alt="Referral illustration" 
+            className="w-[230px]"
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Refer;

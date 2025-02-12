@@ -29,7 +29,7 @@ export default function PropertyCard({
 }: PropertyCardProps) {
   return (
     <Link href="/property" className="flex-shrink-0">
-      <div className="rounded-2xl shadow-lg hover:shadow-xl transition-all border bg-white cursor-pointer w-64 relative flex-shrink-0">
+      <div className="rounded-2xl shadow-lg hover:shadow-xl transition-all border bg-white cursor-pointer max-sm:w-64 w-50 relative flex-shrink-0">
         {/* Image Slider */}
         <div className="relative w-full text-[10px] overflow-hidden rounded-t-2xl">
           <ImageSlider images={images} />
@@ -56,7 +56,7 @@ export default function PropertyCard({
 
         {/* Property Details */}
         <div className="p-4">
-          <h2 className="text-lg font-semibold text-gray-800 truncate">{title}</h2>
+          <h2 className="text-base font-semibold text-gray-800 truncate">{title}</h2>
           <p className="text-sm text-gray-500 mt-1">{location}</p>
 
           {/* Price and Ratings */}

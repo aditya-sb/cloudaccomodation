@@ -16,6 +16,8 @@ import LightHeader from "./components/light-header";
 import { useGetPropertiesQuery } from "./redux/slices/apiSlice";
 import PopularCities from "./components/PopularCities";
 import ExploreProperties from "./components/ExploreProperties";
+import ReviewSection from "./components/Reviews";
+import GetInTouch from "./components/GetInTouch";
 
 export default function Home() {
   const [isHeaderVisible, setIsHeaderVisible] = useState(false);
@@ -64,30 +66,34 @@ export default function Home() {
 
       {/* Popular Cities Section */}
       <PopularCities />
-      
+
       {/* Explore Properties Section */}
       <ExploreProperties />
-      
-      {/* Other Sections */}
-      <div className="space-y-6 mt-8">
-        <PrivacySection />
-        <MoveInSection />
-        <SecurityDepositSection />
-        <NestNetworkSection />
-      </div>
 
-      {/* Booking Button */}
-      <div className="flex justify-center m-10">
-        <BookingButton />
+      {/* Other Sections */}
+      <div className="flex flex-col text-2xl max-md:text-lg mt-6 mb-10 w-full">
+        <div className="flex gap-3 justify-start px-10  font-semibold text-gray-800 mb-10 md:mb-20 w-full">
+          <h3 className="font-bold">Why Choose </h3>
+          <h3 className="font-bold text-blue-500">Cloud Accommodation?</h3>
+        </div>
+        <div className="flex flex-col items-center">
+          <PrivacySection />
+          <MoveInSection />
+          <SecurityDepositSection />
+          <NestNetworkSection />
+        </div>
       </div>
+      <ReviewSection />
+      {/* Booking Button */}
+      {/* <div className="flex justify-center m-10">
+        <BookingButton />
+      </div> */}
 
       {/* Other Services */}
       <OtherServices />
-
-      {/* Customer Reviews */}
-      <CustomerReviews />
-
       <Refer />
+
+      <GetInTouch/>
 
       {/* Footer */}
       <Footer />

@@ -74,24 +74,24 @@ export default function LightHeader() {
             </h1>
           </a>
         </Link>
-        <button onClick={toggleTheme} 
+        {/* <button onClick={toggleTheme} 
             className="text-xl transition-transform md:hidden hover:scale-110 hover:rotate-12">
             {isDarkTheme ? (
               <FaMoon className="text-blue-400" />
             ) : (
               <FaSun className="text-yellow-400" />
             )}
-          </button>
+          </button> */}
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-4 ml-6">
-          <button onClick={toggleTheme} 
+          {/* <button onClick={toggleTheme} 
             className="text-xl transition-transform hover:scale-110 hover:rotate-12">
             {isDarkTheme ? (
               <FaMoon className="text-blue-400" />
             ) : (
               <FaSun className="text-yellow-400" />
             )}
-          </button>
+          </button> */}
           
           {isAuthenticatedUser ? (
             <>

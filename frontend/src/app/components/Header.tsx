@@ -118,7 +118,7 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
         ): null}
 
         
-        <button
+        {/* <button
           onClick={toggleTheme}
           className="md:hidden p-2 rounded-full hover:bg-gray-100 ml-4 mr-4 dark:hover:bg-gray-800 transition-colors"
         >
@@ -127,11 +127,11 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
           ) : (
             <FaSun className="text-xl text-yellow-500" />
           )}
-        </button>
+        </button> */}
         {/* Desktop Navigation - Updated styling */}
         <nav className="hidden md:flex items-center space-x-3">
           {/* Theme Toggle - Updated styling */}
-        <button
+        {/* <button
           onClick={toggleTheme}
           className="p-2 rounded-full hover:bg-gray-100 ml-4 mr-4 dark:hover:bg-gray-800 transition-colors"
         >
@@ -140,7 +140,7 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
           ) : (
             <FaSun className="text-xl text-yellow-500" />
           )}
-        </button>
+        </button> */}
           {isAuthenticatedUser ? (
             <>
               <button

@@ -1,164 +1,64 @@
-import { FaPlane, FaBox, FaUserShield, FaUniversity, FaCar, FaShieldAlt, FaTag, FaSimCard } from "react-icons/fa";
+import React from 'react';
 
-export default function OtherServices() {
+const OtherServices = () => {
+  const services = [
+    { icon: "/images/icons/Airport.png", name: "Student Flights" },
+    { icon: "/images/icons/Airport2.png", name: "Airport Pickup" },
+    { icon: "/images/icons/Shield.png", name: "Student Guarantor" },
+    { icon: "/images/icons/Airport2.png", name: "Airport Pickup" },
+    { icon: "/images/icons/StudentCenter.png", name: "Student Loans" },
+    { icon: "/images/icons/Protect.png", name: "Tenant Insurance" },
+    { icon: "/images/icons/Discount.png", name: "Deals" },
+    { icon: "/images/icons/SimCard.png", name: "Overseas Sim Card" },
+  ];
+
   return (
-    <section className="p-6 dark-mode:bg-gray-900 md:p-12" style={{
-      color: "var(--foreground)",
-      backgroundColor: "var(--border)",
-    }}>
-      <div className="max-w-4xl mx-auto">
-        <h2 className="text-3xl sm:text-4xl mt-7 font-extrabold text-center mb-10" style={{
-          color: "var(--foreground)",
-        }}>
+    <section className="p-8 mb-5" style={{ color: "var(--foreground)" }}>
+      <div className="flex w-full justify-start mb-10">
+        <h3 className="text-3xl max-sm:text-2xl mt-7 font-semibold text-center" 
+            style={{ color: "var(--foreground)" }}>
           Other Services
-        </h2>
-        <div className="grid grid-cols-2 gap-4 md:gap-10  md:grid-cols-3 lg:grid-cols-4">
-          
-          {/* Service 1 */}
-          <div className="p-4 md:p-6 rounded-lg shadow-lg transform transition hover:-translate-y-2 duration-300 text-center" style={{
-            backgroundColor: "var(--gray-bg)",
-            color: "var(--cta-text)",
-          }}>
-            <FaPlane className="text-purple-600 text-3xl sm:text-4xl mb-4 mx-auto" />
-            <p className="text-sm sm:text-lg md:text-xl font-semibold text-purple-600 mb-2">Flight Booking</p>
-            <button
-              className="mt-4 py-2 px-4 rounded-lg shadow-md transition hover:opacity-75"
-              style={{
-                background: "linear-gradient(to right, var(--cta), var(--cta-active))",
-                color: "var(--cta-text)",
-              }}
-            >
-              Coming Soon
-            </button>
-          </div>
+        </h3>
+      </div>
 
-          {/* Service 2 */}
-          <div className="p-4 md:p-6 rounded-lg shadow-lg transform transition hover:-translate-y-2 duration-300 text-center" style={{
-            backgroundColor: "var(--gray-bg)",
-            color: "var(--cta-text)",
-          }}>
-            <FaBox className="text-indigo-600 text-3xl sm:text-4xl mb-4 mx-auto" />
-            <p className="text-sm sm:text-lg md:text-xl font-semibold text-indigo-600 mb-2">Nearby Tiffin</p>
-            <button
-              className="mt-4 py-2 px-4 rounded-lg shadow-md transition hover:opacity-75"
-              style={{
-                background: "linear-gradient(to right, var(--cta), var(--cta-active))",
-                color: "var(--cta-text)",
-              }}
-            >
-              Coming Soon
-            </button>
-          </div>
+      {/* Desktop Grid / Mobile Slider Container */}
+      <div className="max-w-4xl mx-auto">
+        <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-10">
+          {services.map((service, index) => (
+            <ServiceCard key={index} icon={service.icon} name={service.name} />
+          ))}
+        </div>
 
-          {/* Service 3 */}
-          <div className="p-4 md:p-6 rounded-lg shadow-lg transform transition hover:-translate-y-2 duration-300 text-center" style={{
-            backgroundColor: "var(--gray-bg)",
-            color: "var(--cta-text)",
-          }}>
-            <FaUserShield className="text-green-600 text-3xl sm:text-4xl mb-4 mx-auto" />
-            <p className="text-sm sm:text-lg md:text-xl font-semibold text-green-600 mb-2">Student Guarantor</p>
-            <button
-              className="mt-4 py-2 px-4 rounded-lg shadow-md transition hover:opacity-75"
-              style={{
-                background: "linear-gradient(to right, var(--cta), var(--cta-active))",
-                color: "var(--cta-text)",
-              }}
-            >
-              Coming Soon
-            </button>
-          </div>
-
-          {/* Service 4 */}
-          <div className="p-4 md:p-6 rounded-lg shadow-lg transform transition hover:-translate-y-2 duration-300 text-center" style={{
-            backgroundColor: "var(--gray-bg)",
-            color: "var(--cta-text)",
-          }}>
-            <FaUniversity className="text-yellow-500 text-3xl sm:text-4xl mb-4 mx-auto" />
-            <p className="text-sm sm:text-lg md:text-xl font-semibold text-yellow-500 mb-2">Student Loan</p>
-            <button
-              className="mt-4 py-2 px-4 rounded-lg shadow-md transition hover:opacity-75"
-              style={{
-                background: "linear-gradient(to right, var(--cta), var(--cta-active))",
-                color: "var(--cta-text)",
-              }}
-            >
-              Coming Soon
-            </button>
-          </div>
-
-          {/* Service 5 */}
-          <div className="p-4 md:p-6 rounded-lg shadow-lg transform transition hover:-translate-y-2 duration-300 text-center" style={{
-            backgroundColor: "var(--gray-bg)",
-            color: "var(--cta-text)",
-          }}>
-            <FaCar className="text-yellow-500 text-3xl sm:text-4xl mb-4 mx-auto" />
-            <p className="text-sm sm:text-lg md:text-xl font-semibold text-yellow-500 mb-2">Airport Pickup</p>
-            <button
-              className="mt-4 py-2 px-4 rounded-lg shadow-md transition hover:opacity-75"
-              style={{
-                background: "linear-gradient(to right, var(--cta), var(--cta-active))",
-                color: "var(--cta-text)",
-              }}
-            >
-              Coming Soon
-            </button>
-          </div>
-
-          {/* Service 6 */}
-          <div className="p-4 md:p-6 rounded-lg shadow-lg transform transition hover:-translate-y-2 duration-300 text-center" style={{
-            backgroundColor: "var(--gray-bg)",
-            color: "var(--cta-text)",
-          }}>
-            <FaShieldAlt className="text-green-600 text-3xl sm:text-4xl mb-4 mx-auto" />
-            <p className="text-sm sm:text-lg md:text-xl font-semibold text-green-600 mb-2">Tenant Insurance</p>
-            <button
-              className="mt-4 py-2 px-4 rounded-lg shadow-md transition hover:opacity-75"
-              style={{
-                background: "linear-gradient(to right, var(--cta), var(--cta-active))",
-                color: "var(--cta-text)",
-              }}
-            >
-              Coming Soon
-            </button>
-          </div>
-
-          {/* Service 7 */}
-          <div className="p-4 md:p-6 rounded-lg shadow-lg transform transition hover:-translate-y-2 duration-300 text-center" style={{
-            backgroundColor: "var(--gray-bg)",
-            color: "var(--cta-text)",
-          }}>
-            <FaTag className="text-indigo-600 text-3xl sm:text-4xl mb-4 mx-auto" />
-            <p className="text-sm sm:text-lg md:text-xl font-semibold text-indigo-600 mb-2">Deals</p>
-            <button
-              className="mt-4 py-2 px-4 rounded-lg shadow-md transition hover:opacity-75"
-              style={{
-                background: "linear-gradient(to right, var(--cta), var(--cta-active))",
-                color: "var(--cta-text)",
-              }}
-            >
-              Coming Soon
-            </button>
-          </div>
-
-          {/* Service 8 */}
-          <div className="p-4 md:p-6 rounded-lg shadow-lg transform transition hover:-translate-y-2 duration-300 text-center" style={{
-            backgroundColor: "var(--gray-bg)",
-            color: "var(--cta-text)",
-          }}>
-            <FaSimCard className="text-purple-600 text-3xl sm:text-4xl mb-4 mx-auto" />
-            <p className="text-sm sm:text-lg md:text-xl font-semibold text-purple-600 mb-2">Overseas Sim Card</p>
-            <button
-              className="mt-4 py-2 px-4 rounded-lg shadow-md transition hover:opacity-75"
-              style={{
-                background: "linear-gradient(to right, var(--cta), var(--cta-active))",
-                color: "var(--cta-text)",
-              }}
-            >
-              Coming Soon
-            </button>
+        {/* Mobile Slider */}
+        <div className="md:hidden w-full overflow-x-auto scrollbar-hide">
+          <div className="flex space-x-4 pb-4 min-w-min">
+            {services.map((service, index) => (
+              <div key={index} className="flex-shrink-0 w-[200px]">
+                <ServiceCard icon={service.icon} name={service.name} />
+              </div>
+            ))}
           </div>
         </div>
       </div>
     </section>
   );
-}
+};
+
+// Separated ServiceCard component for reusability
+const ServiceCard = ({ icon, name }) => (
+  <div
+    className="p-6 w-full h-full rounded-lg border-2 border-black/20 transform transition md:hover:-translate-y-2 duration-300 text-center"
+    style={{ color: "var(--cta-text)" }}
+  >
+    <img
+      src={icon}
+      alt={name}
+      className="w-100 h-100 mx-auto mb-4"
+    />
+    <p className="text-sm md:text-base text-black">
+      {name}
+    </p>
+  </div>
+);
+
+export default OtherServices;

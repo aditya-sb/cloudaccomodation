@@ -1,22 +1,19 @@
-import { FaLock } from 'react-icons/fa';
+import Image from "next/image";
 
-export default function PrivacySection() {
-    return (
-      <div className=" p-8 rounded-xl dar:bg-gray-800 shadow-lg mx-5 mb-10 flex items-center" style={{
-        backgroundColor: "var(--gray-bg)",
-        color: "var(--cta-text)",
-      }}>
-        <FaLock className="text-5xl text-green-400 mr-6" />
-        <div>
-          <h3 className="text-2xl font-semibold" style={{
-        color: "var(--copy-primary)",
-      }}>Unmatched Privacy</h3>
-          <p className="text-gray-400 mt-2" style={{
-        color: "var(--copy-secondary)",
-      }}>
-            We re committed to protecting your privacy. Throughout your rental journey, we ll be there for you every step of the way.
-          </p>
-        </div>
-      </div>
-    );
+export default function VerifiedListingsSection() {
+  return (
+    <div className="w-4/5 md:w-2/3 p-4 md:text-base md:px-20 rounded-xl md:py-8 border border-blue-500 mx-auto mb-6 flex flex-col md:flex-row items-center shadow-[0_0_20px_20px_rgba(59,130,246,0.1)]">
+      <Image
+        src="/images/icons/guarantee.png"
+        alt="Verification Medal"
+        width={40}
+        height={40}
+        className="mr-0 md:mr-4 mb-4 md:mb-0"
+      />
+      <p className="text-center md:text-left">
+        <strong className="font-bold">Verified Listings:</strong> Every property
+        is thoroughly checked to ensure safety, quality, and reliability.
+      </p>
+    </div>
+  );
 }
