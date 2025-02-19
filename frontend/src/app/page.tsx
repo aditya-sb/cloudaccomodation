@@ -76,7 +76,7 @@ export default function Home() {
           <h3 className="font-bold">Why Choose </h3>
           <h3 className="font-bold text-blue-500">Cloud Accommodation?</h3>
         </div>
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col text-base items-center">
           <PrivacySection />
           <MoveInSection />
           <SecurityDepositSection />

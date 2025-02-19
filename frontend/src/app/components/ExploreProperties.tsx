@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import PropertyCard from './PropertyCard';
 import { useGetPropertiesQuery } from '../redux/slices/apiSlice';
 import { Property } from '../../types/index';
+import { useRouter } from 'next/navigation';
 
 const canadianCities = ['Toronto', 'Brampton', 'Vancouver', 'Montreal', 'Niagara Falls', 'Halifax'];
 
 const ExploreProperties = () => {
+  const router = useRouter();
   const [selectedCity, setSelectedCity] = useState('All');
 
   const { data: properties, error, isLoading } = useGetPropertiesQuery({
@@ -52,12 +54,12 @@ const ExploreProperties = () => {
 
         {properties && properties.length >= maxPropertiesToShow && (
           <div className="flex justify-end">
-            <a
-              href={`http://localhost:3000/properties?search=${selectedCity}`}
+            <div
+              onClick={() => router.push(`/properties?search=${selectedCity}`)}
               className="text-blue-600 hover:text-blue-700 text-sm font-medium"
             >
               View more {selectedCity === 'All' ? 'Properties' : `Properties in ${selectedCity}`} &rarr;
-            </a>
+            </div>
           </div>
         )}
       </div>

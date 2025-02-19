@@ -80,55 +80,51 @@ export default function SearchBar() {
         </h1>
 
         {/* Search Bar */}
-        <div
-          className="relative p-3 rounded-full shadow-lg flex items-center space-x-2 w-full max-w-md sm:max-w-lg lg:max-w-2xl"
-          style={{
-            backgroundColor: "var(--card)",
-            color: "var(--copy-primary)",
-            border: "1px solid var(--gray-border)",
-          }}
-        >
-          <input
-            type="text"
-            placeholder="Search by City, University, or Property..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="px-4 py-2 w-full rounded-l-full border-none text-sm sm:text-base placeholder-gray-text focus:ring-2 focus:outline-none"
+        <div className="relative w-full max-w-md sm:max-w-lg lg:max-w-2xl">
+          <div
+            className="flex px-3 py-1 items-center rounded-full shadow-lg border border-gray-300 overflow-hidden bg-white"
             style={{
-              backgroundColor: "var(--gray-bg)",
+              backgroundColor: "var(--card)",
               color: "var(--copy-primary)",
-              boxShadow: "inset 0px 2px 4px rgba(0, 0, 0, 0.1)",
             }}
-            onFocus={() => setShowDropdown(true)}
-            onBlur={(e) => {
-              setTimeout(() => {
-                if (!e.relatedTarget) {
-                  setShowDropdown(false);
-                }
-              }, 150);
-            }}
-          />
-          <button
-            className="px-4 py-2 rounded-full transition-all focus:ring-2 text-sm sm:text-base hover:opacity-90"
-            style={{
-              backgroundColor: "var(--cta)",
-              color: "var(--cta-text)",
-              boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.15)",
-            }}
-            onClick={() =>
-              (window.location.href = `/properties?search=${searchTerm}`)
-            }
           >
-            <FaSearch className="inline-block" />
-          </button>
+            <input
+              type="text"
+              placeholder="Search by City, University, or Property..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="px-4 py-3 w-full text-base bg-white sm:text-base border-none focus:ring-0 outline-none"
+              style={{
+                color: "var(--copy-primary)",
+              }}
+              onFocus={() => setShowDropdown(true)}
+              onBlur={(e) => {
+                setTimeout(() => {
+                  if (!e.relatedTarget) {
+                    setShowDropdown(false);
+                  }
+                }, 150);
+              }}
+            />
+            <button
+              className="rounded-full p-2 px-4  text-white flex items-center justify-center transition-all"
+              style={{
+                backgroundColor: "var(--cta)",
+                color: "var(--cta-text)",
+              }}
+              onClick={() =>
+                (window.location.href = `/properties?search=${searchTerm}`)
+              }
+            >
+              <FaSearch className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         <div
           className="relative rounded-full shadow-xl flex items-center space-x-2 w-full max-w-md sm:max-w-lg lg:max-w-2xl"
-          style={{
-         
-          }}
+          style={{}}
         >
           {/* ... existing search input and button code ... */}
 
