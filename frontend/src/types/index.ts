@@ -8,6 +8,7 @@ export interface Overview {
 }
 
 export interface Property {
+  id: any;
   _id: number; // Assuming this remains a number; if it's an ObjectId in MongoDB, update it accordingly.
   title: string;
   description: string;

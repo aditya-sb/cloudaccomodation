@@ -3,6 +3,7 @@ import PropertyCard from './PropertyCard';
 import { useGetPropertiesQuery } from '../redux/slices/apiSlice';
 import { Property } from '../../types/index';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const canadianCities = ['Toronto', 'Brampton', 'Vancouver', 'Montreal', 'Niagara Falls', 'Halifax'];
 
@@ -13,7 +14,7 @@ const ExploreProperties = () => {
   const { data: properties, error, isLoading } = useGetPropertiesQuery({
     city: selectedCity === 'All' ? undefined : selectedCity,
   });
-
+  console.log(properties);
   const maxPropertiesToShow = 5;
 
   return (
@@ -71,18 +72,23 @@ const ExploreProperties = () => {
       ) : (
         <div className="flex overflow-x-auto gap-6 pb-4 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {properties?.slice(0, maxPropertiesToShow).map((property: Property, index: number) => (
-            <PropertyCard
+            <Link
               key={index}
-              images={property.images}
-              title={property.title}
-              location={property.location}
-              price={property.price}
-              beds={property.overview.bedrooms}
-              baths={property.overview.bathrooms}
-              area={property.overview.squareFeet}
-              rating={4}
-              reviewsCount={12}
-            />
+              href={`/property/${property._id}`}
+              className="hover:opacity-80 transition-all duration-300"
+            >
+              <PropertyCard
+                images={property.images || []}
+                title={property.title}
+                location={property.location}
+                price={property.price}
+                beds={property.overview.bedrooms}
+                baths={property.overview.bathrooms}
+                area={property.overview.squareFeet}
+                rating={4}
+                reviewsCount={12}
+              />
+            </Link>
           ))}
         </div>
       )}

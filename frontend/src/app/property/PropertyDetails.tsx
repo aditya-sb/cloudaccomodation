@@ -17,20 +17,47 @@ const PropertyDetails = ({
   title,
   location,
   price,
+  description,
+  amenities,
+  overview,
+  features,
 }: {
   title: string;
   location: string;
+  overview: { bedrooms: number; bathrooms: number; squareFeet: number };
   price: string;
+  amenities: string | string[];
   description: string;
   features: string[];
 }) => {
   const [activeSection, setActiveSection] = React.useState('overview'); // state to track selected section
   const [moveInDate, setMoveInDate] = React.useState(""); // state for move-in date
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [processedAmenities, setProcessedAmenities] = React.useState<string[]>([]);
+  React.useEffect(() => {
+    if (!amenities) return;
+    
+    try {
+      if (Array.isArray(amenities)) {
+        // If it's an array with a JSON string as first element
+        const parsed = JSON.parse(amenities[0]);
+        setProcessedAmenities(parsed);
+      } else if (typeof amenities === 'string') {
+        // If it's a direct JSON string
+        const parsed = JSON.parse(amenities);
+        setProcessedAmenities(parsed);
+      }
+    } catch (error) {
+      console.error("Error parsing amenities:", error);
+      setProcessedAmenities([]);
+    }
+  }, [amenities]);
+
+  console.log("smdalskdmalsk",processedAmenities);
   const handleBooking = () => {
     setIsModalOpen(true);
   };
-
+  
   return (
     <div className="mt-4 bg-[var(--card)] text-[var(--copy-primary)] rounded-lg boreder shadow-lg p-4 md:p-6 border border-[var(--border)]">
       {/* Title and Location */}
@@ -119,15 +146,15 @@ const PropertyDetails = ({
             <div className="flex flex-wrap space-x-4 text-sm md:text-[16px] text-[var(--gray-text)]">
               <div className="flex items-center mb-2">
                 <FaBed className="mr-2 text-blue-500" />
-                <span>2 Bedroom</span>
+                <span>{overview?.bedrooms} Bedroom</span>
               </div>
               <div className="flex items-center mb-2">
                 <FaBath className="mr-2 text-blue-500" />
-                <span>2 Bathroom</span>
+                <span>{overview?.bathrooms} Bathroom</span>
               </div>
               <div className="flex items-center mb-2">
                 <FaRuler className="mr-2 text-blue-500" />
-                <span>1200 sq.ft</span>
+                <span>{overview?.squareFeet} sq.ft</span>
               </div>
               <div className="flex items-center mb-2">
                 <FaCalendarAlt className="mr-2 text-blue-500" />
@@ -137,6 +164,21 @@ const PropertyDetails = ({
             <div className="mt-4 text-[var(--copy-secondary)]">
               <p>North facing</p>
               <p>Semi furnished</p>
+            </div>
+          </div>
+        )}
+        {activeSection === 'amenities' && processedAmenities.length > 0 && (
+          <div className="space-y-2">
+            <h3 className="text-xl font-semibold mb-4">Amenities</h3>
+            <div className="flex flex-wrap gap-2">
+              {processedAmenities.map((amenity, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-2 px-4 py-2 border border-blue-500 rounded-lg text-sm"
+                >
+                  {amenity}
+                </div>
+              ))}
             </div>
           </div>
         )}

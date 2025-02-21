@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^1.16.8",
+    "@heroicons/react": "^2.2.0",
     "@reduxjs/toolkit": "^2.3.0",
     "antd": "^5.23.2",
     "axios": "^1.7.7",

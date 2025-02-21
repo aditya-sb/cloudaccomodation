@@ -1,12 +1,5 @@
-import PropertyDetails from "./PropertyDetails";
-import PropertyGallery from "./PropertyGallery";
-import Map from "./Map";
-import BuyerReviews from "./BuyerReviews";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import BookingDetails from "./BookingDetails";
-import PropertyCard from "../components/PropertyCard";
-import Dropdown from "../components/Dropdown";
+"use client";
+
 import {
   FaBolt,
   FaDollarSign,
@@ -14,13 +7,30 @@ import {
   FaUndo,
   FaCheck,
 } from "react-icons/fa";
+import { use } from "react";
+import { useParams } from "next/navigation";
+import Header from "@/app/components/Header";
+import PropertyGallery from "../PropertyGallery";
+import PropertyDetails from "../PropertyDetails";
+import Map from "../Map";
+import BuyerReviews from "../BuyerReviews";
+import Dropdown from "@/app/components/Dropdown";
+import PropertyCard from "@/app/components/PropertyCard";
+import BookingDetails from "../BookingDetails";
+import Footer from "@/app/components/Footer";
+import { useGetPropertiesQuery } from "@/app/redux/slices/apiSlice";
+import PropertyDetailsMobile from "../propertyDetailsMobile";
 
 export default function PropertyPage() {
+  const { propertyId } = useParams();
+  const { data: property, error, isLoading } = useGetPropertiesQuery({ id: propertyId });
+  console.log(property);
+  const thisProperty = property?.[0];
   return (
     <>
       <Header isPropertyPage={true} />
       <div
-        className="min-h-screen p-5 max-sm:p-0 flex flex-col md:flex-row gap-8"
+        className="min-h-screen max-sm:p-0 flex flex-col md:flex-row gap-8"
         style={{
           backgroundColor: "var(--gray-bg)",
           color: "var(--foreground)",
@@ -28,35 +38,41 @@ export default function PropertyPage() {
       >
         {/* Left Section: 60% */}
         <div
-          className="w-full pt-20 pb-5 border rounded-lg px-4  md:w-4/5"
+          className="w-full pt-[60px] pb-5 border rounded-lg  md:w-4/5"
           style={{
             backgroundColor: "var(--card)",
             color: "var(--foreground)",
           }}
         >
           {/* Property Gallery */}
-          <PropertyGallery
-            images={[
-              "/images/cottage.jpeg",
-              "/images/luxuryinside.jpeg",
-              "/images/property-logo.png",
-            ]}
-          />
+          <PropertyGallery images={thisProperty?.images || []} />
 
           {/* Property Details */}
-          <PropertyDetails
-            title="Luxury Villa in Beverly Hills"
-            location="Beverly Hills, CA"
-            price="$5,000,000"
-            description="A breathtaking villa with stunning ocean views and luxurious amenities."
-            features={["5 Bedrooms", "4 Bathrooms", "Swimming Pool", "Garden"]}
-          />
+          <div className="hidden md:block">
+            <PropertyDetails
+              title={thisProperty?.title}
+              location={thisProperty?.location}
+              price={thisProperty?.price}
+              description={thisProperty?.description}
+              amenities={thisProperty?.amenities}
+              overview={thisProperty?.overview}
+            />
+          </div>
+          <div className="block md:hidden">
+            <PropertyDetailsMobile
+              title={thisProperty?.title}
+              location={thisProperty?.location}
+              price={thisProperty?.price}
+              description={thisProperty?.description}
+              amenities={thisProperty?.amenities}
+              overview={thisProperty?.overview} rent={0} availableFrom={""} distanceFromUniversity={""} utilities={[]} securityDeposit={0} rentPayments={[]}            />
+          </div>
 
           {/* Map */}
           <Map
-            location="Beverly Hills, CA"
-            lat={34.0736204}
-            lon={-118.4003563}
+            location={thisProperty?.location}
+            lat={thisProperty?.latitude}
+            lon={thisProperty?.longitude}
           />
 
           {/* Buyer Reviews */}
@@ -64,47 +80,49 @@ export default function PropertyPage() {
         </div>
 
         {/* Right Section: 40% */}
-        <div className="w-full rounded-lg md:w-2/5 p-4"
+        <div
+          className="w-full rounded-lg md:w-2/5 p-4"
           style={{
             backgroundColor: "var(--background)",
             color: "var(--foreground)",
-           }}>
+          }}
+        >
           <div className="sticky top-20 p-4 rounded-lg shadow-sm">
             <h1 className="text-xl font-semibold p-4 ">
-              Luxury Villa in Beverly Hills
+              {thisProperty?.title}
             </h1>
             <div className="rounded-lg overflow-hidden mt-4">
               <Dropdown
                 className="border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
-                title="Instant Booking" 
+                title="Instant Booking"
                 icon={<FaBolt size={14} />}
               >
                 <p>Details about instant booking go here...</p>
               </Dropdown>
               <Dropdown
                 className="border border-gray-200 hover:border-gray-300 transition-colors"
-                title="Lowest Price Guaranteed" 
+                title="Lowest Price Guaranteed"
                 icon={<FaDollarSign size={14} />}
               >
                 <p>Details about price guarantee go here...</p>
               </Dropdown>
               <Dropdown
                 className="border border-gray-200 hover:border-gray-300 transition-colors"
-                title="Verified Properties" 
+                title="Verified Properties"
                 icon={<FaCheck size={14} />}
               >
                 <p>Details about verified properties go here...</p>
               </Dropdown>
               <Dropdown
                 className="border border-gray-200 hover:border-gray-300 transition-colors"
-                title="24x7 Personal Assistance" 
+                title="24x7 Personal Assistance"
                 icon={<FaHeadset size={14} />}
               >
                 <p>Details about personal assistance go here...</p>
               </Dropdown>
               <Dropdown
                 className="border border-gray-200 hover:border-gray-300 transition-colors"
-                title="5.8K+ Reviews" 
+                title="5.8K+ Reviews"
                 icon={<FaUndo size={14} />}
               >
                 <p>Details about reviews go here...</p>
@@ -132,24 +150,24 @@ export default function PropertyPage() {
 
         <section className="pb-5 grid grid-cols-1 md:grid-cols-3 gap-8 px-10 max-w-[1440px] mx-auto">
           <PropertyCard
-            image="/images/mordenhouse.webp"
+            images="/images/mordenhouse.webp"
             title="Modern Family Home"
             location="Beverly Hills, CA"
-            price="$2,500,000"
+            price={250}
             description="A beautiful home with four bedrooms, a spacious living area, and a private pool."
           />
           <PropertyCard
-            image="/images/luxuryinside.jpeg"
+            images="/images/luxuryinside.jpeg"
             title="Luxury City Apartment"
             location="New York, NY"
-            price="$1,800,000"
+            price={1800000}
             description="Stylish two-bedroom apartment with stunning views of the skyline."
           />
           <PropertyCard
             image="/images/cottage.jpeg"
             title="Cozy Country Cottage"
             location="Aspen, CO"
-            price="$850,000"
+            price={850000}
             description="Charming cottage with two bedrooms and a beautiful garden in a tranquil setting."
           />
         </section>

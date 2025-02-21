@@ -1,28 +1,45 @@
 "use client";
 
-import React, { useState } from 'react';
-import Image from 'next/image';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import Image from "next/image";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface PropertyGalleryProps {
   images: string[];
 }
-
 export default function PropertyGallery({ images }: PropertyGalleryProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [loadedImages, setLoadedImages] = useState<string[]>([]);
+
+  useEffect(() => {
+    const loadImages = async () => {
+      const loadedImages = await Promise.all(
+        images.map((image) =>
+          new Promise<string>((resolve, reject) => {
+            const img = new window.Image();
+            img.onload = () => resolve(image);
+            img.onerror = () => reject(new Error("Image failed to load"));
+            img.src = image;
+          })
+        )
+      );
+      setLoadedImages(loadedImages);
+    };
+    loadImages().catch((error) => console.error(error));
+  }, [images]);
 
   const goToNext = () => {
     if (isTransitioning) return;
     setIsTransitioning(true);
-    setCurrentIndex((prev) => (prev + 1) % images.length);
+    setCurrentIndex((prev) => (prev + 1) % loadedImages.length);
     setTimeout(() => setIsTransitioning(false), 500);
   };
 
   const goToPrevious = () => {
     if (isTransitioning) return;
     setIsTransitioning(true);
-    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+    setCurrentIndex((prev) => (prev - 1 + loadedImages.length) % loadedImages.length);
     setTimeout(() => setIsTransitioning(false), 500);
   };
 
@@ -33,7 +50,7 @@ export default function PropertyGallery({ images }: PropertyGalleryProps) {
     setTimeout(() => setIsTransitioning(false), 500);
   };
 
-  // Shared Navigation Buttons Component
+  // Navigation Buttons
   const NavigationButtons = () => (
     <>
       <button
@@ -53,86 +70,74 @@ export default function PropertyGallery({ images }: PropertyGalleryProps) {
     </>
   );
 
-  // Mobile Carousel View
+  // Mobile View
   const MobileView = () => (
-    <>
-      <div className="relative h-[400px] overflow-hidden rounded-xl">
-        <div className={`absolute w-full h-full transition-opacity duration-500 ${
-          isTransitioning ? 'opacity-90' : 'opacity-100'
-        }`}>
+    <div className="relative h-[300px] overflow-hidden">
+      {loadedImages.length > 0 && (
+        <div
+          className={`absolute w-full h-full transition-opacity duration-500 ${
+            isTransitioning ? "opacity-90" : "opacity-100"
+          }`}
+        >
           <Image
-            src={images[currentIndex]}
+            src={loadedImages[currentIndex]}
             alt={`Property image ${currentIndex + 1}`}
-            layout="fill"
+            fill
             className="object-cover"
             priority
           />
         </div>
-        <NavigationButtons />
-      </div>
-      <div className="mt-4 flex justify-center gap-2">
-        <div className="flex gap-2 p-2 overflow-x-auto pb-2">
-          {images.map((image, index) => (
-            <button
-              key={index}
-              onClick={() => goToSlide(index)}
-              className={`relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden transition-all ${
-                currentIndex === index
-                  ? 'ring-2 ring-offset-2 ring-blue-500'
-                  : 'opacity-70 hover:opacity-100'
-              }`}
-            >
-              <Image
-                src={image}
-                alt={`Thumbnail ${index + 1}`}
-                layout="fill"
-                className="object-cover"
-              />
-            </button>
-          ))}
-        </div>
-      </div>
-    </>
+      )}
+      <NavigationButtons />
+    </div>
   );
 
-  // Desktop Grid View
+  // Desktop View
   const DesktopView = () => (
-    <div className="grid grid-cols-12 gap-4">
-      {/* Main large image with navigation */}
+    <div className="grid grid-cols-12 p-4 gap-4">
+      {/* Main Image */}
       <div className="col-span-8 relative h-[400px] rounded-xl overflow-hidden group">
-        <Image
-          src={images[currentIndex]}
-          alt={`Property image ${currentIndex + 1}`}
-          layout="fill"
-          className="object-cover"
-          priority
-        />
-        {/* Show navigation on hover */}
+        {loadedImages.length > 0 && (
+          <div
+            className={`absolute w-full h-full transition-opacity duration-500 ${
+              isTransitioning ? "opacity-90" : "opacity-100"
+            }`}
+          >
+            <Image
+              src={loadedImages[currentIndex]}
+              alt={`Property image ${currentIndex + 1}`}
+              fill
+              className="object-cover"
+              priority
+            />
+          </div>
+        )}
+        {/* Navigation Buttons */}
         <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <NavigationButtons />
         </div>
-        {/* Image counter */}
+        {/* Image Counter */}
         <div className="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm">
-          {currentIndex + 1} / {images.length}
+          {currentIndex + 1} / {loadedImages.length}
         </div>
       </div>
 
-      {/* Side thumbnails in grid */}
+      {/* Thumbnails */}
       <div className="col-span-4 grid grid-cols-2 gap-4 h-[400px] overflow-y-auto pl-1 pt-1 pr-2">
-        {images.map((image, index) => (
+        {loadedImages.map((image, index) => (
           <button
             key={index}
             onClick={() => goToSlide(index)}
             className={`relative aspect-square rounded-lg overflow-hidden transition-all ${
               currentIndex === index
-                ? 'ring-2 ring-offset-2 ring-blue-500'
-                : 'opacity-80 hover:opacity-100'
+                ? "ring-2 ring-offset-2 ring-blue-500"
+                : "opacity-80 hover:opacity-100"
             }`}
           >
             <Image
               src={image}
-              alt={`Property image ${index + 1}`}
-              layout="fill"
+              alt={`Thumbnail ${index + 1}`}
+              fill
               className="object-cover"
             />
           </button>
@@ -143,7 +148,7 @@ export default function PropertyGallery({ images }: PropertyGalleryProps) {
 
   return (
     <div className="w-full max-w-6xl mx-auto">
-      {/* Mobile/Tablet View */}
+      {/* Mobile View */}
       <div className="lg:hidden">
         <MobileView />
       </div>
@@ -155,3 +160,4 @@ export default function PropertyGallery({ images }: PropertyGalleryProps) {
     </div>
   );
 }
+

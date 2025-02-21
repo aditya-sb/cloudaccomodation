@@ -20,7 +20,7 @@ export const apiSlice = createApi({
     const baseQuery = fetchBaseQuery({
       //  baseUrl: 'http://digimonk.net:2783/api',
       // baseUrl: "http://localhost:8000/api",
-      baseUrl: "http://145.223.23.97:8000/api",
+      baseUrl: `${process.env.NEXT_PUBLIC_API_BASE_URL}/api`,
       prepareHeaders: (headers) => {
         if (token) {
           headers.set("Authorization", token);

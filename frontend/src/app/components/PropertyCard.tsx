@@ -8,7 +8,7 @@ interface PropertyCardProps {
   images: string[];
   title: string;
   location: string;
-  price: string;
+  price: number;
   beds: number;
   baths: number;
   area: number;
@@ -28,7 +28,7 @@ export default function PropertyCard({
   reviewsCount,
 }: PropertyCardProps) {
   return (
-    <Link href="/property" className="flex-shrink-0">
+    <div  className="flex-shrink-0">
       <div className="rounded-2xl shadow-lg hover:shadow-xl transition-all border bg-white cursor-pointer max-sm:w-64 w-50 relative flex-shrink-0">
         {/* Image Slider */}
         <div className="relative w-full text-[10px] overflow-hidden rounded-t-2xl">
@@ -70,6 +70,6 @@ export default function PropertyCard({
           </div>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
