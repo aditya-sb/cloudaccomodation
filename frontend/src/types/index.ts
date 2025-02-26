@@ -21,6 +21,9 @@ export interface Property {
   rentDetails: string;
   termsOfStay: string;
   location: string;
+  beds: number;
+  baths: number;
+  squareFeet: number;
   images?: string[] | undefined; // Optional array of image URLs
   verified: boolean;
   createdAt: Date;

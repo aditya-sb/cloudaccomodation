@@ -14,6 +14,7 @@ interface PropertyCardProps {
   area: number;
   rating: number;
   reviewsCount: number;
+  className?: string;
 }
 
 export default function PropertyCard({
@@ -25,11 +26,12 @@ export default function PropertyCard({
   baths,
   area,
   rating,
+  className,
   reviewsCount,
 }: PropertyCardProps) {
   return (
-    <div  className="flex-shrink-0">
-      <div className="rounded-2xl shadow-lg hover:shadow-xl transition-all border bg-white cursor-pointer max-sm:w-64 w-50 relative flex-shrink-0">
+    <div className="flex-shrink-0">
+      <div className={`rounded-2xl shadow-lg hover:shadow-xl transition-all border bg-white cursor-pointer max-sm:w-64 w-50 relative flex-shrink-0 ${className}`}>
         {/* Image Slider */}
         <div className="relative w-full text-[10px] overflow-hidden rounded-t-2xl">
           <ImageSlider images={images} />
@@ -73,3 +75,4 @@ export default function PropertyCard({
     </div>
   );
 }
+

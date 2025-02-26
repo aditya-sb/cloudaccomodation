@@ -41,7 +41,7 @@ function PropertyContent() {
         </div>
 
         {/* View Toggle Buttons */}
-        <div className="flex space-x-3 mr-5">
+        <div className="hidden md:flex space-x-3 mr-5">
           <button
             onClick={() => setView("list")}
             className={`flex items-center px-4 py-2 rounded-lg shadow-lg text-sm transition-all duration-200 ${
