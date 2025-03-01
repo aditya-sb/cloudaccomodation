@@ -8,12 +8,18 @@ import {
   FaQuestionCircle,
 } from "react-icons/fa";
 import { FaMoneyBillTransfer } from "react-icons/fa6";
-const BookingForm = ({ price }: { price: string }) => {
+import { useCreateBookingMutation, useSubmitEnquiryMutation } from "../redux/slices/apiSlice";
+
+const BookingForm = ({ price, propertyId }: { price: number; propertyId: string }) => {
   const [rentalDays, setRentalDays] = useState(30);
   const [moveInMonth, setMoveInMonth] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [error, setError] = useState("");
+
+  // Using the createBooking mutation hook
+  const [createBooking, { isLoading: isSubmitting, isSuccess, reset }] = useCreateBookingMutation();
 
   const months = [
     "January",
@@ -43,10 +49,54 @@ const BookingForm = ({ price }: { price: string }) => {
     });
   };
 
-  const handleBookingSubmit = () => {
-    alert(
-      `Booking submitted!\nName: ${name}\nEmail: ${email}\nPhone: ${phone}\nMove-in Month: ${moveInMonth}\nRental Days: ${rentalDays}`
-    );
+  const validateForm = () => {
+    if (!name.trim()) return "Name is required";
+    if (!email.trim()) return "Email is required";
+    if (!/\S+@\S+\.\S+/.test(email)) return "Email is invalid";
+    if (!phone.trim()) return "Phone is required";
+    if (!moveInMonth) return "Move-in month is required";
+    if (rentalDays < 1) return "Rental days must be at least 1";
+    return "";
+  };
+
+  // Reset form after successful submission
+  useEffect(() => {
+    if (isSuccess) {
+      alert("Booking submitted successfully!");
+      setName("");
+      setEmail("");
+      setPhone("");
+      setMoveInMonth("");
+      setRentalDays(30);
+      reset(); // Reset the mutation state
+    }
+  }, [isSuccess, reset]);
+
+  const handleBookingSubmit = async () => {
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    setError("");
+
+    try {
+      const bookingData = {
+        name,
+        email,
+        phone,
+        rentalDays,
+        moveInMonth,
+        propertyId,
+        price,
+      };
+
+      await createBooking(bookingData).unwrap();
+    } catch (error) {
+      console.error("Error submitting booking:", error);
+      setError("Failed to submit booking. Please try again.");
+    }
   };
 
   return (
@@ -111,29 +161,90 @@ const BookingForm = ({ price }: { price: string }) => {
           placeholder="Enter your email"
         />
       </div>
+
+      <div className="space-y-2">
+        <div className="text-gray-600">Phone:</div>
+        <input
+          type="tel"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          className="p-2 rounded-md w-full border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+          placeholder="Enter your phone number"
+        />
+      </div>
+
+      {error && (
+        <div className="text-red-500 text-sm font-medium">{error}</div>
+      )}
+
       <button
-        className="w-full py-2 rounded-md bg-blue-600 text-white flex justify-center items-center space-x-2 transition-all hover:bg-blue-700"
+        className="w-full py-2 rounded-md bg-blue-600 text-white flex justify-center items-center space-x-2 transition-all hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
         onClick={handleBookingSubmit}
+        disabled={isSubmitting}
       >
-        <span>Complete Booking</span>
-        <FaArrowRight className="h-5 w-5" />
+        <span>{isSubmitting ? "Submitting..." : "Complete Booking"}</span>
+        {!isSubmitting && <FaArrowRight className="h-5 w-5" />}
       </button>
     </div>
   );
 };
 
-const EnquiryForm = ({ price }: { price: string }) => {
+const EnquiryForm = ({ price, propertyId }: { price: number; propertyId: string }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
-  const handleEnquirySubmit = () => {
-    alert(
-      `Enquiry submitted!\nName: ${name}\nEmail: ${email}\nPhone: ${phone}\nMessage: ${message}`
-    );
+  // Using the submitEnquiry mutation hook
+  const [submitEnquiry, { isLoading: isSubmitting, isSuccess, reset }] = useSubmitEnquiryMutation();
+
+  const validateForm = () => {
+    if (!name.trim()) return "Name is required";
+    if (!email.trim()) return "Email is required";
+    if (!/\S+@\S+\.\S+/.test(email)) return "Email is invalid";
+    if (!phone.trim()) return "Phone is required";
+    if (!message.trim()) return "Message is required";
+    if (message.trim().length < 10) return "Message must be at least 10 characters";
+    return "";
   };
-  console.log("price", price);
+
+  // Reset form after successful submission
+  useEffect(() => {
+    if (isSuccess) {
+      alert("Enquiry submitted successfully!");
+      setName("");
+      setEmail("");
+      setPhone("");
+      setMessage("");
+      reset(); // Reset the mutation state
+    }
+  }, [isSuccess, reset]);
+
+  const handleEnquirySubmit = async () => {
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    setError("");
+
+    try {
+      const enquiryData = {
+        name,
+        email,
+        phone,
+        message: `Property ID: ${propertyId}, Price: ${price}. ${message}`,
+      };
+
+      await submitEnquiry(enquiryData).unwrap();
+    } catch (error) {
+      console.error("Error submitting enquiry:", error);
+      setError("Failed to submit enquiry. Please try again.");
+    }
+  };
+
   return (
     <div className="flex flex-col text-base space-y-4">
       <div className="flex flex-col sm:flex-row gap-4">
@@ -202,16 +313,21 @@ const EnquiryForm = ({ price }: { price: string }) => {
         />
       </div>
 
+      {error && (
+        <div className="text-red-500 text-sm font-medium">{error}</div>
+      )}
+
       <button
-        className="w-full py-2 rounded-md flex justify-center items-center space-x-2 transition-all hover:opacity-75"
+        className="w-full py-2 rounded-md flex justify-center items-center space-x-2 transition-all hover:opacity-75 disabled:opacity-50 disabled:cursor-not-allowed"
         style={{
           background: "var(--cta)",
           color: "var(--cta-text)",
         }}
         onClick={handleEnquirySubmit}
+        disabled={isSubmitting}
       >
-        <span>Submit Enquiry</span>
-        <FaArrowRight size={20} />
+        <span>{isSubmitting ? "Submitting..." : "Submit Enquiry"}</span>
+        {!isSubmitting && <FaArrowRight size={20} />}
       </button>
     </div>
   );
@@ -220,9 +336,11 @@ const EnquiryForm = ({ price }: { price: string }) => {
 const BookingDetails = ({
   price,
   booking,
+  propertyId,
 }: {
-  price: string;
+  price: number;
   booking: boolean;
+  propertyId: string;
 }) => {
   const [isMinimized, setIsMinimized] = useState(true);
   const [activeForm, setActiveForm] = useState<"booking" | "enquiry">(
@@ -340,9 +458,9 @@ const BookingDetails = ({
 
           {/* Render either Booking Form or Enquiry Form based on activeForm */}
           {booking && activeForm === "booking" ? (
-            <BookingForm price={price} />
+            <BookingForm price={price} propertyId={propertyId} />
           ) : (
-            <EnquiryForm price={price} />
+            <EnquiryForm price={price} propertyId={propertyId} />
           )}
 
           {/* Minimize Button */}

@@ -72,7 +72,7 @@ export default function Home() {
 
       {/* Other Sections */}
       <div className="flex flex-col text-2xl max-md:text-lg mt-6 mb-10 w-full">
-        <div className="flex gap-3 justify-start text-xl px-10  font-semibold text-gray-800 mb-10 md:mb-20 w-full">
+        <div className="flex gap-3 justify-start text-xl max-sm:text-base px-10  font-semibold text-gray-800 mb-10 md:mb-20 w-full">
           <h3 className="font-bold">Why Choose </h3>
           <h3 className="font-bold text-blue-500">Cloud Accommodation?</h3>
         </div>

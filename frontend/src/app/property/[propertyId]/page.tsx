@@ -174,7 +174,7 @@ export default function PropertyPage() {
       </div>
 
       {/* Booking Details */}
-      <BookingDetails price="$5,000" booking={true} />
+      <BookingDetails price={thisProperty?.price || "$5,000"} booking={true} propertyId={propertyId as string} />
       <Footer />
     </>
   );

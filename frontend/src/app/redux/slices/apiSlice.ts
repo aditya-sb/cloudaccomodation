@@ -50,7 +50,7 @@ export const apiSlice = createApi({
     return result;
   },
 
-  tagTypes: ["User", "Auth", "Property"], // Add tag types for invalidation
+  tagTypes: ["User", "Auth", "Property", "Booking", "Dashboard"], // Added Dashboard tag type
   endpoints: (builder) => ({
     register: builder.mutation({
       query: (userData) => ({
@@ -170,6 +170,51 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["Property"], // Invalidate Property tag after deleting
     }),
+
+    // New booking-related endpoints
+    createBooking: builder.mutation({
+      query: (bookingData) => ({
+        url: "/booking/create",
+        method: "POST",
+        body: bookingData,
+      }),
+      invalidatesTags: ["Booking"], // Invalidate Booking tag after creating
+    }),
+    getBookings: builder.query({
+      query: () => "/booking/all",
+      providesTags: ["Booking"], // Tag this endpoint for future invalidation
+    }),
+    getBookingById: builder.query({
+      query: (id) => `/booking/${id}`,
+      providesTags: (result, error, id) => [{ type: "Booking", id }],
+    }),
+    updateBookingStatus: builder.mutation({
+      query: ({ id, status }) => ({
+        url: `/booking/${id}/status`,
+        method: "PUT",
+        body: { status },
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: "Booking", id },
+        "Booking",
+      ],
+    }),
+    deleteBooking: builder.mutation({
+      query: (id) => ({
+        url: `/booking/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Booking"], // Invalidate Booking tag after deleting
+    }),
+
+    // Dashboard stats endpoint
+    getDashboardStats: builder.query({
+      query: (params) => ({
+        url: "/analytics/dashboard",
+        params: params,
+      }),
+      providesTags: ["Dashboard"],
+    }),
   }),
 });
 
@@ -189,10 +234,19 @@ export const {
   useGetUserPlanQuery,
   useCreateSubscriptionMutation,
   useDeleteUserMutation,
-  useCreatePropertyMutation, // New hook for creating property
-  useGetPropertiesQuery, // New hook for fetching properties
-  useEditPropertyMutation, // New hook for editing property
-  useDeletePropertyMutation, // New hook for deleting property
+  useCreatePropertyMutation,
+  useGetPropertiesQuery,
+  useEditPropertyMutation,
+  useDeletePropertyMutation,
+  // Booking hooks
+  useCreateBookingMutation,
+  useGetBookingsQuery,
+  useGetBookingByIdQuery,
+  useUpdateBookingStatusMutation,
+  useDeleteBookingMutation,
+  // Dashboard hooks
+  useGetDashboardStatsQuery,
+  useLazyGetDashboardStatsQuery,
 } = apiSlice;
 
 // Function to handle logout and invalidate user queries
