@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import ListView from "./ListView";
 import MapView from "./MapView";
 import { FaThList, FaMapMarkedAlt } from "react-icons/fa";
-import Filter from "../components/Filter";
-import { useGetPropertiesQuery, useCreatePropertyMutation } from "../redux/slices/apiSlice";
+import Filter, { FilterState } from "../components/Filter";
+import { useGetPropertiesQuery } from "../redux/slices/apiSlice";
 
 function PropertyContent() {
   const searchParams = useSearchParams();
@@ -12,28 +12,54 @@ function PropertyContent() {
   const city = searchParams.get("city");
   const [view, setView] = useState<"list" | "map">("list");
   const [mapCenter, setMapCenter] = useState({ lat: 0, lon: 0 });
+  const [filters, setFilters] = useState<FilterState>({});
 
-  const { data: properties = [], isLoading, isError } = useGetPropertiesQuery({
-    city: search || "",
-  });
+  // Memoize query params to prevent unnecessary re-renders
+  const queryParams = useMemo(() => ({
+    city: search || city || "",
+    sortBy: filters.sort,
+    university: filters.university,
+    locality: filters.locality,
+    minPrice: filters.minPrice,
+    roomType: filters.roomType?.join(','),
+    kitchenType: filters.kitchenType?.join(','),
+    bathroomType: filters.bathroomType?.join(','),
+    moveInMonth: filters.moveInMonth?.join(','),
+    stayDuration: filters.stayDuration,
+  }), [search, city, filters]);
+
+  const { data: properties = [], isLoading, isError } = useGetPropertiesQuery(queryParams);
+
+  // Memoize the filter change handler
+  const handleFilterChange = useCallback((newFilters: FilterState) => {
+    setFilters(prevFilters => {
+      // Only update if filters have actually changed
+      if (JSON.stringify(prevFilters) !== JSON.stringify(newFilters)) {
+        return newFilters;
+      }
+      return prevFilters;
+    });
+  }, []);
+
   // Only update map center when properties change AND when the first property exists
   useEffect(() => {
-    if (properties.length > 0 && 
-        (properties[0].latitude !== mapCenter.lat || 
-         properties[0].longitude !== mapCenter.lon)) {
-      setMapCenter({
-        lat: properties[0].latitude,
-        lon: properties[0].longitude,
-      });
+    if (properties.length > 0) {
+      const firstProperty = properties[0];
+      if (firstProperty.latitude !== mapCenter.lat || firstProperty.longitude !== mapCenter.lon) {
+        setMapCenter({
+          lat: firstProperty.latitude,
+          lon: firstProperty.longitude,
+        });
+      }
     }
   }, [properties]); // Remove mapCenter from dependencies
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <div></div>;
   if (isError) return <div>Error loading properties.</div>;
 
   return (
     <div className="mb-10">
-      <Filter />
+      <Filter onFilterChange={handleFilterChange} />
       <div className="flex justify-between items-center mx-8 mt-6 space-x-4">
         {/* Showing Properties Text */}
         <div className="text-lg font-semibold ml-5" style={{ color: "var(--foreground)" }}>
@@ -81,4 +107,4 @@ function PropertyContent() {
   );
 }
 
-export default PropertyContent;
+export default PropertyContent; 

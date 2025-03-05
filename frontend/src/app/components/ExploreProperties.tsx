@@ -83,7 +83,7 @@ const ExploreProperties = () => {
       </div>
 
       {isLoading ? (
-        <div>Loading...</div>
+        <div></div>
       ) : error ? (
         <div>Error loading properties</div>
       ) : (

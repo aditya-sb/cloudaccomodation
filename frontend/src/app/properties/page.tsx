@@ -13,7 +13,7 @@ export default function PropertyPage() {
       color: "var(--foreground)",
     }}>
       <Header isPropertyPage={false} />
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div></div>}>
         <PropertyContent />
       </Suspense>
       <Footer />
