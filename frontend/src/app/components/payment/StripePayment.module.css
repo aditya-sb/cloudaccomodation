@@ -1,0 +1,82 @@
+.overlay {
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+}
+
+.modal {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  width: 95%;
+  max-width: 480px;
+  margin: 20px;
+  position: relative;
+  max-height: 70vh;
+  min-height: auto;
+  overflow-y: auto;
+  animation: modalEnter 0.3s ease-out;
+  padding: 12px;
+}
+
+.container {
+  padding: 0;
+  width: 100%;
+  height: auto;
+  min-height: auto;
+}
+
+.cardWrapper {
+  padding: 14px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background-color: white;
+  margin-bottom: 12px;
+  margin: 8px 0;
+}
+
+.submitBtn {
+  width: 100%;
+  background-color: #3B82F6;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.submitBtn:hover {
+  background-color: #2563EB;
+}
+
+.submitBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.error {
+  background-color: #FEE2E2;
+  color: #DC2626;
+  padding: 10px;
+  border-radius: 8px;
+  margin: 12px 0;
+  font-size: 13px;
+}
+
+@keyframes modalEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

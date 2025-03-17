@@ -76,7 +76,6 @@ export default function SearchBar() {
           className="text-4xl sm:text-5xl font-bold text-center mb-4"
           style={{ color: "var(--cta-text)" }}
         >
-          Explore <span style={{ color: "var(--background)" }}>Canada</span>
         </h1>
 
         {/* Search Bar */}

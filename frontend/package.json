@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -12,6 +12,8 @@
     "@googlemaps/js-api-loader": "^1.16.8",
     "@heroicons/react": "^2.2.0",
     "@reduxjs/toolkit": "^2.3.0",
+    "@stripe/react-stripe-js": "^3.4.0",
+    "@stripe/stripe-js": "^6.0.0",
     "antd": "^5.23.2",
     "axios": "^1.7.7",
     "leaflet": "^1.9.4",

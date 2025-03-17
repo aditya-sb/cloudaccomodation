@@ -50,7 +50,7 @@ export const apiSlice = createApi({
     return result;
   },
 
-  tagTypes: ["User", "Auth", "Property", "Booking", "Dashboard"], // Added Dashboard tag type
+  tagTypes: ["User", "Auth", "Property", "Booking", "Dashboard", "Payment"], // Added Payment tag type
   endpoints: (builder) => ({
     register: builder.mutation({
       query: (userData) => ({
@@ -215,6 +215,31 @@ export const apiSlice = createApi({
       }),
       providesTags: ["Dashboard"],
     }),
+
+    // Payment-related endpoints
+    createPaymentIntent: builder.mutation({
+      query: (data) => {
+        console.log("Creating payment intent with data:", data);
+        return {
+          url: "/payment/create-payment-intent",
+          method: "POST",
+          body: data,
+        };
+      },
+      invalidatesTags: ["Payment", "Booking"],
+    }),
+    confirmPayment: builder.mutation({
+      query: (paymentIntentId) => ({
+        url: "/payment/confirm-payment",
+        method: "POST",
+        body: paymentIntentId,
+      }),
+      invalidatesTags: ["Payment", "Booking"],
+    }),
+    getPaymentStatus: builder.query({
+      query: (bookingId) => `/payment/status/${bookingId}`,
+      providesTags: (result, error, bookingId) => [{ type: "Payment", id: bookingId }],
+    }),
   }),
 });
 
@@ -247,6 +272,10 @@ export const {
   // Dashboard hooks
   useGetDashboardStatsQuery,
   useLazyGetDashboardStatsQuery,
+  // Payment hooks
+  useCreatePaymentIntentMutation,
+  useConfirmPaymentMutation,
+  useGetPaymentStatusQuery,
 } = apiSlice;
 
 // Function to handle logout and invalidate user queries
