@@ -53,19 +53,22 @@ export default function PropertyPage() {
               title={thisProperty?.title}
               location={thisProperty?.location}
               price={thisProperty?.price}
+              country={thisProperty?.country}
               description={thisProperty?.description}
               amenities={thisProperty?.amenities}
-              overview={thisProperty?.overview}
-            />
+              overview={thisProperty?.overview} features={[]} currency={thisProperty?.currency}            />
           </div>
           <div className="block md:hidden">
             <PropertyDetailsMobile
               title={thisProperty?.title}
               location={thisProperty?.location}
               price={thisProperty?.price}
+              country={thisProperty?.country}
               description={thisProperty?.description}
               amenities={thisProperty?.amenities}
-              overview={thisProperty?.overview} rent={0} availableFrom={""} distanceFromUniversity={""} utilities={[]} securityDeposit={0} rentPayments={[]}            />
+              availableFrom={thisProperty?.availableFrom}
+              currency={thisProperty?.currency}
+              overview={thisProperty?.overview} distanceFromUniversity={""} utilities={[]} securityDeposit={thisProperty?.securityDeposit} rentPayments={[]} rent={0}/>
           </div>
 
           {/* Map */}

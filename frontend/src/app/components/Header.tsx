@@ -68,7 +68,7 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
   return (
     <>
       <header
-        className="fixed top-0 left-0 w-full h-16 z-50 backdrop-blur bg-white/80 dark:bg-gray-900/80 text-gray-900 dark:text-gray-100 flex items-center justify-between px-4 py-4 border-b shadow-sm"
+        className="fixed top-0 left-0 w-full h-16 backdrop-blur bg-white/80 dark:bg-gray-900/80 text-gray-900 dark:text-gray-100 flex items-center justify-between px-4 py-4 border-b shadow-sm"
         style={{
           color: "var(--foreground)",
           borderBottomColor: "var(--gray-border)",
@@ -76,7 +76,7 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
           top: "0",
           left: "0",
           right: "0",
-          zIndex: "50",
+          zIndex: "10000",
         }}
       >
         {/* Logo - Updated styling */}

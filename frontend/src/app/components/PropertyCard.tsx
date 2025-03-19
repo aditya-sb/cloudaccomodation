@@ -35,6 +35,7 @@ interface PropertyCardProps {
   rating: number;
   reviewsCount: number;
   country: string; // Add country prop
+  currencyCode?: string;
   className?: string;
 }
 
@@ -50,10 +51,11 @@ export default function PropertyCard({
   className,
   reviewsCount,
   country,
+  currencyCode,
 }: PropertyCardProps) {
   // Get currency code and symbol based on country
-  const currencyCode = COUNTRY_TO_CURRENCY[country as keyof typeof COUNTRY_TO_CURRENCY] || 'USD';
-  const currencySymbol = CURRENCY_SYMBOLS[currencyCode as keyof typeof CURRENCY_SYMBOLS] || '$';
+  const currency = currencyCode || COUNTRY_TO_CURRENCY[country as keyof typeof COUNTRY_TO_CURRENCY] || 'USD';
+  const currencySymbol = CURRENCY_SYMBOLS[currency as keyof typeof CURRENCY_SYMBOLS] || '$';
 
   return (
     <div className="flex-shrink-0">

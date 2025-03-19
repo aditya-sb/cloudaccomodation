@@ -9,6 +9,16 @@ import {
   Car,
   Wallet,
 } from "lucide-react";
+import { getCurrencySymbol } from "@/constants/currency";
+
+const CURRENCY_SYMBOLS = {
+  'USD': '$',
+  'CAD': 'C$',
+  'INR': '₹',
+  'GBP': '£',
+  'EUR': '€',
+  'AUD': 'A$'
+} as const;
 
 interface PropertyDetailsMobileProps {
   title: string;
@@ -23,6 +33,8 @@ interface PropertyDetailsMobileProps {
   overview: Array<{ bedrooms: number; bathrooms: number; squareFeet: number }>;
   securityDeposit: number;
   rentPayments: { type: string; dueDate: string; amount: number }[];
+  currency: string;
+  country: string; // Add country prop
 }
 
 const PropertyDetailsMobile: React.FC<PropertyDetailsMobileProps> = ({
@@ -30,16 +42,17 @@ const PropertyDetailsMobile: React.FC<PropertyDetailsMobileProps> = ({
   location,
   price,
   description,
-  rent,
   availableFrom,
-  distanceFromUniversity,
   utilities,
   amenities,
   securityDeposit,
   rentPayments,
   overview,
+  country,
 }) => {
   if (!amenities) return null;
+
+  const currencySymbol = getCurrencySymbol(country);
 
   let amenitiesList = [];
   try {
@@ -67,7 +80,7 @@ const PropertyDetailsMobile: React.FC<PropertyDetailsMobileProps> = ({
           </div>
           <div className="flex flex-col w-fit justify-center items-center bg-white px-3 py-3 rounded-lg shadow-lg">
             <span className="w-fit flex text-base font-semibold">RENT</span>
-            <span className="w-fit flex text-lg font-bold">{price} CAD</span>
+            <span className="w-fit flex text-lg font-bold">{currencySymbol}{price}</span>
             <span className="w-fit text-sm text-gray-500">per month</span>
           </div>
         </div>
@@ -145,7 +158,7 @@ const PropertyDetailsMobile: React.FC<PropertyDetailsMobileProps> = ({
           <span className="flex gap-2">
             <Wallet />
             Security Deposit:{" "}
-            <span className="font-semibold text-blue-500">${500}</span>
+            <span className="font-semibold text-blue-500">{currencySymbol}{securityDeposit}</span>
           </span>
           <div className="flex items-center">
             <ChevronRight size={20} className="text-gray-400" />
@@ -209,7 +222,7 @@ const PropertyDetailsMobile: React.FC<PropertyDetailsMobileProps> = ({
               <div key={index} className="flex justify-between text-sm">
                 <span>{payment.type}</span>
                 <span>{payment.dueDate}</span>
-                <span className="font-semibold">${payment.amount}</span>
+                <span className="font-semibold">{currencySymbol}{payment.amount}</span>
               </div>
             ))}
           </div>

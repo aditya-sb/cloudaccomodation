@@ -2,11 +2,23 @@ import React from "react";
 import Image from "next/image";
 import ImageSlider from "../components/ImageSlider";
 
+// Add currency mappings
+const CURRENCY_SYMBOLS = {
+  'USD': '$',
+  'INR': '₹',
+  'CAD': 'C$',
+  'GBP': '£',
+  'EUR': '€',
+  'AUD': 'A$'
+};
+
 interface MapPropertyCardProps {
   images: Array<string>;
   title: string;
   location: string;
   price: string;
+  country: string;
+  currencyCode?: string;
   className?: string;
   onClick?: () => void;
   isMapPopup?: boolean;
@@ -17,6 +29,8 @@ const MapPropertyCard: React.FC<MapPropertyCardProps> = ({
   title,
   location,
   price,
+  country,
+  currencyCode = 'USD',
   onClick,
   className,
   isMapPopup = false,
@@ -33,6 +47,8 @@ const MapPropertyCard: React.FC<MapPropertyCardProps> = ({
     ? "mt-2 space-y-1" // Added more spacing
     : "mt-3 space-y-2";
 
+  const currencySymbol = CURRENCY_SYMBOLS[currencyCode as keyof typeof CURRENCY_SYMBOLS] || '$';
+
   return (
     <div
       onClick={onClick}
@@ -48,7 +64,7 @@ const MapPropertyCard: React.FC<MapPropertyCardProps> = ({
           {title}
         </h3>
         <p className="text-gray-500 text-sm leading-tight">{location}</p>
-        <p className="text-teal-600 font-semibold text-sm leading-tight">{price}/month</p>
+        <p className="text-teal-600 font-semibold text-sm leading-tight">{currencySymbol}{price}/month</p>
       </div>
     </div>
   );

@@ -32,6 +32,8 @@ const ListView: React.FC<ListViewProps> = ({ properties }) => {
                 area={property.squareFeet}
                 rating={4.1}
                 reviewsCount={12}
+                country={property.country}
+                currency={property.currency}
                 className="max-sm:w-full mb-5"
               />
           </Link>

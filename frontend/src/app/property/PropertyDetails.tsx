@@ -12,6 +12,7 @@ import {
   FaDollarSign,
   FaFileContract,
 } from "react-icons/fa";
+import { getCurrencySymbol } from "@/constants/currency";
 
 const PropertyDetails = ({
   title,
@@ -21,6 +22,8 @@ const PropertyDetails = ({
   amenities,
   overview,
   features,
+  currency,
+  country,
 }: {
   title: string;
   location: string;
@@ -29,7 +32,10 @@ const PropertyDetails = ({
   amenities: string | string[];
   description: string;
   features: string[];
+  currency: string;
+  country: string;
 }) => {
+  const currencySymbol = getCurrencySymbol(country);
   const [activeSection, setActiveSection] = React.useState('overview'); // state to track selected section
   const [moveInDate, setMoveInDate] = React.useState(""); // state for move-in date
   const [isModalOpen, setIsModalOpen] = React.useState(false);
@@ -63,7 +69,9 @@ const PropertyDetails = ({
       {/* Title and Location */}
       <div className="flex items-center justify-between">
       <h2 className="text-2xl md:text-3xl font-semibold">{title} </h2>
-      <span className="text-2xl md:text-xl font-semibold">{price}<span className="text-lg max-sm:text-sm"> /month</span></span>
+      <span className="text-2xl md:text-xl font-semibold">
+        {currencySymbol}{price}<span className="text-lg max-sm:text-sm"> /month</span>
+      </span>
       </div>
       <p className="text-lg md:text-xl mt-2">{location}</p>
 
@@ -202,7 +210,7 @@ const PropertyDetails = ({
         <p className="font-semibold text-[var(--copy-secondary)] mb-1">
           Price:
         </p>
-        <p className="text-lg">{price}</p>
+        <p className="text-lg">{currencySymbol}{price}</p>
       </div>
       <div className="mb-6">
         <p className="font-semibold text-[var(--copy-secondary)] mb-1">

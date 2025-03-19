@@ -58,53 +58,59 @@ function PropertyContent() {
   if (isError) return <div>Error loading properties.</div>;
 
   return (
-    <div className="mb-10">
-      <Filter onFilterChange={handleFilterChange} />
-      <div className="flex justify-between items-center mx-8 mt-6 space-x-4">
-        {/* Showing Properties Text */}
-        <div className="text-lg font-semibold ml-5" style={{ color: "var(--foreground)" }}>
-          Showing {properties.length} properties
-        </div>
-
-        {/* View Toggle Buttons */}
-        <div className="hidden md:flex space-x-3 mr-5">
-          <button
-            onClick={() => setView("list")}
-            className={`flex items-center px-4 py-2 rounded-lg shadow-lg text-sm transition-all duration-200 ${
-              view === "list"
-                ? "bg-gradient-to-r from-green-500 to-teal-500 text-white"
-                : "bg-gray-200 text-gray-700"
-            } hover:bg-gradient-to-r hover:from-green-600 hover:to-teal-600`}
-          >
-            <FaThList className="mr-2 text-lg" /> List View
-          </button>
-          <button
-            onClick={() => setView("map")}
-            className={`flex items-center px-4 py-2 rounded-lg shadow-lg text-sm transition-all duration-200 ${
-              view === "map"
-                ? "bg-gradient-to-r from-green-500 to-teal-500 text-white"
-                : "bg-gray-200 text-gray-700"
-            } hover:bg-gradient-to-r hover:from-green-600 hover:to-teal-600`}
-          >
-            <FaMapMarkedAlt className="mr-2 text-lg" /> Map View
-          </button>
-        </div>
+    <div className="relative">
+      {/* Sticky filter container */}
+      <div className="sticky top-16 z-50 bg-white dark:bg-gray-900 pb-2 shadow-md">
+        <Filter onFilterChange={handleFilterChange} />
       </div>
+      
+      <div className="relative z-40 mt-16">
+        <div className="flex justify-between items-center mx-8 mt-6 space-x-4">
+          {/* Showing Properties Text */}
+          <div className="text-lg font-semibold ml-5" style={{ color: "var(--foreground)" }}>
+            Showing {properties.length} properties
+          </div>
 
-      <div className="p-4 mx-5 mt-6">
-        {view === "list" ? (
-          <ListView properties={properties} />
-        ) : (
-          <MapView 
-            properties={properties} 
-            mapLat={mapCenter.lat} 
-            mapLon={mapCenter.lon} 
-            mapLocation={search || "All Properties"} 
-          />
-        )}
+          {/* View Toggle Buttons */}
+          <div className="hidden md:flex space-x-3 mt-8 mr-5">
+            <button
+              onClick={() => setView("list")}
+              className={`flex items-center px-4 py-2 rounded-lg shadow-lg text-sm transition-all duration-200 ${
+                view === "list"
+                  ? "bg-gradient-to-r from-green-500 to-teal-500 text-white"
+                  : "bg-gray-200 text-gray-700"
+              } hover:bg-gradient-to-r hover:from-green-600 hover:to-teal-600`}
+            >
+              <FaThList className="mr-2 text-lg" /> List View
+            </button>
+            <button
+              onClick={() => setView("map")}
+              className={`flex items-center px-4 py-2 rounded-lg shadow-lg text-sm transition-all duration-200 ${
+                view === "map"
+                  ? "bg-gradient-to-r from-green-500 to-teal-500 text-white"
+                  : "bg-gray-200 text-gray-700"
+              } hover:bg-gradient-to-r hover:from-green-600 hover:to-teal-600`}
+            >
+              <FaMapMarkedAlt className="mr-2 text-lg" /> Map View
+            </button>
+          </div>
+        </div>
+
+        <div className="p-4 mx-5 mt-2">
+          {view === "list" ? (
+            <ListView properties={properties} />
+          ) : (
+            <MapView 
+              properties={properties} 
+              mapLat={mapCenter.lat} 
+              mapLon={mapCenter.lon} 
+              mapLocation={search || "All Properties"} 
+            />
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
-export default PropertyContent; 
+export default PropertyContent;

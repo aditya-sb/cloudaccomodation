@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { Property } from "@/types";
-  import PropertyCard from "./PropertyCard";
+import PropertyCard from "./PropertyCard";
 import MapPropertyCard from "./MapPropertyCard";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -14,6 +14,13 @@ interface MapViewProps {
   mapLon: number;
   mapLocation: string;
 }
+
+const CURRENCY_SYMBOLS: { [key: string]: string } = {
+  USD: '$',
+  EUR: '€',
+  GBP: '£',
+  // Add more currency symbols as needed
+};
 
 const MapView: React.FC<MapViewProps> = ({ properties, mapLat, mapLon, mapLocation }) => {
   const mapRef = useRef<HTMLDivElement>(null);
@@ -130,10 +137,10 @@ const MapView: React.FC<MapViewProps> = ({ properties, mapLat, mapLon, mapLocati
     // Add new markers with detailed information
     properties.forEach((property) => {
       if (property.latitude && property.longitude) {
-        // Create detailed marker style
+        const currencySymbol = CURRENCY_SYMBOLS[property.currency as keyof typeof CURRENCY_SYMBOLS] || '$';
         const formattedPrice = typeof property.price === 'number' 
-          ? property.price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 })
-          : property.price.toString();
+          ? `${currencySymbol}${property.price.toLocaleString()}`
+          : `${currencySymbol}${property.price}`;
           
         const markerHtml = document.createElement('div');
         markerHtml.innerHTML = `
@@ -169,6 +176,8 @@ const MapView: React.FC<MapViewProps> = ({ properties, mapLat, mapLon, mapLocati
               title={property.title}
               location={property.location}
               price={property.price.toString()}
+              country={property.country}
+              currencyCode={property.currency}
               isMapPopup={true}
             />
           </a>
@@ -257,6 +266,8 @@ const MapView: React.FC<MapViewProps> = ({ properties, mapLat, mapLon, mapLocati
                   location={property.location}
                   price={property.price}
                   description={property.description}
+                  country={property.country}
+                  currencyCode={property.currency}
                 />
               </div>
             ))}
