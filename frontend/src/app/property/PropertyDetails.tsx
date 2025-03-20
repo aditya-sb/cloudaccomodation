@@ -13,27 +13,36 @@ import {
   FaFileContract,
 } from "react-icons/fa";
 import { getCurrencySymbol } from "@/constants/currency";
+import Map from "./Map";
 
 const PropertyDetails = ({
   title,
   location,
   price,
+  securityDeposit,
   description,
+  termsOfStay,
   amenities,
   overview,
   features,
   currency,
   country,
+  latitude,
+  longitude,
 }: {
   title: string;
   location: string;
   overview: { bedrooms: number; bathrooms: number; squareFeet: number };
   price: string;
+  securityDeposit: string;
+  termsOfStay: string;
   amenities: string | string[];
   description: string;
   features: string[];
   currency: string;
   country: string;
+  latitude?: number;
+  longitude?: number;
 }) => {
   const currencySymbol = getCurrencySymbol(country);
   const [activeSection, setActiveSection] = React.useState('overview'); // state to track selected section
@@ -187,6 +196,93 @@ const PropertyDetails = ({
                   {amenity}
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {activeSection === 'exploreNearby' && (
+          <div>
+              {latitude && longitude && (
+                <Map 
+                  location={location} 
+                  lat={latitude} 
+                  lon={longitude} 
+                />
+              )}
+           
+          </div>
+        )}
+
+        {activeSection === 'rentDetails' && (
+          <div>
+            <h3 className="text-xl font-semibold mb-4">Rent Details</h3>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center p-4 border border-[var(--border)] rounded-lg">
+                <div className="flex items-center gap-2">
+                  <FaDollarSign className="text-blue-500" />
+                  <span className="font-medium">Monthly Rent</span>
+                </div>
+                <span className="text-lg font-semibold">{currencySymbol}{price}</span>
+              </div>
+              
+              <div className="flex justify-between items-center p-4 border border-[var(--border)] rounded-lg">
+                <div className="flex items-center gap-2">
+                  <FaFileContract className="text-blue-500" />
+                  <span className="font-medium">Security Deposit</span>
+                </div>
+                <span className="text-lg font-semibold">{currencySymbol}{securityDeposit}</span>
+              </div>
+
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                <p className="text-sm text-blue-600">
+                  * Security deposit is refundable at the end of your stay, subject to property condition
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeSection === 'termsOfStay' && (
+          <div>
+            <h3 className="text-xl font-semibold mb-4 text-gray-800">Terms of Stay</h3>
+            <div className="space-y-4">
+              {typeof termsOfStay === 'string' ? (
+                <div className="p-4 border border-[var(--border)] rounded-lg">
+                  <p className="text-gray-700 whitespace-pre-line">
+                    {termsOfStay?.replace(/<[^>]*>/g, '')}
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="p-4 border border-[var(--border)] rounded-lg">
+                    <h4 className="font-medium mb-2 text-gray-800">Minimum Stay Duration</h4>
+                    <p className="text-gray-700">Minimum 6 months lease required</p>
+                  </div>
+                  
+                  <div className="p-4 border border-[var(--border)] rounded-lg">
+                    <h4 className="font-medium mb-2 text-gray-800">Payment Terms</h4>
+                    <ul className="space-y-2 text-gray-700">
+                      <li>First month's rent due at signing</li>
+                      <li>Security deposit required</li>
+                      <li>Monthly rent due by the 1st of each month</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="p-4 border border-[var(--border)] rounded-lg">
+                    <h4 className="font-medium mb-2 text-gray-800">Notice Period</h4>
+                    <p className="text-gray-700">60 days notice required before moving out</p>
+                  </div>
+                  
+                  <div className="p-4 border border-[var(--border)] rounded-lg">
+                    <h4 className="font-medium mb-2 text-gray-800">Additional Rules</h4>
+                    <ul className="space-y-2 text-gray-700">
+                      <li>No smoking inside the property</li>
+                      <li>Pets subject to approval</li>
+                      <li>No unauthorized modifications to the property</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}

@@ -15,37 +15,38 @@ const ListView: React.FC<ListViewProps> = ({ properties }) => {
     setShowMore(!showMore);
   };
 
-  const visibleProperties = showMore ? properties : properties.slice(0, 5);
+  const visibleProperties = properties.length >= 15 
+    ? (showMore ? properties.slice(0, 15) : properties.slice(0, 5))
+    : properties;
 
   return (
     <div className="flex flex-col items-center">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 w-full">
         {visibleProperties.map((property, index) => (
-          <Link target="_blank" key={index}  href={`/property/${property._id}`}>
-              <PropertyCard
-                images={property.images || []}
-                title={property.title}
-                location={property.location}
-                price={property.price}
-                beds={property.overview.bedrooms}
-                baths={property.overview.bathrooms}
-                area={property.squareFeet}
-                rating={4.1}
-                reviewsCount={12}
-                country={property.country}
-                currency={property.currency}
-                className="max-sm:w-full mb-5"
-              />
+          <Link target="_blank" key={index} href={`/property/${property._id}`}>
+            <PropertyCard
+              images={property.images || []}
+              title={property.title}
+              location={property.location}
+              price={property.price}
+              beds={property.overview.bedrooms}
+              baths={property.overview.bathrooms}
+              area={property.squareFeet}
+              rating={4.1}
+              reviewsCount={12}
+              country={property.country}
+              className="max-sm:w-full mb-5"
+            />
           </Link>
         ))}
       </div>
 
-      {properties.length > 20 && (
+      {properties.length >= 15 && (
         <button
           className="mt-6 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-all duration-300"
           onClick={handleShowMore}
         >
-          {showMore ? "Show Less" : "Load More"}
+          {showMore ? "Show Less" : "Show More"}
         </button>
       )}
     </div>

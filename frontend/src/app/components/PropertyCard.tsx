@@ -91,7 +91,7 @@ export default function PropertyCard({
 
           {/* Price and Ratings */}
           <div className="flex items-center justify-between mt-4">
-            <span className="text-lg font-bold text-gray-800">{currencySymbol} {price.toLocaleString()}</span>
+            <span className="flex justify-center items-center gap-1 text-lg font-bold text-gray-800">{currencySymbol}{price.toLocaleString()}<p className="text-sm">/month</p></span>
             <div className="flex items-center space-x-1">
               <FaStar className="text-yellow-500" />
               <span className="text-sm text-gray-700 font-medium">{rating}</span>

@@ -193,7 +193,7 @@ export default function SearchBar() {
           )}
         </div>
         {/* Scroll Down Arrow */}
-        <div className="absolute right-8 bottom-8">
+        {/* <div className="absolute right-8 bottom-8">
           <div
             className="flex justify-center items-center w-16 h-16 rounded-full animate-bounce shadow-lg"
             style={{
@@ -213,7 +213,7 @@ export default function SearchBar() {
               <path d="M8 12a.5.5 0 0 1-.5-.5V3.707l-3.646 3.647a.5.5 0 1 1-.708-.708l4-4a.5.5 0 0 1 .708 0l4 4a.5.5 0 1 1-.708.708L8.5 3.707V11.5a.5.5 0 0 1-.5.5z" />
             </svg>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
