@@ -6,6 +6,7 @@ import {
   FaHeadset,
   FaUndo,
   FaCheck,
+  FaLocationArrow,
 } from "react-icons/fa";
 import { use } from "react";
 import { useParams } from "next/navigation";
@@ -20,12 +21,17 @@ import BookingDetails from "../BookingDetails";
 import Footer from "@/app/components/Footer";
 import { useGetPropertiesQuery } from "@/app/redux/slices/apiSlice";
 import PropertyDetailsMobile from "../propertyDetailsMobile";
+import { getCurrencySymbol } from "@/constants/currency";
+import { Pin } from "lucide-react";
+import { FaLocationPin, FaMapLocationDot } from "react-icons/fa6";
 
 export default function PropertyPage() {
   const { propertyId } = useParams();
   const { data: property, error, isLoading } = useGetPropertiesQuery({ id: propertyId });
   console.log(property);
   const thisProperty = property?.[0];
+  const currencySymbol = getCurrencySymbol(thisProperty?.country);
+
   return (
     <>
       <Header isPropertyPage={true} />
@@ -38,13 +44,14 @@ export default function PropertyPage() {
       >
         {/* Left Section: 60% */}
         <div
-          className="w-full pt-[60px] pb-5 border rounded-lg  md:w-4/5"
+          className="w-full pt-[60px] md:ml-10 pb-5 rounded-lg  md:w-4/5"
           style={{
-            backgroundColor: "var(--card)",
             color: "var(--foreground)",
+            
           }}
         >
           {/* Property Gallery */}
+          <div className="relative bg-white rounded-lg shadow-sm">
           <PropertyGallery images={thisProperty?.images || []} />
 
           {/* Property Details */}
@@ -75,6 +82,7 @@ export default function PropertyPage() {
               currency={thisProperty?.currency}
               overview={thisProperty?.overview} distanceFromUniversity={""} utilities={[]} securityDeposit={thisProperty?.securityDeposit} rentPayments={[]} rent={0}/>
           </div>
+          </div>
 
           {/* Remove the standalone Map component */}
 
@@ -91,9 +99,19 @@ export default function PropertyPage() {
           }}
         >
           <div className="sticky top-20 p-4 rounded-lg shadow-sm">
-            <h1 className="text-xl font-semibold p-4 ">
-              {thisProperty?.title}
-            </h1>
+            <div className="flex justify-between">
+              <h1 className="text-xl font-semibold">
+                {thisProperty?.title}
+              </h1>
+              <p className="text-lg font-semibold">
+                {currencySymbol}{thisProperty?.price}
+              </p>
+            </div>
+            <p className="text-sm mt-2 gap-2 text-gray-500 flex items-center">
+              <FaMapLocationDot className="text-blue-500 mr-1" />
+               {thisProperty?.location}
+            </p>
+            
             <div className="rounded-lg overflow-hidden mt-4">
               <Dropdown
                 className="border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"

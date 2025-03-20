@@ -9,21 +9,24 @@ const canadianCities = [
   "Toronto",
   "Brampton",
   "Vancouver",
+  "Ottawa",
   "Montreal",
   "Niagara Falls",
   "Halifax",
+  "London",
+  "Manchester",
 ];
 
 const ExploreProperties = () => {
   const router = useRouter();
-  const [selectedCity, setSelectedCity] = useState("All");
+  const [selectedCity, setSelectedCity] = useState("");
 
   const {
     data: properties,
     error,
     isLoading,
   } = useGetPropertiesQuery({
-    city: selectedCity === "All" ? undefined : selectedCity,
+    city: selectedCity === "" ? undefined : selectedCity,
   });
   console.log(properties);
   const maxPropertiesToShow = 5;
@@ -41,16 +44,16 @@ const ExploreProperties = () => {
       <div className="mb-2">
         {/* Responsive button grid */}
         <div className="flex flex-wrap gap-3">
-          <button
-            onClick={() => setSelectedCity("All")}
+          {/* <button
+            onClick={() => setSelectedCity("")}
             className={`px-4 py-2 rounded-full text-sm ${
-              selectedCity === "All"
+              selectedCity === ""
                 ? "bg-blue-100 text-blue-700 border border-blue-400"
                 : "bg-white hover:bg-blue-50 border border-gray-200"
             }`}
           >
             All Cities
-          </button>
+          </button> */}
           {canadianCities.map((city) => (
             <button
               key={city}
@@ -70,10 +73,10 @@ const ExploreProperties = () => {
           <div className="flex justify-end">
             <div
               onClick={() => router.push(`/properties?search=${selectedCity}`)}
-              className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+              className="text-blue-600 hover:text-blue-700 text-sm font-medium cursor-pointer"
             >
               View more{" "}
-              {selectedCity === "All"
+              {selectedCity === ""
                 ? "Properties"
                 : `Properties in ${selectedCity}`}{" "}
               &rarr;
@@ -87,7 +90,7 @@ const ExploreProperties = () => {
       ) : error ? (
         <div>Error loading properties</div>
       ) : (
-        <div className="flex overflow-x-auto gap-6 pb-4 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        <div className="flex overflow-x-auto pt-2 gap-6 pb-4 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {properties
             ?.slice(0, maxPropertiesToShow)
             .map((property: Property, index: number) => (

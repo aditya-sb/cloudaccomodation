@@ -45,11 +45,11 @@ export default function SearchBar() {
       style={{ height: "540px" }}
     >
       <Image
-        src="/images/cityscape.jpeg"
+        src="/images/bg2.jpg"
         alt="Cityscape"
         layout="fill"
         objectFit="cover"
-        className="opacity-80 transition-all duration-300 ease-in-out"
+        className="opacity-100 transition-all duration-300 "
       />
       <div className="absolute inset-0 flex flex-col justify-center items-center px-4 sm:px-8">
         {/* Logo and Header */}

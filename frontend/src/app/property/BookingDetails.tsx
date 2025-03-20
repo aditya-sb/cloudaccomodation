@@ -11,8 +11,8 @@ import { FaMoneyBillTransfer } from "react-icons/fa6";
 import { useCreateBookingMutation, useSubmitEnquiryMutation } from "../redux/slices/apiSlice";
 import dynamic from 'next/dynamic';
 import StripePayment from '../components/payment/StripePayment'; // Adjust the path as necessary
-
-
+import isAuthenticated from "@/utils/auth-util";
+import Login from "../auth/Login";
 
 const BookingForm = ({ price, propertyId }: { price: number; propertyId: string }) => {
   const [rentalDays, setRentalDays] = useState(30);
@@ -263,7 +263,7 @@ const BookingForm = ({ price, propertyId }: { price: number; propertyId: string 
 const EnquiryForm = ({ price, propertyId }: { price: number; propertyId: string }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  // const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
@@ -274,7 +274,7 @@ const EnquiryForm = ({ price, propertyId }: { price: number; propertyId: string 
     if (!name.trim()) return "Name is required";
     if (!email.trim()) return "Email is required";
     if (!/\S+@\S+\.\S+/.test(email)) return "Email is invalid";
-    if (!phone.trim()) return "Phone is required";
+    // if (!phone.trim()) return "Phone is required";
     if (!message.trim()) return "Message is required";
     if (message.trim().length < 10) return "Message must be at least 10 characters";
     return "";
@@ -286,7 +286,7 @@ const EnquiryForm = ({ price, propertyId }: { price: number; propertyId: string 
       alert("Enquiry submitted successfully!");
       setName("");
       setEmail("");
-      setPhone("");
+      // setPhone("");
       setMessage("");
       reset(); // Reset the mutation state
     }
@@ -305,7 +305,7 @@ const EnquiryForm = ({ price, propertyId }: { price: number; propertyId: string 
       const enquiryData = {
         name,
         email,
-        phone,
+        // phone,
         message: `Property ID: ${propertyId}, Price: ${price}. ${message}`,
       };
 
@@ -336,7 +336,7 @@ const EnquiryForm = ({ price, propertyId }: { price: number; propertyId: string 
             placeholder="Enter your name"
           />
         </div>
-        <div
+        {/* <div
           className="flex-1 flex flex-col space-y-2"
           style={{ color: "var(--copy-secondary)" }}
         >
@@ -352,7 +352,7 @@ const EnquiryForm = ({ price, propertyId }: { price: number; propertyId: string 
             }}
             placeholder="Enter your phone no."
           />
-        </div>
+        </div> */}
       </div>
 
       <div className="space-y-2">
@@ -417,6 +417,7 @@ const BookingDetails = ({
   const [activeForm, setActiveForm] = useState<"booking" | "enquiry">("enquiry");
   const [shake, setShake] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [bookingDetails, setBookingDetails] = useState({
     name: "",
     email: "",
@@ -463,6 +464,20 @@ const BookingDetails = ({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const handleAuthCheck = (formType: "booking" | "enquiry") => {
+    if (isAuthenticated()) {
+      setActiveForm(formType);
+      setIsMinimized(false);
+    } else {
+      // Open login modal if not authenticated
+      setIsModalOpen(true);
+    }
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <>
       {/* Overlay when forms are expanded */}
@@ -471,6 +486,24 @@ const BookingDetails = ({
           className="fixed inset-0 bg-black bg-opacity-65 backdrop-blur-sm z-10"
           onClick={() => setIsMinimized(true)}
         />
+      )}
+
+      {/* Login Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-65 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-auto" style={{ background: "var(--card)", color: "var(--foreground)" }}>
+            <Login
+              openForgetPassword={() => {}}
+            />
+            <button
+              onClick={closeModal}
+              className="absolute top-2 right-2 transition-all hover:opacity-75"
+              style={{ color: "var(--copy-secondary)" }}
+            >
+              <FaAngleDown size={20} />
+            </button>
+          </div>
+        </div>
       )}
 
       {/* Payment Modal - Moved outside the booking form */}
@@ -512,10 +545,7 @@ const BookingDetails = ({
                 className={`px-6 py-3 w-full border-2 items-center flex rounded-full font-semibold ${
                   shake ? "animate-shake" : ""
                 }`}
-                onClick={() => {
-                  setActiveForm("booking");
-                  setIsMinimized(false);
-                }}
+                onClick={() => handleAuthCheck("booking")}
                 style={{
                   background:
                     "linear-gradient(to right, var(--cta), var(--cta-active))",
@@ -531,10 +561,7 @@ const BookingDetails = ({
               className={`px-6 py-3 w-full border-2 flex items-center rounded-full font-semibold ${
                 shake ? "animate-shake" : ""
               }`}
-              onClick={() => {
-                setActiveForm("enquiry");
-                setIsMinimized(false);
-              }}
+              onClick={() => handleAuthCheck("enquiry")}
               style={{
                 background:
                   "linear-gradient(to right, var(--cta), var(--cta-active))",

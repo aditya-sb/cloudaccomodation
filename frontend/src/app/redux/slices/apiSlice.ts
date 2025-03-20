@@ -50,7 +50,7 @@ export const apiSlice = createApi({
     return result;
   },
 
-  tagTypes: ["User", "Auth", "Property", "Booking", "Dashboard", "Payment"], // Added Payment tag type
+  tagTypes: ["User", "Auth", "Property", "Booking", "Dashboard", "Payment", "Enquiry"], 
   endpoints: (builder) => ({
     register: builder.mutation({
       query: (userData) => ({
@@ -88,6 +88,7 @@ export const apiSlice = createApi({
         method: "POST",
         body: equiryDetails,
       }),
+      invalidatesTags: ["Enquiry"],
     }),
     verifyOtp: builder.mutation({
       query: (otp) => ({
@@ -216,6 +217,19 @@ export const apiSlice = createApi({
       providesTags: ["Dashboard"],
     }),
 
+    // Enquiry-related endpoints
+    getEnquiries: builder.query({
+      query: () => "/enquiry/all",
+      providesTags: ["Enquiry"],
+    }),
+    deleteEnquiry: builder.mutation({
+      query: (id) => ({
+        url: `/enquiry/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Enquiry"],
+    }),
+
     // Payment-related endpoints
     createPaymentIntent: builder.mutation({
       query: (data) => {
@@ -272,6 +286,9 @@ export const {
   // Dashboard hooks
   useGetDashboardStatsQuery,
   useLazyGetDashboardStatsQuery,
+  // Enquiry hooks
+  useGetEnquiriesQuery,
+  useDeleteEnquiryMutation,
   // Payment hooks
   useCreatePaymentIntentMutation,
   useConfirmPaymentMutation,
