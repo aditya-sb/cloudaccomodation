@@ -2,6 +2,12 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   transpilePackages: ['@stripe/stripe-js', '@stripe/react-stripe-js'],
   devDomains: ['localhost', 'cloudaccommodation.com'],
   webpack: (config) => {

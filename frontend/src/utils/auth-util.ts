@@ -1,3 +1,5 @@
+"use client";
+
 let cachedAuthToken: string | null = null;
 
 const isAuthenticated = (): boolean => {

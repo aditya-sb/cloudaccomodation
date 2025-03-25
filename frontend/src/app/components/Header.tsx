@@ -32,7 +32,7 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState<React.ReactNode>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [isAuthenticatedUser, setIsAuthenticatedUser] = useState(isAuthenticated());
+  const [isAuthenticatedUser, setIsAuthenticatedUser] = useState(false);
   const { data, isLoading: isLoadingData, error: dataError, refetch } = useGetUserDetailsQuery({}, {
     skip: !isAuthenticatedUser
   });

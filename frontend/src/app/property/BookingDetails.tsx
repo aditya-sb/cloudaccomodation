@@ -14,7 +14,25 @@ import StripePayment from '../components/payment/StripePayment'; // Adjust the p
 import isAuthenticated from "@/utils/auth-util";
 import Login from "../auth/Login";
 
-const BookingForm = ({ price, propertyId }: { price: number; propertyId: string }) => {
+// Country code mapping
+const COUNTRY_CODES = {
+  'Canada': 'INR',
+  'United States': 'US',
+  'United Kingdom': 'GB',
+  'Australia': 'AU',
+  'European Union': 'EU',
+  'Singapore': 'SG',
+  'Hong Kong': 'HK',
+  'Japan': 'JP',
+  'India': 'IN',
+  'Brazil': 'BR',
+  'Mexico': 'MX',
+  'South Africa': 'ZA',
+  'United Arab Emirates': 'AE',
+  'South Korea': 'KR'
+};
+
+const BookingForm = ({ price, propertyId, currency }: { price: number; propertyId: string, currency: string }) => {
   const [rentalDays, setRentalDays] = useState(30);
   const [moveInMonth, setMoveInMonth] = useState("");
   const [name, setName] = useState("");
@@ -23,7 +41,7 @@ const BookingForm = ({ price, propertyId }: { price: number; propertyId: string 
   const [error, setError] = useState("");
   const [bookingId, setBookingId] = useState<string | null>(null);
   const [showPayment, setShowPayment] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false); // Add this line
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingDetails, setBookingDetails] = useState({
     name: "",
     email: "",
@@ -31,11 +49,12 @@ const BookingForm = ({ price, propertyId }: { price: number; propertyId: string 
     rentalDays: 30,
     moveInMonth: "",
     propertyId: "",
-    price: 0
+    price: 0,
+    currency: currency || "inr",
+    country: "IN"
   });
 
-  // Remove the createBooking mutation as it's no longer needed here
-  // const [createBooking] = useCreateBookingMutation();
+  const [createBooking] = useCreateBookingMutation();
 
   const months = [
     "January",
@@ -52,7 +71,6 @@ const BookingForm = ({ price, propertyId }: { price: number; propertyId: string 
     "December",
   ];
 
-  // Function to generate future months dynamically
   const getAvailableMonths = (numberOfMonths: number) => {
     const currentDate = new Date();
     const currentMonth = currentDate.getMonth();
@@ -75,11 +93,9 @@ const BookingForm = ({ price, propertyId }: { price: number; propertyId: string 
     return "";
   };
 
-  // Reset form after successful payment
   const handlePaymentSuccess = async () => {
     alert("Payment successful! Your booking is being created.");
     
-    // Create the booking after payment is successful
     const bookingData = {
       name,
       email,
@@ -94,17 +110,15 @@ const BookingForm = ({ price, propertyId }: { price: number; propertyId: string 
       const response = await createBooking(bookingData).unwrap();
       console.log("Booking created successfully:", response);
       setBookingId(response.booking._id);
-      setShowPayment(false); // Hide payment form after booking is created
+      setShowPayment(false);
     } catch (error) {
       console.error("Error creating booking:", error);
       setError("Failed to create booking. Please try again.");
     }
   };
 
-  // Handle payment error
   const handlePaymentError = (message: string) => {
     setError(`Payment failed: ${message}`);
-    // Keep the booking form and ID, so they can try again
   };
 
   const handleBookingSubmit = async () => {
@@ -115,7 +129,7 @@ const BookingForm = ({ price, propertyId }: { price: number; propertyId: string 
     }
 
     setError("");
-    setIsSubmitting(true); // Add this line
+    setIsSubmitting(true);
     
     try {
       // Instead of creating booking immediately, show payment form
@@ -127,17 +141,20 @@ const BookingForm = ({ price, propertyId }: { price: number; propertyId: string 
         moveInMonth,
         propertyId,
         price,
+        currency: currency || "inr",
+        country: "IN"
       };
 
+      // Update bookingDetails before showing payment
+      setBookingDetails(bookingData);
       setShowPayment(true);
     } catch (error) {
       setError("Something went wrong. Please try again.");
     } finally {
-      setIsSubmitting(false); // Add this line
+      setIsSubmitting(false);
     }
   };
 
-  // Update booking details whenever form fields change
   useEffect(() => {
     setBookingDetails({
       name,
@@ -146,14 +163,15 @@ const BookingForm = ({ price, propertyId }: { price: number; propertyId: string 
       rentalDays,
       moveInMonth,
       propertyId,
-      price
+      price,
+      currency:currency || "inr",
+      country: "IN"
     });
-  }, [name, email, phone, rentalDays, moveInMonth, propertyId, price]);
+  }, [name, email, phone, rentalDays, moveInMonth, propertyId, price, currency]);
 
   return (
     <div className="flex flex-col text-sm space-y-3">
       {!showPayment ? (
-        // Booking Form
         <>
           <div className="space-y-1.5">
             <div className="text-gray-600 text-xs font-medium">Rental Days:</div>
@@ -245,15 +263,8 @@ const BookingForm = ({ price, propertyId }: { price: number; propertyId: string 
           bookingDetails={bookingDetails}
           isOpen={showPayment}
           onClose={() => setShowPayment(false)}
-          onSuccess={() => {
-            setShowPayment(false);
-            alert("Payment successful!");
-            // Additional success handling
-          }}
-          onError={(message) => {
-            setShowPayment(false);
-            setError(message);
-          }}
+          onSuccess={handlePaymentSuccess}
+          onError={handlePaymentError}
         />
       )}
     </div>
@@ -263,32 +274,27 @@ const BookingForm = ({ price, propertyId }: { price: number; propertyId: string 
 const EnquiryForm = ({ price, propertyId }: { price: number; propertyId: string }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  // const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  // Using the submitEnquiry mutation hook
   const [submitEnquiry, { isLoading: isSubmitting, isSuccess, reset }] = useSubmitEnquiryMutation();
 
   const validateForm = () => {
     if (!name.trim()) return "Name is required";
     if (!email.trim()) return "Email is required";
     if (!/\S+@\S+\.\S+/.test(email)) return "Email is invalid";
-    // if (!phone.trim()) return "Phone is required";
     if (!message.trim()) return "Message is required";
     if (message.trim().length < 10) return "Message must be at least 10 characters";
     return "";
   };
 
-  // Reset form after successful submission
   useEffect(() => {
     if (isSuccess) {
       alert("Enquiry submitted successfully!");
       setName("");
       setEmail("");
-      // setPhone("");
       setMessage("");
-      reset(); // Reset the mutation state
+      reset();
     }
   }, [isSuccess, reset]);
 
@@ -305,7 +311,6 @@ const EnquiryForm = ({ price, propertyId }: { price: number; propertyId: string 
       const enquiryData = {
         name,
         email,
-        // phone,
         message: `Property ID: ${propertyId}, Price: ${price}. ${message}`,
       };
 
@@ -336,23 +341,6 @@ const EnquiryForm = ({ price, propertyId }: { price: number; propertyId: string 
             placeholder="Enter your name"
           />
         </div>
-        {/* <div
-          className="flex-1 flex flex-col space-y-2"
-          style={{ color: "var(--copy-secondary)" }}
-        >
-          <div>Phone:</div>
-          <input
-            type="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="p-2 rounded-md w-full focus:ring-2 transition-all"
-            style={{
-              background: "var(--input-bg)",
-              border: "1px solid var(--input-border)",
-            }}
-            placeholder="Enter your phone no."
-          />
-        </div> */}
       </div>
 
       <div className="space-y-2">
@@ -408,16 +396,19 @@ const BookingDetails = ({
   price,
   booking,
   propertyId,
+  currency = "inr"
 }: {
   price: number;
   booking: boolean;
   propertyId: string;
+  currency?: string;
 }) => {
   const [isMinimized, setIsMinimized] = useState(true);
   const [activeForm, setActiveForm] = useState<"booking" | "enquiry">("enquiry");
   const [shake, setShake] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [error, setError] = useState("");
   const [bookingDetails, setBookingDetails] = useState({
     name: "",
     email: "",
@@ -425,7 +416,9 @@ const BookingDetails = ({
     rentalDays: 30,
     moveInMonth: "",
     propertyId: "",
-    price: 0
+    price: 0,
+    currency: currency,
+    country: "IN"
   });
 
   useEffect(() => {
@@ -434,7 +427,6 @@ const BookingDetails = ({
         setShake(true);
         setTimeout(() => setShake(false), 500);
       }, 3000);
-
       return () => clearInterval(interval);
     }
   }, [isMinimized]);
@@ -464,12 +456,24 @@ const BookingDetails = ({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (showPayment) {
+      // Make sure we have the latest booking details with the country code
+      setBookingDetails(prevDetails => ({
+        ...prevDetails,
+        propertyId,
+        price,
+        currency: currency || "inr",
+        country: "IN" // Use country code
+      }));
+    }
+  }, [showPayment, propertyId, price, currency]);
+
   const handleAuthCheck = (formType: "booking" | "enquiry") => {
     if (isAuthenticated()) {
       setActiveForm(formType);
       setIsMinimized(false);
     } else {
-      // Open login modal if not authenticated
       setIsModalOpen(true);
     }
   };
@@ -480,7 +484,6 @@ const BookingDetails = ({
 
   return (
     <>
-      {/* Overlay when forms are expanded */}
       {!isMinimized && (
         <div
           className="fixed inset-0 bg-black bg-opacity-65 backdrop-blur-sm z-10"
@@ -488,7 +491,6 @@ const BookingDetails = ({
         />
       )}
 
-      {/* Login Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-65 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-auto" style={{ background: "var(--card)", color: "var(--foreground)" }}>
@@ -506,9 +508,11 @@ const BookingDetails = ({
         </div>
       )}
 
-      {/* Payment Modal - Moved outside the booking form */}
       <StripePayment
-        bookingDetails={bookingDetails}
+        bookingDetails={{
+          ...bookingDetails,
+          currency: currency || "inr"
+        }}
         isOpen={showPayment}
         onClose={() => setShowPayment(false)}
         onSuccess={() => {
@@ -521,23 +525,19 @@ const BookingDetails = ({
         }}
       />
 
-      {/* Main Booking Details Container */}
       <div
         id="bookingDetails"
         className={`fixed transition-all duration-500 ease-in-out transform ${
-          isMinimized
-            ? "bottom-4 left-6 right-6 md:left-auto md:right-6 h-12 flex justify-center md:justify-end items-center gap-2"
-            : "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full md:max-w-md p-4 md:p-6 rounded-lg z-20"
+          isMinimized ? "bottom-4 left-6 right-6 md:left-auto md:right-6 h-12 flex justify-center md:justify-end items-center gap-2" : "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full md:max-w-md p-4 md:p-6 rounded-lg z-20"
         }`}
         style={{
           background: isMinimized ? "transparent" : "var(--card)",
           color: "var(--foreground)",
           border: isMinimized ? "none" : "1px solid var(--border-color)",
-          maxHeight: isMinimized ? "auto" : "70vh", // Changed from 90vh to 70vh
+          maxHeight: isMinimized ? "auto" : "70vh",
           overflow: isMinimized ? "visible" : "auto"
         }}
       >
-        {/* Minimized State */}
         {isMinimized && (
           <div className="flex justify-center w-full md:w-[400px] gap-4 px-4">
             {booking && (
@@ -547,8 +547,7 @@ const BookingDetails = ({
                 }`}
                 onClick={() => handleAuthCheck("booking")}
                 style={{
-                  background:
-                    "linear-gradient(to right, var(--cta), var(--cta-active))",
+                  background:  "linear-gradient(to right, var(--cta), var(--cta-active))",
                   color: "var(--cta-text)",
                 }}
               >
@@ -563,8 +562,7 @@ const BookingDetails = ({
               }`}
               onClick={() => handleAuthCheck("enquiry")}
               style={{
-                background:
-                  "linear-gradient(to right, var(--cta), var(--cta-active))",
+                background:  "linear-gradient(to right, var(--cta), var(--cta-active))",
                 color: "var(--cta-text)",
               }}
             >
@@ -573,19 +571,14 @@ const BookingDetails = ({
           </div>
         )}
 
-        {/* Expanded State */}
         {!isMinimized && (
           <div className="max-h-[80vh] md:max-h-none overflow-y-auto">
-            
-
-            {/* Render either Booking Form or Enquiry Form based on activeForm */}
             {booking && activeForm === "booking" ? (
-              <BookingForm price={price} propertyId={propertyId} />
+              <BookingForm price={price} propertyId={propertyId} currency={currency} />
             ) : (
               <EnquiryForm price={price} propertyId={propertyId} />
             )}
 
-            {/* Minimize Button */}
             <button
               onClick={() => setIsMinimized(true)}
               className="absolute top-2 right-2 transition-all hover:opacity-75"

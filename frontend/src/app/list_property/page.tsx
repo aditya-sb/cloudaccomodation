@@ -11,7 +11,7 @@ export default function Home() {
       backgroundColor: "var(--background)",
       color: "var(--foreground)",
     }}>
-      <Header />
+      <Header isPropertyPage={false} />
       <div className="pt-16"> {/* Adjust `pt-16` based on your header height */}
         <Form />
       </div>
