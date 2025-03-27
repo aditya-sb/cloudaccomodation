@@ -13,7 +13,7 @@ const ImageSlider = ({ images }) => {
       {Array.isArray(images) && images.length > 0 ? (
         images.map((image, index) => (
           <div key={index} className={styles.imageContainer}>
-            <img src={transformedUrls(image)} alt={`Property Image ${index + 1}`} className={styles.image} />
+            <img src={transformImageUrl(image)} alt={`Property Image ${index + 1}`} className={styles.image} />
           </div>
         ))
       ) : (
