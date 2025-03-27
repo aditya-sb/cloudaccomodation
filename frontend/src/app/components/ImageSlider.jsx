@@ -3,7 +3,10 @@ import { Carousel } from "antd";
 import styles from "./ImageSlider.module.css"; // Create a CSS module for styling
 
 const ImageSlider = ({ images }) => {
-  const transformedUrls = images.map((url) => url.replace('http://localhost:8000', process.env.NEXT_PUBLIC_API_BASE_URL));
+  const transformImageUrl = (url) => {
+    if (!url) return url;
+    return url.replace('http://localhost:8000', process.env.NEXT_PUBLIC_REST_API_ENDPOINT);
+  };
   
   return (
     <Carousel autoplay dots={false}>
