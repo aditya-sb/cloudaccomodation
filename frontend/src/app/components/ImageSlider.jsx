@@ -5,7 +5,7 @@ import styles from "./ImageSlider.module.css"; // Create a CSS module for stylin
 const ImageSlider = ({ images }) => {
   const transformImageUrl = (url) => {
     if (!url) return url;
-    return url.replace('http://localhost:8000', process.env.NEXT_PUBLIC_REST_API_ENDPOINT);
+    return url.replace('http://localhost:8000', process.env.NEXT_PUBLIC_API_BASE_URL);
   };
   
   return (
