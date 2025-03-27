@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
     return config;
   },
   images: {
-    domains: ['localhost', 'cloudaccommodation.com'],
+    domains: ["145.223.23.97",'localhost', 'cloudaccommodation.com'],
   },
 };
 
