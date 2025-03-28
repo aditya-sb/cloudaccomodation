@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface CityCardProps {
   name: string;
@@ -28,6 +29,7 @@ export default function CityCardSlider() {
   const isDragging = useRef(false);
   const startX = useRef(0);
   const scrollLeft = useRef(0);
+  const router = useRouter();
 
   const getVisibleCards = () => {
     if (typeof window === 'undefined') return 3;
@@ -163,7 +165,7 @@ export default function CityCardSlider() {
               >
                 <div
                   className="flex flex-col items-center cursor-pointer"
-                  onClick={() => window.location.href = `/properties?search=${city.name}`}
+                  onClick={() => router.push(`/properties?search=${city.name}`)}
                 >
                   <div
                     className="rounded-lg overflow-hidden shadow-lg"

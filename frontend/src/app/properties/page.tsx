@@ -1,4 +1,3 @@
-// src/app/propertyPage.tsx
 "use client";
 
 import { Suspense } from "react";

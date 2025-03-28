@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useState, useCallback, useEffect } from "react";
 import Slider from "react-input-slider";
 import { FaFilter, FaUniversity, FaMapMarkerAlt, FaDollarSign, FaCalendarAlt, FaBed, FaUtensils, FaBath } from "react-icons/fa";
@@ -136,13 +138,16 @@ export default function Filter({ onFilterChange }: FilterProps) {
   }, []);
 
   const handleFilterChange = useCallback((type: keyof FilterState, value: any) => {
-    setFilters(prev => {
-      const newFilters = { ...prev, [type]: value };
-      // Only send non-empty values to parent
-      onFilterChange(cleanFilters(newFilters));
-      return newFilters;
-    });
-  }, [onFilterChange]);
+    setFilters(prev => ({
+      ...prev,
+      [type]: value
+    }));
+  }, []);
+
+  // Add effect to handle filter changes
+  useEffect(() => {
+    onFilterChange(cleanFilters(filters));
+  }, [filters, onFilterChange]);
 
   const handleBudgetChange = useCallback(({ x }: { x: number }) => {
     setBudget({ x });

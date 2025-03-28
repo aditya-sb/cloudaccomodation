@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaSearch, FaBolt } from "react-icons/fa";
 
@@ -33,9 +34,10 @@ export default function SearchBar() {
     "Dalhousie University",
   ];
 
+  const router = useRouter();
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
-      window.location.href = `/properties?search=${searchTerm}`;
+      router.push(`/properties?search=${searchTerm}`);
     }
   };
 
@@ -112,9 +114,7 @@ export default function SearchBar() {
                 backgroundColor: "var(--cta)",
                 color: "var(--cta-text)",
               }}
-              onClick={() =>
-                (window.location.href = `/properties?search=${searchTerm}`)
-              }
+              onClick={() => router.push(`/properties?search=${searchTerm}`)}
             >
               <FaSearch className="w-5 h-5" />
             </button>
@@ -146,9 +146,8 @@ export default function SearchBar() {
                   {cities.map((city) => (
                     <button
                       key={city}
-                      onMouseDown={() =>
-                        (window.location.href = `/properties?search=${city}`)
-                      }
+                      onClick={() => router.push(`/properties?search=${city}`)}
+                    
                       className="px-4 py-2 rounded-full text-sm transition-all hover:scale-105"
                       style={{
                         backgroundColor: "var(--gray-bg)",
@@ -174,9 +173,7 @@ export default function SearchBar() {
                   {universities.map((university) => (
                     <button
                       key={university}
-                      onMouseDown={() =>
-                        (window.location.href = `/properties?search=${university}`)
-                      }
+                      onClick={() => router.push(`/properties?search=${university}`)}
                       className="px-4 py-2 rounded-full text-sm transition-all hover:scale-105"
                       style={{
                         backgroundColor: "var(--gray-bg)",

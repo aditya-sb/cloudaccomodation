@@ -1,6 +1,9 @@
+"use client";
+
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import ExploreProperties from './ExploreProperties';
+import { useRouter } from 'next/navigation';
 
 const cityData = {
   Canada: [
@@ -36,7 +39,7 @@ const flagData = {
 const PopularCities = () => {
   const [selectedCountry, setSelectedCountry] = useState('Canada');
   const [currentIndex, setCurrentIndex] = useState(0);
-  
+  const router = useRouter();
   const getItemsPerPage = () => {
     if (typeof window !== 'undefined') {
       if (window.innerWidth < 640) return 2; // Mobile
@@ -149,7 +152,7 @@ const PopularCities = () => {
                       >
                         <div
                           className="relative rounded-lg overflow-hidden shadow-md group cursor-pointer"
-                          onClick={() => window.location.href = `/properties?search=${city.name}`}
+                          onClick={() => router.push(`/properties?search=${city.name}`)}
                         >
                           {/* Square aspect ratio container */}
                           <div className="relative pb-[100%]">

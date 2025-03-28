@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   transpilePackages: ['@stripe/stripe-js', '@stripe/react-stripe-js'],
-  devDomains: ['localhost', 'cloudaccommodation.com'],
+  // devDomains: ['localhost', 'cloudaccommodation.com'],
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,

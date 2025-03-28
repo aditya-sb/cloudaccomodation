@@ -40,7 +40,8 @@ const Login: React.FC<LoginProps> = ({ openForgetPassword }) => {
       .then((response) => {
         setMessage({ type: "success", text: response.message });
         setLoading(false);
-        setTimeout(() => {router.push("/");window.location.reload()
+        setTimeout(() => {
+          router.push("/");
           localStorage.setItem("auth_Token", response.signature);
         }, 1000); // Navigate to the home page after a delay
       })

@@ -21,7 +21,7 @@ import { useTheme } from "../ThemeContext";
 import isAuthenticated from "@/utils/auth-util";
 import { useGetUserDetailsQuery } from "../redux/slices/apiSlice";
 import Loader from "@/loader/loader";
-
+import { useRouter } from "next/navigation";
 interface HeaderProps {
   isPropertyPage: boolean;
 }
@@ -45,7 +45,7 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
   }, []);
   
   const toggleMenu = () => setMenuOpen(!menuOpen);
-
+  const router = useRouter();
   const openModal = (content: React.ReactNode) => {
     setModalContent(content);
     setIsModalOpen(true);
@@ -58,7 +58,7 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
 
   const handleSearch = () => {
     if (searchTerm.trim()) {
-      window.location.href = `/properties?search=${searchTerm}`;
+      router.push(`/properties?search=${searchTerm}`);
     }
   };
   if(isLoadingData){

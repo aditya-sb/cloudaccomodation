@@ -1,10 +1,13 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import ListView from "./ListView";
-import MapView from "./MapView";
+import dynamic from 'next/dynamic';
 import { FaThList, FaMapMarkedAlt } from "react-icons/fa";
 import Filter, { FilterState } from "../components/Filter";
 import { useGetPropertiesQuery } from "../redux/slices/apiSlice";
+
+// Dynamically import MapView with no SSR
+const MapView = dynamic(() => import('./MapView'), { ssr: false });
 
 function PropertyContent() {
   const searchParams = useSearchParams();
@@ -13,6 +16,12 @@ function PropertyContent() {
   const [view, setView] = useState<"list" | "map">("list");
   const [mapCenter, setMapCenter] = useState({ lat: 0, lon: 0 });
   const [filters, setFilters] = useState<FilterState>({});
+  const [isClient, setIsClient] = useState(false);
+
+  // Check if we're on the client side
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Memoize query params to prevent unnecessary re-renders
   const queryParams = useMemo(() => ({
@@ -52,7 +61,7 @@ function PropertyContent() {
         });
       }
     }
-  }, [properties]); // Remove mapCenter from dependencies
+  }, [properties]);
 
   if (isLoading) return <div></div>;
   if (isError) return <div>Error loading properties.</div>;
@@ -99,13 +108,24 @@ function PropertyContent() {
         <div className="p-4 mx-5 mt-2">
           {view === "list" ? (
             <ListView properties={properties} />
-          ) : (
+          ) : isClient ? (
             <MapView 
               properties={properties} 
               mapLat={mapCenter.lat} 
               mapLon={mapCenter.lon} 
               mapLocation={search || "All Properties"} 
             />
+          ) : (
+            <div className="flex h-screen">
+              <div className="relative w-3/5 h-full shadow-lg bg-gray-100 animate-pulse" />
+              <div className="flex-1 h-full overflow-y-auto p-6 bg-gray-50">
+                <div className="animate-pulse">
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </div>

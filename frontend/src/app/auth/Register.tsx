@@ -84,8 +84,7 @@ const Register = () => {
           setMessage({ type: "success", text: response.message });
 
           // Optional: Redirect to login page
-          setTimeout(() => {router.push("/");window.location.reload()
-            localStorage.setItem("auth_Token", response.signature);
+          setTimeout(() => {router.push("/login");
           }, 1000); 
         }
       })

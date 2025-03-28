@@ -2,11 +2,13 @@
 import React, { useEffect, useState } from 'react';
 import { FaSignOutAlt } from "react-icons/fa";
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 const Profile: React.FC = () => {
   const [name, setName] = useState('Aditya');
   const [email, setEmail] = useState('test@gmail.com');
   const [message, setMessage] = useState('');
+  const router = useRouter();
 
   useEffect(() => {
     const userId = sessionStorage.getItem('userId');
@@ -28,7 +30,7 @@ const Profile: React.FC = () => {
       await axios.post('http://localhost:5000/logout');
       sessionStorage.removeItem('userId');
       setMessage("You have successfully logged out.");
-      setTimeout(() => window.location.href = '/', 1000);
+      setTimeout(() => router.push('/'), 1000);
     } catch (error) {
       console.error("Logout failed", error);
       setMessage("Error logging out.");
