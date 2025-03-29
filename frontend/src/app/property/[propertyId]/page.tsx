@@ -24,6 +24,7 @@ import PropertyDetailsMobile from "../propertyDetailsMobile";
 import { getCurrencySymbol } from "@/constants/currency";
 import { Pin } from "lucide-react";
 import { FaLocationPin, FaMapLocationDot } from "react-icons/fa6";
+import ReviewForm from "@/app/components/ReviewForm";
 
 export default function PropertyPage() {
   const { propertyId } = useParams();
@@ -88,6 +89,11 @@ export default function PropertyPage() {
 
           {/* Buyer Reviews */}
           <BuyerReviews />
+
+          {/* Add Review Form */}
+          <div className="mt-6">
+            <ReviewForm propertyId={propertyId as string} />
+          </div>
         </div>
 
         {/* Right Section: 40% */}

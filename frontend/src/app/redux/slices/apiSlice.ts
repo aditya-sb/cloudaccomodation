@@ -50,7 +50,7 @@ export const apiSlice = createApi({
     return result;
   },
 
-  tagTypes: ["User", "Auth", "Property", "Booking", "Dashboard", "Payment", "Enquiry"], 
+  tagTypes: ["User", "Auth", "Property", "Booking", "Dashboard", "Payment", "Enquiry", "Review"], 
   endpoints: (builder) => ({
     register: builder.mutation({
       query: (userData) => ({
@@ -217,6 +217,20 @@ export const apiSlice = createApi({
       providesTags: ["Dashboard"],
     }),
 
+    // Reviews-related endpoints
+    getPropertyReviews: builder.query({
+      query: (propertyId) => `/analytics/reviews/property/${propertyId}`,
+      providesTags: ["Review"],
+    }),
+    addReview: builder.mutation({
+      query: ({ propertyId, reviewData }) => ({
+        url: `/analytics/review/${propertyId}`,
+        method: "POST",
+        body: reviewData,
+      }),
+      invalidatesTags: ["Review"],
+    }),
+
     // Enquiry-related endpoints
     getEnquiries: builder.query({
       query: () => "/enquiry/all",
@@ -286,6 +300,9 @@ export const {
   // Dashboard hooks
   useGetDashboardStatsQuery,
   useLazyGetDashboardStatsQuery,
+  // Review hooks
+  useGetPropertyReviewsQuery,
+  useAddReviewMutation,
   // Enquiry hooks
   useGetEnquiriesQuery,
   useDeleteEnquiryMutation,
