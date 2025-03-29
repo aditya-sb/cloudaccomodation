@@ -47,7 +47,7 @@ export default function LightHeader() {
     setModalContent(null);
   };
 
-  if (isLoadingData) return <Loader />;
+  // if (isLoadingData) return <Loader />;
 
 
   return (

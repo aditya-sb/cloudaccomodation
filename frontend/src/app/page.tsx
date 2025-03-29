@@ -18,6 +18,7 @@ import PopularCities from "./components/PopularCities";
 import ExploreProperties from "./components/ExploreProperties";
 import ReviewSection from "./components/Reviews";
 import GetInTouch from "./components/GetInTouch";
+import Loader from "@/loader/loader";
 
 export default function Home() {
   const [isHeaderVisible, setIsHeaderVisible] = useState(false);
@@ -42,6 +43,11 @@ export default function Home() {
       }
     };
   }, []);
+
+  
+  if (isLoading) {
+    <Loader/>
+  }
 
   return (
     <div

@@ -61,9 +61,9 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
       router.push(`/properties?search=${searchTerm}`);
     }
   };
-  if(isLoadingData){
-    <Loader/>;
-  }
+  // if(isLoadingData){
+  //   <Loader/>;
+  // }
 
   return (
     <>
