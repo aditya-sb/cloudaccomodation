@@ -70,6 +70,14 @@ export const apiSlice = createApi({
       // Invalidate User and Auth queries upon login
       invalidatesTags: ["User", "Auth"],
     }),
+    googleAuth: builder.mutation({
+      query: (googleUserData) => ({
+        url: "/user/google-auth",
+        method: "POST",
+        body: googleUserData,
+      }),
+      invalidatesTags: ["User", "Auth"],
+    }),
     getUserDetails: builder.query({
       query: () => "/user/getUserDetails",
       providesTags: ["User"], // Tag this endpoint for future invalidation
@@ -274,6 +282,7 @@ export const apiSlice = createApi({
 export const {
   useRegisterMutation,
   useLoginMutation,
+  useGoogleAuthMutation,
   useGetUserDetailsQuery,
   useSaveUserDetailsMutation,
   useSubmitEnquiryMutation,

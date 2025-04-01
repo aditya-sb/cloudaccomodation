@@ -1,20 +1,29 @@
-// RootLayout.tsx
-"use client";
+import type { Metadata } from "next";
 import "./globals.css";
-import { store } from "./redux/store";
-import { ThemeProvider } from "./ThemeContext";
-import { Provider } from 'react-redux';
+import ClientLayout from "./ClientLayout";
+import ServerLayout from "./ServerLayout";
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export const metadata: Metadata = {
+  title: "Cloud Accommodation",
+  description: "Find your perfect stay.",
+  viewport: "width=device-width, initial-scale=1",
+  icons: {
+    icon: "/favicon.ico",
+  },
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <ThemeProvider >
-      <Provider store={store}>
-      <html lang="en">
-        <body className="antialiased">
-          {children}
-        </body>
-      </html>
-      </Provider>
-    </ThemeProvider>
+    <html lang="en">
+      <body>
+        <ServerLayout>
+          <ClientLayout>{children}</ClientLayout>
+        </ServerLayout>
+      </body>
+    </html>
   );
 }

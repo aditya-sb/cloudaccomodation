@@ -1,6 +1,9 @@
 import React from 'react';
+import { useRouter } from "next/navigation";
 
 const OtherServices = () => {
+  const router = useRouter();
+
   const services = [
     { icon: "/images/icons/Airport.png", name: "Student Flights" },
     { icon: "/images/icons/Airport2.png", name: "Airport Pickup" },
@@ -37,6 +40,28 @@ const OtherServices = () => {
                 <ServiceCard icon={service.icon} name={service.name} />
               </div>
             ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Sign Up Banner */}
+      <div className="max-w-4xl mx-auto mt-16 mb-8">
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg overflow-hidden">
+          <div className="px-6 py-8 md:p-10 flex flex-col md:flex-row items-center justify-between">
+            <div className="md:max-w-lg mb-6 md:mb-0 text-center md:text-left">
+              <h3 className="text-xl md:text-2xl font-bold text-white mb-2">
+                Create Your Account Today
+              </h3>
+              <p className="text-blue-100 text-sm md:text-base">
+                Sign up to unlock exclusive features, save your favorite properties, and get personalized accommodation recommendations.
+              </p>
+            </div>
+            <button 
+              onClick={() => router.push('/auth/register')}
+              className="py-3 px-8 bg-white text-blue-600 rounded-full font-semibold hover:bg-blue-50 transition-colors shadow-md transform hover:scale-105 duration-200"
+            >
+              Sign Up Now
+            </button>
           </div>
         </div>
       </div>

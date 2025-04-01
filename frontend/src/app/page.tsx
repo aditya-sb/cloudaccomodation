@@ -26,12 +26,17 @@ export default function Home() {
   const { data: properties, error, isLoading } = useGetPropertiesQuery({});
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsHeaderVisible(!entry.isIntersecting); // Header shows when search bar is out of view
-      },
-      { root: null, threshold: 0.5 } // Trigger when the search bar is fully out of view
-    );
+    const options = {
+      root: null,
+      rootMargin: "0px",
+      threshold: 0.5,
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        setIsHeaderVisible(!entry.isIntersecting);
+      });
+    }, options);
 
     if (searchBarRef.current) {
       observer.observe(searchBarRef.current);
@@ -51,7 +56,7 @@ export default function Home() {
 
   return (
     <div
-      className="min-h-screen "
+      className="min-h-screen"
       style={{
         backgroundColor: "var(--background)",
         color: "var(--foreground)",
