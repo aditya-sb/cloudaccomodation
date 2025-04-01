@@ -27,7 +27,7 @@ function PropertyContent() {
   const queryParams = useMemo(() => ({
     city: search || city || "",
     sortBy: filters.sort,
-    university: filters.university,
+    university: filters.university || "",
     locality: filters.locality,
     minPrice: filters.minPrice,
     roomType: filters.roomType?.join(','),

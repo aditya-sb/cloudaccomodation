@@ -5,6 +5,8 @@ import Slider from "react-input-slider";
 import { FaFilter, FaUniversity, FaMapMarkerAlt, FaDollarSign, FaCalendarAlt, FaBed, FaUtensils, FaBath } from "react-icons/fa";
 import "react-datepicker/dist/react-datepicker.css";
 import { createPortal } from "react-dom";
+import { useGetUniversitiesByLocationQuery } from "../redux/slices/apiSlice";
+import { useSearchParams } from 'next/navigation';
 
 export type RoomType = 'private' | 'shared';
 export type KitchenType = 'private' | 'shared';
@@ -15,6 +17,8 @@ export interface FilterState {
   sort?: string;
   university?: string;
   locality?: string;
+  city?: string;
+  country?: string;
   minPrice?: number;
   maxPrice?: number;
   moveInMonth?: string[];
@@ -36,6 +40,8 @@ const getFilterIcon = (filter: string) => {
       return <FaFilter {...iconStyle} />;
     case "University":
       return <FaUniversity {...iconStyle} />;
+    case "City":
+      return <FaMapMarkerAlt {...iconStyle} />;
     case "Locality":
       return <FaMapMarkerAlt {...iconStyle} />;
     case "Budget":
@@ -98,12 +104,66 @@ export default function Filter({ onFilterChange }: FilterProps) {
     sort: '',
     university: '',
     locality: '',
+    city: '',
+    country: 'Canada', // Default country
     minPrice: 500,
     stayDuration: ''
   });
   const [budget, setBudget] = useState({ x: 500 });
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
+
+  // Add searchParams to get URL parameters
+  const searchParams = useSearchParams();
+
+  // Add these states to manage city input for university fetching
+  const [debouncedCity, setDebouncedCity] = useState('');
+
+  // Extract city from URL search parameter on component mount
+  useEffect(() => {
+    const searchQuery = searchParams.get('search');
+    if (searchQuery) {
+      // Assume the search query is the city name
+      const cityFromUrl = searchQuery.trim();
+      if (cityFromUrl) {
+        // Update the city in filters
+        setFilters(prev => ({
+          ...prev,
+          city: cityFromUrl
+        }));
+        // Immediately set the debounced city to trigger university search
+        setDebouncedCity(cityFromUrl);
+      }
+    }
+  }, [searchParams]);
+
+  // Auto-load universities when University filter is clicked
+  useEffect(() => {
+    if (activeDropdown === "University" && !debouncedCity && searchParams.get('search')) {
+      // If no city is set yet but we have a search parameter, use it
+      setDebouncedCity(searchParams.get('search')?.trim() || '');
+    }
+  }, [activeDropdown, debouncedCity, searchParams]);
+
+  // Debounce the city input to prevent too many API calls
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (filters.city) {
+        setDebouncedCity(filters.city);
+      }
+    }, 500); // 500ms debounce
+    
+    return () => clearTimeout(timer);
+  }, [filters.city]);
+
+  // Fetch universities based on city
+  const {
+    data: universities = [],
+    isLoading: isLoadingUniversities,
+  } = useGetUniversitiesByLocationQuery(
+    { city: debouncedCity, country: filters.country || 'Canada' },
+    { skip: !debouncedCity }
+  );
 
   // Set up portal container on mount
   useEffect(() => {
@@ -164,8 +224,16 @@ export default function Filter({ onFilterChange }: FilterProps) {
       width: 240 // Fixed width for dropdown
     });
     
+    // If University filter is being opened and we have a search parameter but no debounced city
+    if (filter === "University" && activeDropdown !== filter && searchParams.get('search')) {
+      const cityFromUrl = searchParams.get('search')?.trim() || '';
+      if (cityFromUrl && !debouncedCity) {
+        setDebouncedCity(cityFromUrl);
+      }
+    }
+    
     setActiveDropdown(activeDropdown === filter ? null : filter);
-  }, [activeDropdown]);
+  }, [activeDropdown, debouncedCity, searchParams]);
 
   const clearAllFilters = useCallback(() => {
     const emptyFilters = {
@@ -176,6 +244,8 @@ export default function Filter({ onFilterChange }: FilterProps) {
       sort: '',
       university: '',
       locality: '',
+      city: '',
+      country: 'Canada', // Keep default country
       minPrice: 500,
       maxPrice: undefined,
       stayDuration: ''
@@ -196,6 +266,8 @@ export default function Filter({ onFilterChange }: FilterProps) {
       filters.sort ||
       filters.university ||
       filters.locality ||
+      filters.city ||
+      (filters.country && filters.country !== 'Canada') ||
       (filters.minPrice && filters.minPrice !== 500) ||
       filters.stayDuration
     );
@@ -203,7 +275,7 @@ export default function Filter({ onFilterChange }: FilterProps) {
 
   // Update filterButtons
   const filterButtons = [
-    "Sort", "University", "Locality", "Budget", "Move in Month", 
+    "Sort", "City", "University", "Locality", "Budget", "Move in Month", 
     "Stay Duration", "Room Type", "Kitchen Type", "Bathroom Type"
   ];
 
@@ -391,33 +463,151 @@ export default function Filter({ onFilterChange }: FilterProps) {
 
         {filter === "Stay Duration" && (
           <ul className="space-y-2">
-            {["Less than 6 months", "6-12 months", "1 year+"].map((option) => (
-              <li key={option} className="flex items-center">
-                <input
-                  type="radio"
-                  id={`duration-${option}`}
-                  name="duration"
-                  checked={filters.stayDuration === option}
-                  onChange={() => handleFilterChange("stayDuration", option)}
-                  className="mr-2 rounded"
-                />
-                <label htmlFor={`duration-${option}`}>{option}</label>
-              </li>
-            ))}
+            <li>
+              <h4 className="text-sm font-semibold mb-2">General Durations</h4>
+              <ul className="space-y-2 ml-2 mb-4">
+                {["Month-to-Month", "Less than 6 months", "6-12 months", "1 year+"].map((option) => (
+                  <li key={option} className="flex items-center">
+                    <input
+                      type="radio"
+                      id={`duration-${option}`}
+                      name="duration"
+                      checked={filters.stayDuration === option}
+                      onChange={() => handleFilterChange("stayDuration", option)}
+                      className="mr-2 rounded"
+                    />
+                    <label htmlFor={`duration-${option}`}>{option}</label>
+                  </li>
+                ))}
+              </ul>
+            </li>
+            
+            <li>
+              <h4 className="text-sm font-semibold mb-2">Specific Durations</h4>
+              <ul className="space-y-2 ml-2 grid grid-cols-1 gap-2">
+                <li className="flex items-center">
+                  <input
+                    type="radio"
+                    id="duration-jan-to-mar"
+                    name="duration"
+                    checked={filters.stayDuration === "Jan to Mar"}
+                    onChange={() => handleFilterChange("stayDuration", "Jan to Mar")}
+                    className="mr-2 rounded"
+                  />
+                  <label htmlFor="duration-jan-to-mar">Jan to Mar (Q1)</label>
+                </li>
+                <li className="flex items-center">
+                  <input
+                    type="radio"
+                    id="duration-apr-to-jun"
+                    name="duration"
+                    checked={filters.stayDuration === "Apr to Jun"}
+                    onChange={() => handleFilterChange("stayDuration", "Apr to Jun")}
+                    className="mr-2 rounded"
+                  />
+                  <label htmlFor="duration-apr-to-jun">Apr to Jun (Q2)</label>
+                </li>
+                <li className="flex items-center">
+                  <input
+                    type="radio"
+                    id="duration-jul-to-sep"
+                    name="duration"
+                    checked={filters.stayDuration === "Jul to Sep"}
+                    onChange={() => handleFilterChange("stayDuration", "Jul to Sep")}
+                    className="mr-2 rounded"
+                  />
+                  <label htmlFor="duration-jul-to-sep">Jul to Sep (Q3)</label>
+                </li>
+                <li className="flex items-center">
+                  <input
+                    type="radio"
+                    id="duration-oct-to-dec"
+                    name="duration"
+                    checked={filters.stayDuration === "Oct to Dec"}
+                    onChange={() => handleFilterChange("stayDuration", "Oct to Dec")}
+                    className="mr-2 rounded"
+                  />
+                  <label htmlFor="duration-oct-to-dec">Oct to Dec (Q4)</label>
+                </li>
+                <li className="flex items-center">
+                  <input
+                    type="radio"
+                    id="duration-jan-to-dec"
+                    name="duration"
+                    checked={filters.stayDuration === "Jan to Dec"}
+                    onChange={() => handleFilterChange("stayDuration", "Jan to Dec")}
+                    className="mr-2 rounded"
+                  />
+                  <label htmlFor="duration-jan-to-dec">Jan to Dec (Full Year)</label>
+                </li>
+              </ul>
+            </li>
           </ul>
         )}
 
-        {(filter === "University" || filter === "Locality") && (
+        {filter === "University" && (
+          <div>
+            {isLoadingUniversities ? (
+              <div className="py-2 text-sm">Loading universities...</div>
+            ) : universities.length > 0 ? (
+              <div>
+                <select
+                  className="w-full p-2 rounded border"
+                  value={filters.university || ''}
+                  onChange={(e) => handleFilterChange("university", e.target.value)}
+                >
+                  <option value="">All Universities</option>
+                  {universities.map((uni, index) => (
+                    <option key={index} value={uni.name}>
+                      {uni.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : (
+              <div className="py-2 text-sm">No universities found for {debouncedCity}</div>
+            )}
+          </div>
+        )}
+
+        {filter === "Locality" && (
           <input
             type="text"
-            placeholder={`Enter ${filter.toLowerCase()}...`}
+            placeholder="Enter locality..."
             className="w-full z-64 p-2 rounded border"
-            value={filter === "University" ? filters.university : filters.locality}
-            onChange={(e) => handleFilterChange(
-              filter === "University" ? "university" : "locality",
-              e.target.value
-            )}
+            value={filters.locality || ''}
+            onChange={(e) => handleFilterChange("locality", e.target.value)}
           />
+        )}
+
+        {filter === "City" && (
+          <div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">City</label>
+              <input
+                type="text"
+                placeholder="Enter city name"
+                className="w-full p-2 rounded border"
+                value={filters.city || ''}
+                onChange={(e) => handleFilterChange("city", e.target.value)}
+              />
+            </div>
+            
+            <div className="mb-2">
+              <label className="block text-sm font-medium mb-1">Country</label>
+              <select
+                className="w-full p-2 rounded border"
+                value={filters.country || 'Canada'}
+                onChange={(e) => handleFilterChange("country", e.target.value)}
+              >
+                <option value="Canada">Canada</option>
+                <option value="USA">United States</option>
+                <option value="UK">United Kingdom</option>
+                <option value="India">India</option>
+                <option value="Australia">Australia</option>
+              </select>
+            </div>
+          </div>
         )}
       </div>
     );

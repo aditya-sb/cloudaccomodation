@@ -276,6 +276,18 @@ export const apiSlice = createApi({
       query: (bookingId) => `/payment/status/${bookingId}`,
       providesTags: (result, error, bookingId) => [{ type: "Payment", id: bookingId }],
     }),
+    
+    // Universities-related endpoint
+    getUniversitiesByLocation: builder.query({
+      query: ({ city, country }) => ({
+        url: `/property/universities`,
+        params: { city, country },
+      }),
+      transformResponse: (response) => {
+        // If response is an array, return it; otherwise, return an empty array
+        return Array.isArray(response) ? response : [];
+      },
+    }),
   }),
 });
 
@@ -319,6 +331,8 @@ export const {
   useCreatePaymentIntentMutation,
   useConfirmPaymentMutation,
   useGetPaymentStatusQuery,
+  // Universities hook
+  useGetUniversitiesByLocationQuery,
 } = apiSlice;
 
 // Function to handle logout and invalidate user queries
