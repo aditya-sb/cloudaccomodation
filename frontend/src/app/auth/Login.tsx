@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useLoginMutation } from "../redux/slices/apiSlice";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
-import { handleLogin } from "../../utils/auth-util";
+import { handleLogin, notifyAuthStateChange } from "../../utils/auth-util";
 
 interface LoginProps {
   openForgetPassword: () => void;
@@ -28,7 +28,6 @@ const Login: React.FC<LoginProps> = ({ openForgetPassword }) => {
     const email = form.email.value.trim();
     const password = form.password.value;
 
-    // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setMessage({ type: "error", text: "Please enter a valid email address" });
@@ -44,13 +43,13 @@ const Login: React.FC<LoginProps> = ({ openForgetPassword }) => {
       .then(async (response) => {
         setMessage({ type: "success", text: response.message });
         
-        // Call handleLogin to verify the token and hit the getUserDetails API
         const loginSuccess = await handleLogin(response.signature);
         
         if (loginSuccess) {
+          notifyAuthStateChange();
           setTimeout(() => {
             router.push("/");
-          }, 1000); // Navigate to the home page after a delay
+          }, 1000);
         } else {
           setMessage({ type: "error", text: "Failed to validate login" });
         }
@@ -70,20 +69,19 @@ const Login: React.FC<LoginProps> = ({ openForgetPassword }) => {
     try {
       setGoogleLoading(true);
       const result = await signIn("google", { 
-        redirect: false // Don't redirect automatically
+        redirect: false 
       });
       
       if (result?.error) {
         setMessage({ type: "error", text: "Google sign-in failed" });
       } else if (result?.ok) {
-        // The token should be stored in localStorage by NextAuth callbacks
         const token = localStorage.getItem('auth_Token');
         
         if (token) {
-          // Validate the token with our backend
           const loginSuccess = await handleLogin(token);
           
           if (loginSuccess) {
+            notifyAuthStateChange();
             router.push("/");
           } else {
             setMessage({ type: "error", text: "Failed to validate login after Google sign-in" });

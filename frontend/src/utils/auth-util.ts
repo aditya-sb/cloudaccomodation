@@ -13,6 +13,13 @@ export const setAuthToken = (token: string | null): void => {
   }
 };
 
+// Add this new function
+export const notifyAuthStateChange = (): void => {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('auth-state-changed'));
+  }
+};
+
 // Function to handle login - can be called after both normal and social login
 export const handleLogin = async (token: string): Promise<boolean> => {
   try {
@@ -30,15 +37,18 @@ export const handleLogin = async (token: string): Promise<boolean> => {
     if (response.ok) {
       const userData = await response.json();
       // Here you could store user data in a state management solution if needed
+      notifyAuthStateChange();
       return true;
     } else {
       console.error('Failed to validate user token');
       setAuthToken(null);
+      notifyAuthStateChange();
       return false;
     }
   } catch (error) {
     console.error('Error during login validation:', error);
     setAuthToken(null);
+    notifyAuthStateChange();
     return false;
   }
 };

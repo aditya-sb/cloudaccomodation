@@ -37,11 +37,19 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
     skip: !isAuthenticatedUser
   });
   console.log(data);
+  
   useEffect(() => {
-    setIsAuthenticatedUser(isAuthenticated());
-    if (isAuthenticatedUser) {
-      closeModal();
-    }
+    // Check auth status whenever the component mounts or auth state changes
+    const checkAuth = () => {
+      setIsAuthenticatedUser(isAuthenticated());
+    };
+
+    checkAuth();
+    window.addEventListener('auth-state-changed', checkAuth);
+    
+    return () => {
+      window.removeEventListener('auth-state-changed', checkAuth);
+    };
   }, []);
   
   const toggleMenu = () => setMenuOpen(!menuOpen);

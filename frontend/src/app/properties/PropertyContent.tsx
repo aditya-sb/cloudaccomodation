@@ -69,7 +69,8 @@ function PropertyContent() {
   return (
     <div className="relative">
       {/* Sticky filter container */}
-      <div className="sticky top-16 z-50 bg-white dark:bg-gray-900 pb-2 shadow-md">
+      <div className="sticky top-16 z-50 bg-white dark:bg-gray-900 shadow-md"
+        style={{ marginBottom: "5rem", }}>
         <Filter onFilterChange={handleFilterChange} />
       </div>
       

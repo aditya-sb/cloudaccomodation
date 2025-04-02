@@ -281,7 +281,10 @@ export const apiSlice = createApi({
     getUniversitiesByLocation: builder.query({
       query: ({ city, country }) => ({
         url: `/property/universities`,
-        params: { city, country },
+        params: { 
+          ...(city && { city }), 
+          ...(country && { country })
+        },
       }),
       transformResponse: (response) => {
         // If response is an array, return it; otherwise, return an empty array

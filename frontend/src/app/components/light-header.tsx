@@ -31,8 +31,18 @@ export default function LightHeader() {
     skip: !isAuthenticatedUser
   });
   console.log(data);
+
   useEffect(() => {
-    setIsAuthenticatedUser(isAuthenticated());
+    const checkAuth = () => {
+      setIsAuthenticatedUser(isAuthenticated());
+    };
+
+    checkAuth();
+    window.addEventListener('auth-state-changed', checkAuth);
+    
+    return () => {
+      window.removeEventListener('auth-state-changed', checkAuth);
+    };
   }, []);
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
