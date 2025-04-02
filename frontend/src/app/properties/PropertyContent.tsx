@@ -14,7 +14,6 @@ function PropertyContent() {
   const search = searchParams.get("search");
   const city = searchParams.get("city");
   const [view, setView] = useState<"list" | "map">("list");
-  const [mapCenter, setMapCenter] = useState({ lat: 0, lon: 0 });
   const [filters, setFilters] = useState<FilterState>({});
   const [isClient, setIsClient] = useState(false);
 
@@ -49,19 +48,6 @@ function PropertyContent() {
       return prevFilters;
     });
   }, []);
-
-  // Only update map center when properties change AND when the first property exists
-  useEffect(() => {
-    if (properties.length > 0) {
-      const firstProperty = properties[0];
-      if (firstProperty.latitude !== mapCenter.lat || firstProperty.longitude !== mapCenter.lon) {
-        setMapCenter({
-          lat: firstProperty.latitude,
-          lon: firstProperty.longitude,
-        });
-      }
-    }
-  }, [properties]);
 
   if (isLoading) return <div></div>;
   if (isError) return <div>Error loading properties.</div>;
@@ -112,8 +98,7 @@ function PropertyContent() {
           ) : isClient ? (
             <MapView 
               properties={properties} 
-              mapLat={mapCenter.lat} 
-              mapLon={mapCenter.lon} 
+              mapAddress={search || city || "London, UK"} // Use address instead of coordinates
               mapLocation={search || "All Properties"} 
             />
           ) : (
