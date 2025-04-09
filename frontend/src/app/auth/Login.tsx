@@ -49,6 +49,7 @@ const Login: React.FC<LoginProps> = ({ openForgetPassword }) => {
           notifyAuthStateChange();
           setTimeout(() => {
             router.push("/");
+            window.location.reload();
           }, 1000);
         } else {
           setMessage({ type: "error", text: "Failed to validate login" });
@@ -83,6 +84,7 @@ const Login: React.FC<LoginProps> = ({ openForgetPassword }) => {
           if (loginSuccess) {
             notifyAuthStateChange();
             router.push("/");
+            window.location.reload();
           } else {
             setMessage({ type: "error", text: "Failed to validate login after Google sign-in" });
           }
@@ -209,13 +211,13 @@ const Login: React.FC<LoginProps> = ({ openForgetPassword }) => {
         </div>
       )}
 
-      <button
+      {/* <button
         type="button"
         onClick={openForgetPassword}
         className="w-full text-center text-sm text-muted-foreground hover:text-foreground"
       >
         Forgot your password?
-      </button>
+      </button> */}
     </div>
   );
 };

@@ -90,6 +90,17 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["User"], // Invalidate the User tag after saving user details
     }),
+    updateUser: builder.mutation({
+      query: (userData) => ({
+        url: '/user/updateUser',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: userData,
+      }),
+      invalidatesTags: ['User'],
+    }),
     submitEnquiry: builder.mutation({
       query: (equiryDetails) => ({
         url: "/enquiry/submitEnquiry",
@@ -160,7 +171,10 @@ export const apiSlice = createApi({
     getProperties: builder.query({
       query: (queryParams) => ({
         url: "/property",
-        params: queryParams, // Pass search queries as params
+        params: {
+          ...queryParams,
+          verified: true
+        },
       }),
       providesTags: ["Property"], // Tag this endpoint for future invalidation
     }),
@@ -300,6 +314,7 @@ export const {
   useGoogleAuthMutation,
   useGetUserDetailsQuery,
   useSaveUserDetailsMutation,
+  useUpdateUserMutation,
   useSubmitEnquiryMutation,
   useVerifyOtpMutation,
   useGetCategoryQuery,

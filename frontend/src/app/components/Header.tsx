@@ -84,7 +84,7 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
           top: "0",
           left: "0",
           right: "0",
-          zIndex: "10000",
+          zIndex: "50",
         }}
       >
         {/* Logo - Updated styling */}
@@ -278,14 +278,14 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
       {/* Modal - Updated styling */}
       {isModalOpen && (
         <div className="fixed inset-0 backdrop-blur-sm bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 w-96 relative shadow-xl">
+          <div className="bg-white md:w-2/5  dark:bg-gray-900 rounded-2xl w-full m-4  relative shadow-xl">
             <button
               onClick={closeModal}
               className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
               <FaTimes className="text-xl" />
             </button>
-            {modalContent}
+            <div className="flex items-center justify-center">{modalContent}</div>
           </div>
         </div>
       )}

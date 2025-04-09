@@ -224,14 +224,15 @@ export default function LightHeader() {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
-          <div className={`rounded-2xl w-96 p-6 shadow-2xl transform transition-all 
-            ${isDarkTheme ? 'bg-gray-800 text-white' : 'bg-white text-black'}`}>
-            <button onClick={closeModal} 
-              className="absolute top-4 right-4 hover:rotate-90 transition-transform">
-              <FaTimes className="text-2xl" />
+        <div className="fixed inset-0 backdrop-blur-sm bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white md:w-2/5  dark:bg-gray-900 rounded-2xl w-full m-4  relative shadow-xl">
+            <button
+              onClick={closeModal}
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            >
+              <FaTimes className="text-xl" />
             </button>
-            {modalContent}
+            <div className="flex items-center justify-center">{modalContent}</div>
           </div>
         </div>
       )}

@@ -115,7 +115,7 @@ const Register = () => {
   };
 
   return (
-    <div className="w-full max-w-md space-y-6 p-8 rounded-xl">
+    <div className="w-full max-w-xl space-y-6 p-6 rounded-xl">
       <div className="space-y-2 text-center">
         <h1 className="text-2xl font-bold tracking-tight">Create an Account</h1>
         <p className="text-sm text-muted-foreground">
@@ -123,7 +123,9 @@ const Register = () => {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
+      {/* Grid container for form fields */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Username */}
         <div className="space-y-2">
           <label
@@ -192,7 +194,7 @@ const Register = () => {
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-3 text-muted-foreground"
             >
-              {showPassword ? <EyeOff /> : <Eye />}
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
           <div className="flex gap-1 mt-1">
@@ -232,12 +234,14 @@ const Register = () => {
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               className="absolute right-3 top-3 text-muted-foreground"
             >
-              {showConfirmPassword ? <EyeOff /> : <Eye />}
+              {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
         </div>
+      </div>
 
-        {/* Submit Button */}
+      {/* Submit Button - Full width regardless of screen size */}
+      <div className="mt-6">
         <button
           type="submit"
           disabled={isLoading}
@@ -252,7 +256,8 @@ const Register = () => {
             "Create account"
           )}
         </button>
-      </form>
+      </div>
+    </form>
 
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
