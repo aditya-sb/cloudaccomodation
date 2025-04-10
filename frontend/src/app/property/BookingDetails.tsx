@@ -107,9 +107,13 @@ const BookingForm = ({ price, propertyId, currency }: { price: number; propertyI
     };
 
     try {
-      const response = await createBooking(bookingData).unwrap();
-      console.log("Booking created successfully:", response);
-      setBookingId(response.booking._id);
+      // Commenting out API call
+      // const response = await createBooking(bookingData).unwrap();
+      // console.log("Booking created successfully:", response);
+      // setBookingId(response.booking._id);
+      
+      console.log("Booking data:", bookingData); // For debugging
+      setBookingId("mock-booking-id"); // Mock booking ID
       setShowPayment(false);
     } catch (error) {
       console.error("Error creating booking:", error);

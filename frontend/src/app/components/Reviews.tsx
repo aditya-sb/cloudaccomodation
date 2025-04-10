@@ -60,7 +60,7 @@ const ReviewSection = () => {
         modules={[Pagination]}
         className="px-10"
         breakpoints={{
-          // when window width is >= 768px (tablet/desktop)
+          // when  width is >= 768px (tablet/desktop)
           768: {
             slidesPerView: 4.5,
             spaceBetween: 20,
