@@ -12,6 +12,7 @@ import {
   FaSun,
   FaSearch,
   FaTimes,
+  FaBookmark,
 } from "react-icons/fa";
 import Login from "../auth/Login";
 import Profile from "../auth/Profile";
@@ -22,6 +23,7 @@ import isAuthenticated from "@/utils/auth-util";
 import { useGetUserDetailsQuery } from "../redux/slices/apiSlice";
 import Loader from "@/loader/loader";
 import { useRouter } from "next/navigation";
+import Bookings from "./bookings/Bookings";
 interface HeaderProps {
   isPropertyPage: boolean;
 }
@@ -157,17 +159,23 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
               >
                 <FaUser className="text-lg mr-2" /> Profile
               </button>
-              <button
+              {/* <button
                 onClick={() => openModal(<div>History Content</div>)}
                 className="flex items-center hover:text-blue-500 transition-colors"
               >
                 <FaHistory className="text-lg mr-2" /> History
-              </button>
+              </button> */}
               <button
                 onClick={() => openModal(<div>Chat Content</div>)}
                 className="flex items-center hover:text-blue-500 transition-colors"
               >
                 <FaComments className="text-lg mr-2" /> Chat
+              </button>
+              <button
+                onClick={() => openModal(<Bookings />)}
+                className="flex items-center hover:text-blue-500 transition-colors"
+              >
+                <FaBookmark className="text-lg mr-2" /> Bookings
               </button>
             </>
           ) : (
@@ -236,17 +244,23 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
                 >
                   <FaUser className="mr-3" /> Profile
                 </button>
-                <button
+                {/* <button
                   onClick={() => openModal(<div>History Content</div>)}
                   className="flex items-center hover:text-blue-500 transition-colors"
                 >
                   <FaHistory className="mr-3" /> History
-                </button>
+                </button> */}
                 <button
                   onClick={() => openModal(<div>Chat Content</div>)}
                   className="flex items-center hover:text-blue-500 transition-colors"
                 >
                   <FaComments className="mr-3" /> Chat
+                </button>
+                <button
+                  onClick={() => openModal(<div>Bookings Content</div>)}
+                  className="flex items-center hover:text-blue-500 transition-colors"
+                >
+                  <FaBookmark className="mr-3" /> Bookings
                 </button>
               </>
             ) : (

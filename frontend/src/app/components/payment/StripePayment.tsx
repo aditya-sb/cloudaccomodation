@@ -10,6 +10,7 @@ import {
 } from "@stripe/react-stripe-js";
 import {
   useCreatePaymentIntentMutation,
+  useConfirmPaymentMutation,
 } from "../../redux/slices/apiSlice";
 import { FaLock, FaCreditCard, FaSpinner, FaTimes } from "react-icons/fa";
 
@@ -137,8 +138,9 @@ const CheckoutForm = ({
   const [processing, setProcessing] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
 
-  // API hooks
+  // Add confirmPayment mutation hook
   const [createPaymentIntent] = useCreatePaymentIntentMutation();
+  const [confirmPayment] = useConfirmPaymentMutation();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -226,11 +228,25 @@ const CheckoutForm = ({
       }
 
       if (paymentIntent.status === "succeeded") {
-        // Clear form state after success
-        setClientSecret(null);
-        cardElement.clear();
-        onSuccess();
-        return;
+        try {
+          // Call the confirm payment endpoint
+          const confirmResponse = await confirmPayment({
+            paymentIntentId: paymentIntent.id
+          }).unwrap();
+
+          if (confirmResponse.success) {
+            // Clear form state after success
+            setClientSecret(null);
+            cardElement.clear();
+            onSuccess();
+            return;
+          } else {
+            throw new Error("Failed to confirm payment");
+          }
+        } catch (confirmError) {
+          console.error("Confirm payment error:", confirmError);
+          throw new Error("Failed to confirm payment booking");
+        }
       } else {
         throw new Error(`Payment status: ${paymentIntent.status}`);
       }

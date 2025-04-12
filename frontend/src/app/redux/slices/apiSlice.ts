@@ -305,6 +305,16 @@ export const apiSlice = createApi({
         return Array.isArray(response) ? response : [];
       },
     }),
+
+    // User-specific bookings endpoint
+    getUserBookings: builder.query({
+      query: (userId) => ({
+        url: `/booking/user/${userId}`,  // Updated to match the backend route
+        method: 'GET',
+        // The Authorization header will be automatically added by the baseQuery
+      }),
+      providesTags: ["Booking"],
+    }),
   }),
 });
 
@@ -351,6 +361,8 @@ export const {
   useGetPaymentStatusQuery,
   // Universities hook
   useGetUniversitiesByLocationQuery,
+  // User-specific bookings hook
+  useGetUserBookingsQuery,
 } = apiSlice;
 
 // Function to handle logout and invalidate user queries

@@ -136,7 +136,6 @@ const BookingForm = ({ price, propertyId, currency }: { price: number; propertyI
     setIsSubmitting(true);
     
     try {
-      // Instead of creating booking immediately, show payment form
       const bookingData = {
         name,
         email,
@@ -145,11 +144,10 @@ const BookingForm = ({ price, propertyId, currency }: { price: number; propertyI
         moveInMonth,
         propertyId,
         price,
-        currency: currency || "inr",
-        country: "IN"
+        currency: currency || "inr", // Add currency
+        country: COUNTRY_CODES[currency] || "IN"
       };
 
-      // Update bookingDetails before showing payment
       setBookingDetails(bookingData);
       setShowPayment(true);
     } catch (error) {
