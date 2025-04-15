@@ -13,13 +13,28 @@ function PropertyContent() {
   const searchParams = useSearchParams();
   const search = searchParams.get("search");
   const city = searchParams.get("city");
-  const [view, setView] = useState<"list" | "map">("map");
+  const [isMobile, setIsMobile] = useState(false);
+  const [view, setView] = useState<"list" | "map">("list");
   const [filters, setFilters] = useState<FilterState>({});
   const [isClient, setIsClient] = useState(false);
 
   // Check if we're on the client side
   useEffect(() => {
     setIsClient(true);
+  }, []);
+
+  // Check if we're on mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+      if (window.innerWidth < 768) {
+        setView("list"); // Force list view on mobile
+      }
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   // Memoize query params to prevent unnecessary re-renders
@@ -93,7 +108,7 @@ function PropertyContent() {
         </div>
 
         <div className="p-4 mx-5 mt-2">
-          {view === "list" ? (
+          {(view === "list" || isMobile) ? (
             <ListView properties={properties} />
           ) : isClient ? (
             <MapView 

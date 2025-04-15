@@ -37,7 +37,6 @@ export default function Bookings() {
     refetchOnMountOrArgChange: true,
     skip: !userId
   });
-
   if (isLoading) return <Loader />;
   if (error) {
     console.error('Bookings error:', error);
@@ -50,7 +49,7 @@ export default function Bookings() {
     );
   }
 
-  const bookings = data?.bookings || [];
+  const bookings = data || [];
   
   // Filter bookings based on active tab
   const filteredBookings = bookings.filter(booking => {
