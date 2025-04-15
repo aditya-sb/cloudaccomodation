@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { FaHeart, FaBed, FaBath, FaVectorSquare, FaStar } from "react-icons/fa";
+import { FaHeart, FaBed, FaBath, FaVectorSquare, FaStar, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import ImageSlider from "./ImageSlider";
 import styles from "./ImageSlider.module.css";
 
@@ -36,6 +36,7 @@ interface PropertyCardProps {
   price: number;
   beds: number;
   baths: number;
+  verified?: boolean;
   area: number;
   rating: number;
   reviewsCount: number;
@@ -54,6 +55,7 @@ export default function PropertyCard({
   area,
   rating,
   className,
+  verified = false,
   reviewsCount,
   country,
   currencyCode,
@@ -68,6 +70,22 @@ export default function PropertyCard({
         {/* Image Slider */}
         <div className="relative w-full text-[10px] overflow-hidden rounded-t-2xl">
           <ImageSlider images={images} />
+          
+          {/* Verification Badge */}
+          <div className="absolute top-3 left-3 z-10">
+            {verified ? (
+              <div className="bg-green-500 text-white px-2 py-1 rounded-md flex items-center text-xs font-medium">
+                <FaCheckCircle className="mr-1" />
+                Verified
+              </div>
+            ) : (
+              <div className="bg-gray-500 text-white px-2 py-1 rounded-md flex items-center text-xs font-medium">
+                <FaTimesCircle className="mr-1" />
+                Unverified
+              </div>
+            )}
+          </div>
+          
           <div className={styles.infoOverlay}>
             <div className={styles.infoText}>
               <div className={styles.infoItem}>
@@ -110,4 +128,3 @@ export default function PropertyCard({
     </div>
   );
 }
-

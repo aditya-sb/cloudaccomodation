@@ -108,6 +108,7 @@ const ExploreProperties = () => {
                   baths={property.overview.bathrooms}
                   area={property.overview.squareFeet}
                   rating={4}
+                  verified={property.verified}
                   reviewsCount={12}
                   country={property.country}
                 />

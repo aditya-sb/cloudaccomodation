@@ -36,7 +36,7 @@ const MapPropertyCard: React.FC<MapPropertyCardProps> = ({
   isMapPopup = false,
 }) => {
   const containerClasses = isMapPopup
-    ? "max-w-[300px]" // Increased from 250px to 300px
+    ? "max-w-[200px]" // Increased from 250px to 300px
     : "cursor-pointer rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 mb-6";
 
   const imageClasses = isMapPopup
