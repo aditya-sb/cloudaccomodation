@@ -32,7 +32,12 @@ const COUNTRY_CODES = {
   'South Korea': 'KR'
 };
 
-const BookingForm = ({ price, propertyId, currency }: { price: number; propertyId: string, currency: string }) => {
+const BookingForm = ({ price, propertyId, currency, securityDeposit }: { 
+  price: number; 
+  propertyId: string;
+  currency: string;
+  securityDeposit?: number;
+}) => {
   const [rentalDays, setRentalDays] = useState(30);
   const [moveInMonth, setMoveInMonth] = useState("");
   const [name, setName] = useState("");
@@ -42,6 +47,10 @@ const BookingForm = ({ price, propertyId, currency }: { price: number; propertyI
   const [bookingId, setBookingId] = useState<string | null>(null);
   const [showPayment, setShowPayment] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [includeDeposit, setIncludeDeposit] = useState(false);
+  const [depositAmount, setDepositAmount] = useState(securityDeposit || 0);
+  const [includeLastMonth, setIncludeLastMonth] = useState(false);
+  const [lastMonthAmount, setLastMonthAmount] = useState(price);
   const [bookingDetails, setBookingDetails] = useState({
     name: "",
     email: "",
@@ -50,6 +59,8 @@ const BookingForm = ({ price, propertyId, currency }: { price: number; propertyI
     moveInMonth: "",
     propertyId: "",
     price: 0,
+    securityDeposit: 0,
+    lastMonthPayment: 0,
     currency: currency || "inr",
     country: "IN"
   });
@@ -144,6 +155,8 @@ const BookingForm = ({ price, propertyId, currency }: { price: number; propertyI
         moveInMonth,
         propertyId,
         price,
+        securityDeposit: includeDeposit ? depositAmount : 0,
+        lastMonthPayment: includeLastMonth ? price : 0, // Set the correct amount
         currency: currency || "inr", // Add currency
         country: COUNTRY_CODES[currency] || "IN"
       };
@@ -166,10 +179,12 @@ const BookingForm = ({ price, propertyId, currency }: { price: number; propertyI
       moveInMonth,
       propertyId,
       price,
+      securityDeposit: includeDeposit ? depositAmount : 0,
+      lastMonthPayment: includeLastMonth ? price : 0, // Set the correct amount
       currency:currency || "inr",
       country: "IN"
     });
-  }, [name, email, phone, rentalDays, moveInMonth, propertyId, price, currency]);
+  }, [name, email, phone, rentalDays, moveInMonth, propertyId, price, includeDeposit, depositAmount, includeLastMonth, currency]);
 
   return (
     <div className="flex flex-col text-sm space-y-3">
@@ -245,6 +260,36 @@ const BookingForm = ({ price, propertyId, currency }: { price: number; propertyI
               className="p-1.5 text-sm rounded-md w-full border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
               placeholder="Enter your phone number"
             />
+          </div>
+
+          <div className="space-y-1.5">
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="includeDeposit"
+                checked={includeDeposit}
+                onChange={(e) => setIncludeDeposit(e.target.checked)}
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <label htmlFor="includeDeposit" className="text-sm text-gray-700">
+                Include Security Deposit ({currency} {securityDeposit})
+              </label>
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="includeLastMonth"
+                checked={includeLastMonth}
+                onChange={(e) => setIncludeLastMonth(e.target.checked)}
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <label htmlFor="includeLastMonth" className="text-sm text-gray-700">
+                Include Last Month Payment ({currency} {price})
+              </label>
+            </div>
           </div>
 
           {error && (
@@ -398,11 +443,13 @@ const BookingDetails = ({
   price,
   booking,
   propertyId,
+  securityDeposit,
   currency = "inr"
 }: {
   price: number;
   booking: boolean;
   propertyId: string;
+  securityDeposit?: number;
   currency?: string;
 }) => {
   const [isMinimized, setIsMinimized] = useState(true);
@@ -419,6 +466,7 @@ const BookingDetails = ({
     moveInMonth: "",
     propertyId: "",
     price: 0,
+    securityDeposit: 0,
     currency: currency,
     country: "IN"
   });
@@ -576,7 +624,7 @@ const BookingDetails = ({
         {!isMinimized && (
           <div className="max-h-[80vh] md:max-h-none overflow-y-auto">
             {booking && activeForm === "booking" ? (
-              <BookingForm price={price} propertyId={propertyId} currency={currency} />
+              <BookingForm price={price} propertyId={propertyId} currency={currency} securityDeposit={securityDeposit} />
             ) : (
               <EnquiryForm price={price} propertyId={propertyId} />
             )}
