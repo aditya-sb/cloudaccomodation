@@ -13,7 +13,7 @@ function PropertyContent() {
   const searchParams = useSearchParams();
   const search = searchParams.get("search");
   const city = searchParams.get("city");
-  const [view, setView] = useState<"list" | "map">("list");
+  const [view, setView] = useState<"list" | "map">("map");
   const [filters, setFilters] = useState<FilterState>({});
   const [isClient, setIsClient] = useState(false);
 
@@ -55,12 +55,12 @@ function PropertyContent() {
   return (
     <div className="relative">
       {/* Sticky filter container */}
-      <div className="sticky top-16 z-50 bg-white dark:bg-gray-900 shadow-md"
+      <div className="sticky top-16 z-20 bg-white dark:bg-gray-900 shadow-md"
         style={{ marginBottom: "5rem", }}>
         <Filter onFilterChange={handleFilterChange} />
       </div>
       
-      <div className="relative z-40 mt-16">
+      <div className="relative mt-16">
         <div className="flex justify-between items-center mx-8 mt-6 space-x-4">
           {/* Showing Properties Text */}
           <div className="text-lg font-semibold ml-5" style={{ color: "var(--foreground)" }}>

@@ -15,35 +15,15 @@ import {
 import { FaLock, FaCreditCard, FaSpinner, FaTimes } from "react-icons/fa";
 
 // Initialize Stripe with your publishable key
-const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
-// Check if the key is valid
-let isValidKey = true;
-let keyError = "";
+const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '';
 
-// Make sure we have a valid key
-if (!publishableKey) {
-  console.error(
-    "Stripe publishable key is missing. Please check your environment variables."
-  );
-  isValidKey = false;
-  keyError = "Stripe publishable key is missing";
-} else if (
-  publishableKey === "REPLACE_WITH_YOUR_ACTUAL_STRIPE_PUBLISHABLE_KEY"
-) {
-  console.error(
-    "Stripe publishable key is still set to the placeholder value. Please replace it with your actual key."
-  );
-  isValidKey = false;
-  keyError = "Stripe publishable key is set to a placeholder value";
-} else if (!publishableKey.startsWith("pk_")) {
-  console.error(
-    "Invalid Stripe publishable key format. The key should start with 'pk_'"
-  );
-  isValidKey = false;
-  keyError = "Invalid Stripe publishable key format";
+// Validate key
+if (!publishableKey || !publishableKey.startsWith('pk_')) {
+  console.error('Invalid or missing Stripe publishable key');
+  throw new Error('Stripe publishable key is required and must start with "pk_"');
 }
 
-const stripePromise = isValidKey ? loadStripe(publishableKey) : null;
+const stripePromise = loadStripe(publishableKey);
 
 const CARD_ELEMENT_OPTIONS = {
   style: {

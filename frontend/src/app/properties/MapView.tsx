@@ -19,7 +19,7 @@ const CURRENCY_SYMBOLS: { [key: string]: string } = {
   // Add more currency symbols as needed
 };
 
-const GOOGLE_PLACES_API_KEY = 'AIzaSyAI3YT6c38r1nxnUxqUApk000Vuc_I1K_4';
+const GOOGLE_PLACES_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY || '';
 
 // Create a singleton for Google Maps API loading
 const GoogleMapsLoader = (() => {
@@ -244,6 +244,22 @@ const MapView: React.FC<MapViewProps> = ({ properties, mapAddress, mapLocation }
             white-space: nowrap !important;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
           }
+          .gm-style .gm-style-iw-c {
+            padding: 0 !important;
+            background: none !important;
+            box-shadow: none !important;
+          }
+          .gm-style .gm-style-iw-d {
+            overflow: hidden !important;
+            padding: 0 !important;
+            background: none !important;
+          }
+          .gm-style .gm-style-iw-tc {
+            display: none !important;
+          }
+          .gm-style-iw button[title="Close"] {
+            display: none !important;
+          }
         `;
         document.head.appendChild(styleTag);
       }
@@ -289,29 +305,34 @@ const MapView: React.FC<MapViewProps> = ({ properties, mapAddress, mapLocation }
           
           // Create info window content
           const infoWindowContent = document.createElement('div');
-          infoWindowContent.style.width = "200px";
+          
+          // Use createRoot to render React component directly
+          const root = createRoot(infoWindowContent);
+          root.render(
+            <MapPropertyCard
+              images={property.images || []}
+              title={property.title}
+              beds={property.overview.bedrooms}
+              baths={property.overview.bathrooms}
+              area={property.squareFeet}
+              rating={property.rating}
+              reviewsCount={property.reviewsCount}
+              verified={property.verified}
+              location={property.location}
+              price={property.price.toString()}
+              country={property.country}
+              currencyCode={property.currency}
+              isMapPopup={true}
+            />
+          );
           
           // Create info window
           const infoWindow = new google.maps.InfoWindow({
             content: infoWindowContent,
-            maxWidth: 320
+            maxWidth: 200,
+            disableAutoPan: false,
+            closeButton: false  // Add this line to disable the close button
           });
-          
-          // Use createRoot to render React component
-          const root = createRoot(infoWindowContent);
-          root.render(
-            <a href={`/property/${propertyId}`} target="_blank" rel="noopener noreferrer">
-              <MapPropertyCard
-                images={property.images || []}
-                title={property.title}
-                location={property.location}
-                price={property.price.toString()}
-                country={property.country}
-                currencyCode={property.currency}
-                isMapPopup={true}
-              />
-            </a>
-          );
           
           // Add click event to marker
           marker.addListener('click', () => {
@@ -466,6 +487,12 @@ const MapView: React.FC<MapViewProps> = ({ properties, mapAddress, mapLocation }
                   title={property.title}
                   location={property.location}
                   price={property.price}
+                  beds={property.overview.bedrooms}
+                  baths={property.overview.bathrooms}
+                  area={property.squareFeet}
+                  rating={4.1}
+                  reviewsCount={12}
+                  verified={property.verified}
                   description={property.description}
                   country={property.country}
                   currencyCode={property.currency}

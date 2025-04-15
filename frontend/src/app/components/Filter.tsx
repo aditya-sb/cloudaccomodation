@@ -161,7 +161,7 @@ export default function Filter({ onFilterChange }: FilterProps) {
         container.style.left = "0";
         container.style.width = "100%";
         container.style.height = "0";
-        container.style.zIndex = "9999";
+        container.style.zIndex = "4";
         container.style.pointerEvents = "none";
         document.body.appendChild(container);
       }
