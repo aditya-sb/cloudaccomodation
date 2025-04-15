@@ -246,13 +246,14 @@ const MapView: React.FC<MapViewProps> = ({ properties, mapAddress, mapLocation }
           }
           .gm-style .gm-style-iw-c {
             padding: 0 !important;
-            background: none !important;
-            box-shadow: none !important;
+            background: white !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
           }
           .gm-style .gm-style-iw-d {
             overflow: hidden !important;
             padding: 0 !important;
-            background: none !important;
+            margin: 0 !important;
           }
           .gm-style .gm-style-iw-tc {
             display: none !important;
@@ -309,6 +310,7 @@ const MapView: React.FC<MapViewProps> = ({ properties, mapAddress, mapLocation }
           // Use createRoot to render React component directly
           const root = createRoot(infoWindowContent);
           root.render(
+            <a href={`/property/${propertyId}`} target="_blank" rel="noopener noreferrer">
             <MapPropertyCard
               images={property.images || []}
               title={property.title}
@@ -324,6 +326,7 @@ const MapView: React.FC<MapViewProps> = ({ properties, mapAddress, mapLocation }
               currencyCode={property.currency}
               isMapPopup={true}
             />
+            </a>
           );
           
           // Create info window
