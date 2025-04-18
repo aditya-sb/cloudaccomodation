@@ -13,10 +13,11 @@ import dynamic from 'next/dynamic';
 import StripePayment from '../components/payment/StripePayment'; // Adjust the path as necessary
 import isAuthenticated from "@/utils/auth-util";
 import Login from "../auth/Login";
+import SelectedBedroomDropdown, { BedroomDetail } from "../components/SelectedBedroomDropdown";
 
 // Country code mapping
-const COUNTRY_CODES = {
-  'Canada': 'INR',
+const COUNTRY_CODES: Record<string, string> = {
+  'Canada': 'CA',
   'United States': 'US',
   'United Kingdom': 'GB',
   'Australia': 'AU',
@@ -32,11 +33,52 @@ const COUNTRY_CODES = {
   'South Korea': 'KR'
 };
 
-const BookingForm = ({ price, propertyId, currency, securityDeposit }: { 
+// Currency mapping
+const CURRENCY_CODES: Record<string, string> = {
+  'CA': 'cad',
+  'US': 'usd',
+  'GB': 'gbp',
+  'AU': 'aud',
+  'EU': 'eur',
+  'SG': 'sgd',
+  'HK': 'hkd',
+  'JP': 'jpy',
+  'IN': 'inr',
+  'BR': 'brl',
+  'MX': 'mxn',
+  'ZA': 'zar',
+  'AE': 'aed',
+  'KR': 'krw'
+};
+
+// Define the BookingDetailsType interface to match what StripePayment expects
+interface BookingDetailsType {
+  name: string;
+  email: string;
+  phone: string;
+  rentalDays: number;
+  moveInMonth: string;
+  propertyId: string;
+  price: number;
+  securityDeposit?: number;
+  lastMonthPayment?: number;
+  currency?: string;
+  country?: string;
+  userId?: string; // This will be added during payment processing
+  selectedBedroom?: BedroomDetail | null;
+}
+
+const BookingForm = ({ price, propertyId, currency, securityDeposit, bookingOptions, bedroomDetails }: { 
   price: number; 
   propertyId: string;
   currency: string;
   securityDeposit?: number;
+  bookingOptions?: {
+    allowSecurityDeposit: boolean;
+    allowFirstRent: boolean;
+    allowFirstAndLastRent: boolean;
+  };
+  bedroomDetails?: BedroomDetail[];
 }) => {
   const [rentalDays, setRentalDays] = useState(30);
   const [moveInMonth, setMoveInMonth] = useState("");
@@ -47,11 +89,8 @@ const BookingForm = ({ price, propertyId, currency, securityDeposit }: {
   const [bookingId, setBookingId] = useState<string | null>(null);
   const [showPayment, setShowPayment] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [includeDeposit, setIncludeDeposit] = useState(false);
-  const [depositAmount, setDepositAmount] = useState(securityDeposit || 0);
-  const [includeLastMonth, setIncludeLastMonth] = useState(false);
-  const [lastMonthAmount, setLastMonthAmount] = useState(price);
-  const [bookingDetails, setBookingDetails] = useState({
+  const [selectedBedroom, setSelectedBedroom] = useState<BedroomDetail | null>(null);
+  const [bookingDetails, setBookingDetails] = useState<BookingDetailsType>({
     name: "",
     email: "",
     phone: "",
@@ -62,8 +101,47 @@ const BookingForm = ({ price, propertyId, currency, securityDeposit }: {
     securityDeposit: 0,
     lastMonthPayment: 0,
     currency: currency || "inr",
-    country: "IN"
+    country: "IN",
+    selectedBedroom: null
   });
+
+  // Default booking options if not provided
+  const options = bookingOptions || {
+    allowSecurityDeposit: false,
+    allowFirstRent: false,
+    allowFirstAndLastRent: false
+  };
+
+  // Calculate payment details based on booking options
+  const calculatePaymentDetails = (basePrice: number) => {
+    // Use selected bedroom's rent if available, otherwise use the property price
+    const effectivePrice = selectedBedroom ? selectedBedroom.rent : basePrice;
+    
+    if (options.allowSecurityDeposit) {
+      return {
+        price: 0, // No rent charged when only security deposit is required
+        securityDeposit: securityDeposit || effectivePrice,
+        lastMonthPayment: 0
+      };
+    } else if (options.allowFirstAndLastRent) {
+      return {
+        price: effectivePrice, // First month rent
+        securityDeposit: 0, // No security deposit
+        lastMonthPayment: effectivePrice // Last month is same as first month
+      };
+    } else {
+      // Default to first month only (allowFirstRent or no option selected)
+      return {
+        price: effectivePrice, // Only first month rent
+        securityDeposit: 0,
+        lastMonthPayment: 0
+      };
+    }
+  };
+
+  // Calculate payment totals for display
+  const paymentDetails = calculatePaymentDetails(price);
+  const totalPayment = paymentDetails.price + paymentDetails.securityDeposit + paymentDetails.lastMonthPayment;
 
   const [createBooking] = useCreateBookingMutation();
 
@@ -101,6 +179,7 @@ const BookingForm = ({ price, propertyId, currency, securityDeposit }: {
     if (!phone.trim()) return "Phone is required";
     if (!moveInMonth) return "Move-in month is required";
     if (rentalDays < 1) return "Rental days must be at least 1";
+    if (bedroomDetails && bedroomDetails.length > 0 && !selectedBedroom) return "Please select a bedroom";
     return "";
   };
 
@@ -114,7 +193,8 @@ const BookingForm = ({ price, propertyId, currency, securityDeposit }: {
       rentalDays,
       moveInMonth,
       propertyId,
-      price,
+      price: selectedBedroom ? selectedBedroom.rent : price,
+      selectedBedroomName: selectedBedroom ? selectedBedroom.name : undefined
     };
 
     try {
@@ -147,18 +227,20 @@ const BookingForm = ({ price, propertyId, currency, securityDeposit }: {
     setIsSubmitting(true);
     
     try {
-      const bookingData = {
+      const paymentDetails = calculatePaymentDetails(price);
+      const countryCode = COUNTRY_CODES[currency] || "IN";
+      
+      const bookingData: BookingDetailsType = {
         name,
         email,
         phone,
         rentalDays,
         moveInMonth,
         propertyId,
-        price,
-        securityDeposit: includeDeposit ? depositAmount : 0,
-        lastMonthPayment: includeLastMonth ? price : 0, // Set the correct amount
-        currency: currency || "inr", // Add currency
-        country: COUNTRY_CODES[currency] || "IN"
+        ...paymentDetails,
+        currency: currency || "inr",
+        country: countryCode,
+        selectedBedroom: selectedBedroom || undefined
       };
 
       setBookingDetails(bookingData);
@@ -170,7 +252,14 @@ const BookingForm = ({ price, propertyId, currency, securityDeposit }: {
     }
   };
 
+  const handleBedroomChange = (bedroom: BedroomDetail | null) => {
+    setSelectedBedroom(bedroom);
+  };
+
   useEffect(() => {
+    const paymentDetails = calculatePaymentDetails(price);
+    const countryCode = COUNTRY_CODES[currency] || "IN";
+    
     setBookingDetails({
       name,
       email,
@@ -178,18 +267,31 @@ const BookingForm = ({ price, propertyId, currency, securityDeposit }: {
       rentalDays,
       moveInMonth,
       propertyId,
-      price,
-      securityDeposit: includeDeposit ? depositAmount : 0,
-      lastMonthPayment: includeLastMonth ? price : 0, // Set the correct amount
-      currency:currency || "inr",
-      country: "IN"
+      ...paymentDetails,
+      currency: currency || "inr",
+      country: countryCode,
+      selectedBedroom: selectedBedroom || undefined
     });
-  }, [name, email, phone, rentalDays, moveInMonth, propertyId, price, includeDeposit, depositAmount, includeLastMonth, currency]);
+  }, [name, email, phone, rentalDays, moveInMonth, propertyId, price, currency, options, securityDeposit, selectedBedroom]);
 
   return (
     <div className="flex flex-col text-sm space-y-3">
       {!showPayment ? (
         <>
+          {/* Bedroom Selection */}
+          {bedroomDetails && bedroomDetails.length > 0 && (
+            <div className="space-y-1.5">
+              <div className="relative">
+                <SelectedBedroomDropdown
+                  selectedBedroom={selectedBedroom}
+                  onBedroomChange={handleBedroomChange}
+                  bedroomDetails={bedroomDetails}
+                  currency={currency}
+                />
+              </div>
+            </div>
+          )}
+
           <div className="space-y-1.5">
             <div className="text-gray-600 text-xs font-medium">Rental Days:</div>
             <input
@@ -262,35 +364,62 @@ const BookingForm = ({ price, propertyId, currency, securityDeposit }: {
             />
           </div>
 
-          <div className="space-y-1.5">
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="includeDeposit"
-                checked={includeDeposit}
-                onChange={(e) => setIncludeDeposit(e.target.checked)}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <label htmlFor="includeDeposit" className="text-sm text-gray-700">
-                Include Security Deposit ({currency} {securityDeposit})
-              </label>
-            </div>
-          </div>
+          {/* Payment summary */}
+          {selectedBedroom && (
+            <div className="mt-4 p-3 bg-gray-50 rounded-md">
+            <h3 className="font-medium mb-2 text-gray-700">Payment Summary</h3>
+            <div className="space-y-1 text-sm">
+              {selectedBedroom && (
+                <div className="pb-2 mb-1 border-b border-gray-200">
+                  <div className="font-medium text-gray-800">{selectedBedroom.name}</div>
+                  <div className="text-xs text-gray-500">{selectedBedroom.sizeSqFt} sq.ft {selectedBedroom.furnished ? '• Furnished' : ''}</div>
+                </div>
+              )}
 
-          <div className="space-y-1.5">
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="includeLastMonth"
-                checked={includeLastMonth}
-                onChange={(e) => setIncludeLastMonth(e.target.checked)}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <label htmlFor="includeLastMonth" className="text-sm text-gray-700">
-                Include Last Month Payment ({currency} {price})
-              </label>
+              <div className="flex justify-between">
+                <span>First Month Rent:</span>
+                <span>{currency.toUpperCase()} {(selectedBedroom ? selectedBedroom.rent : price)}</span>
+              </div>
+              
+              {paymentDetails.securityDeposit > 0 && (
+                <div className="flex justify-between">
+                  <span>Security Deposit:</span>
+                  <span>{currency.toUpperCase()} {paymentDetails.securityDeposit}</span>
+                </div>
+              )}
+              
+              {paymentDetails.lastMonthPayment > 0 && (
+                <div className="flex justify-between">
+                  <span>Last Month Rent:</span>
+                  <span>{currency.toUpperCase()} {paymentDetails.lastMonthPayment}</span>
+                </div>
+              )}
+              
+              <div className="flex justify-between font-semibold border-t pt-1 mt-1">
+                <span>Total Payment:</span>
+                <span>{currency.toUpperCase()} {
+                  options.allowSecurityDeposit ? 
+                  (paymentDetails.securityDeposit) : 
+                  options.allowFirstAndLastRent ? 
+                  ((selectedBedroom ? selectedBedroom.rent : price) * 2) : 
+                  (selectedBedroom ? selectedBedroom.rent : price)
+                }</span>
+              </div>
+              
+              <div className="mt-2 text-xs text-gray-500">
+                {options.allowSecurityDeposit && (
+                  <p>* Includes security deposit, which is refundable at the end of your stay.</p>
+                )}
+                {options.allowFirstAndLastRent && (
+                  <p>* Includes first and last month's rent as per the rental agreement.</p>
+                )}
+                {options.allowFirstRent && (
+                  <p>* Only first month's rent is required now.</p>
+                )}
+              </div>
             </div>
           </div>
+          )}
 
           {error && (
             <div className="text-red-500 text-sm font-medium">{error}</div>
@@ -307,7 +436,11 @@ const BookingForm = ({ price, propertyId, currency, securityDeposit }: {
         </>
       ) : (
         <StripePayment
-          bookingDetails={bookingDetails}
+          bookingDetails={{
+            ...bookingDetails,
+            // StripePayment will extract the userId from the token internally
+            userId: 'pending' // Temporary userId that will be replaced in StripePayment
+          }}
           isOpen={showPayment}
           onClose={() => setShowPayment(false)}
           onSuccess={handlePaymentSuccess}
@@ -444,13 +577,25 @@ const BookingDetails = ({
   booking,
   propertyId,
   securityDeposit,
-  currency = "inr"
+  currency = "inr",
+  bookingOptions = {
+    allowSecurityDeposit: false,
+    allowFirstRent: false,
+    allowFirstAndLastRent: false
+  },
+  bedroomDetails
 }: {
   price: number;
   booking: boolean;
   propertyId: string;
   securityDeposit?: number;
   currency?: string;
+  bookingOptions?: {
+    allowSecurityDeposit: boolean;
+    allowFirstRent: boolean;
+    allowFirstAndLastRent: boolean;
+  };
+  bedroomDetails?: BedroomDetail[];
 }) => {
   const [isMinimized, setIsMinimized] = useState(true);
   const [activeForm, setActiveForm] = useState<"booking" | "enquiry">("enquiry");
@@ -458,17 +603,19 @@ const BookingDetails = ({
   const [showPayment, setShowPayment] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState("");
-  const [bookingDetails, setBookingDetails] = useState({
+  const [bookingDetails, setBookingDetails] = useState<BookingDetailsType>({
     name: "",
     email: "",
     phone: "",
     rentalDays: 30,
     moveInMonth: "",
-    propertyId: "",
-    price: 0,
+    propertyId,
+    price,
     securityDeposit: 0,
-    currency: currency,
-    country: "IN"
+    lastMonthPayment: 0,
+    currency: currency || "inr",
+    country: "IN",
+    selectedBedroom: null
   });
 
   useEffect(() => {
@@ -508,16 +655,18 @@ const BookingDetails = ({
 
   useEffect(() => {
     if (showPayment) {
+      const paymentDetails = calculatePaymentDetails(price);
+      
       // Make sure we have the latest booking details with the country code
       setBookingDetails(prevDetails => ({
         ...prevDetails,
         propertyId,
-        price,
+        ...paymentDetails,
         currency: currency || "inr",
         country: "IN" // Use country code
       }));
     }
-  }, [showPayment, propertyId, price, currency]);
+  }, [showPayment, propertyId, price, currency, bookingOptions, securityDeposit]);
 
   const handleAuthCheck = (formType: "booking" | "enquiry") => {
     if (isAuthenticated()) {
@@ -530,6 +679,49 @@ const BookingDetails = ({
 
   const closeModal = () => {
     setIsModalOpen(false);
+  };
+
+  // Calculate payment amounts based on booking options
+  const calculatePaymentDetails = (basePrice: number) => {
+    if (bookingOptions.allowSecurityDeposit) {
+      // Add security deposit to the amount
+      return {
+        price: 0, // No rent charged when only security deposit is required
+        securityDeposit: securityDeposit || basePrice, // Use provided security deposit or fall back to price
+        lastMonthPayment: 0
+      };
+    } else if (bookingOptions.allowFirstRent) {
+      // Only first month's rent
+      return {
+        price: basePrice,
+        securityDeposit: 0,
+        lastMonthPayment: 0
+      };
+    } else if (bookingOptions.allowFirstAndLastRent) {
+      // First and last month's rent
+      return {
+        price: basePrice, // First month rent
+        securityDeposit: 0, // No security deposit
+        lastMonthPayment: basePrice // Last month is same as first month
+      };
+    } else {
+      // Default: only first month's rent
+      return {
+        price: basePrice,
+        securityDeposit: 0,
+        lastMonthPayment: 0
+      };
+    }
+  };
+
+  const handlePaymentSuccess = () => {
+    setShowPayment(false);
+    alert("Payment successful!");
+  };
+
+  const handlePaymentError = (message: string) => {
+    setShowPayment(false);
+    setError(message);
   };
 
   return (
@@ -561,18 +753,13 @@ const BookingDetails = ({
       <StripePayment
         bookingDetails={{
           ...bookingDetails,
-          currency: currency || "inr"
+          // StripePayment will extract the userId from the token internally
+          userId: 'pending' // Temporary userId that will be replaced in StripePayment
         }}
         isOpen={showPayment}
         onClose={() => setShowPayment(false)}
-        onSuccess={() => {
-          setShowPayment(false);
-          alert("Payment successful!");
-        }}
-        onError={(message) => {
-          setShowPayment(false);
-          setError(message);
-        }}
+        onSuccess={handlePaymentSuccess}
+        onError={handlePaymentError}
       />
 
       <div
@@ -624,7 +811,14 @@ const BookingDetails = ({
         {!isMinimized && (
           <div className="max-h-[80vh] md:max-h-none overflow-y-auto">
             {booking && activeForm === "booking" ? (
-              <BookingForm price={price} propertyId={propertyId} currency={currency} securityDeposit={securityDeposit} />
+              <BookingForm 
+                price={price} 
+                propertyId={propertyId} 
+                currency={currency} 
+                securityDeposit={securityDeposit}
+                bookingOptions={bookingOptions}
+                bedroomDetails={bedroomDetails}
+              />
             ) : (
               <EnquiryForm price={price} propertyId={propertyId} />
             )}

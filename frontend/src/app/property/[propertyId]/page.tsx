@@ -77,8 +77,11 @@ export default function PropertyPage() {
               location={thisProperty?.location}
               price={thisProperty?.price}
               country={thisProperty?.country}
+              onSiteVerification={thisProperty?.onSiteVerification}
               description={thisProperty?.description}
               amenities={thisProperty?.amenities}
+              bedroomDetails={thisProperty?.overview?.bedroomDetails}
+              bookingOptions={thisProperty?.bookingOptions}
               availableFrom={thisProperty?.availableFrom}
               currency={thisProperty?.currency}
               overview={thisProperty?.overview} distanceFromUniversity={""} utilities={[]} securityDeposit={thisProperty?.securityDeposit} rentPayments={[]} rent={0}/>
@@ -206,7 +209,9 @@ export default function PropertyPage() {
         price={thisProperty?.price || "$5,000"} 
         booking={true} 
         propertyId={propertyId as string} 
+        bedroomDetails={thisProperty?.overview?.bedroomDetails}
         securityDeposit={thisProperty?.securityDeposit}
+        bookingOptions={thisProperty?.bookingOptions}
       />
       <Footer />
     </>

@@ -47,7 +47,7 @@ const CARD_ELEMENT_OPTIONS = {
 };
 
 interface BookingDetails {
-  userId: string; // Add this line
+  userId?: string; // Make userId optional since it will be extracted from token
   name: string;
   email: string;
   phone: string;
@@ -56,7 +56,9 @@ interface BookingDetails {
   propertyId: string;
   price: number;
   securityDeposit?: number;
-  lastMonthPayment?: number; // Add this line
+  lastMonthPayment?: number;
+  currency?: string;
+  country?: string;
 }
 
 interface StripePaymentProps {
@@ -166,7 +168,7 @@ const CheckoutForm = ({
 
       // Update the payment intent creation with proper total amount calculation
       const totalAmount = 
-        bookingDetails.price + 
+        (bookingDetails.price || 0) + 
         (bookingDetails.securityDeposit || 0) + 
         (bookingDetails.lastMonthPayment || 0);
 
@@ -299,12 +301,14 @@ const CheckoutForm = ({
             <span className="text-gray-600">Move-in</span>
             <span className="font-medium">{bookingDetails.moveInMonth}</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Rent Amount</span>
-            <span className="font-medium">
-              ${bookingDetails.price.toLocaleString()}
-            </span>
-          </div>
+          {bookingDetails.price > 0 && (
+            <div className="flex justify-between">
+              <span className="text-gray-600">First Month Rent</span>
+              <span className="font-medium">
+                ${bookingDetails.price.toLocaleString()}
+              </span>
+            </div>
+          )}
           {bookingDetails.securityDeposit > 0 && (
             <div className="flex justify-between">
               <span className="text-gray-600">Security Deposit</span>
@@ -315,7 +319,7 @@ const CheckoutForm = ({
           )}
           {bookingDetails.lastMonthPayment > 0 && (
             <div className="flex justify-between">
-              <span className="text-gray-600">Last Month Payment</span>
+              <span className="text-gray-600">Last Month Rent</span>
               <span className="font-medium">
                 ${bookingDetails.lastMonthPayment.toLocaleString()}
               </span>
@@ -325,7 +329,7 @@ const CheckoutForm = ({
             <span className="text-sm text-gray-800">Total Amount</span>
             <span className="text-lg font-semibold text-blue-600">
               ${(
-                bookingDetails.price + 
+                (bookingDetails.price || 0) + 
                 (bookingDetails.securityDeposit || 0) + 
                 (bookingDetails.lastMonthPayment || 0)
               ).toLocaleString()}
@@ -368,7 +372,7 @@ const CheckoutForm = ({
             {processing
               ? "Processing..."
               : `Pay $${(
-                  bookingDetails.price + 
+                  (bookingDetails.price || 0) + 
                   (bookingDetails.securityDeposit || 0) + 
                   (bookingDetails.lastMonthPayment || 0)
                 ).toLocaleString()}`}

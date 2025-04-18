@@ -53,19 +53,47 @@ const PropertyDetails = ({
     if (!amenities) return;
     
     try {
+      // Handle different possible amenities formats
       if (Array.isArray(amenities)) {
-        // If it's an array with a JSON string as first element
-        const parsed = JSON.parse(amenities[0]);
-        setProcessedAmenities(parsed);
+        if (typeof amenities[0] === 'string') {
+          try {
+            // Try to parse first element if it looks like JSON
+            if (amenities[0].startsWith('[') || amenities[0].startsWith('{')) {
+              setProcessedAmenities(JSON.parse(amenities[0]));
+            } else {
+              // If it's just a string, use the array directly
+              setProcessedAmenities(amenities);
+            }
+          } catch {
+            // If parsing fails, use the array as is
+            setProcessedAmenities(amenities);
+          }
+        } else {
+          // If it's already an array of non-strings, use it directly
+          setProcessedAmenities(amenities);
+        }
       } else if (typeof amenities === 'string') {
-        // If it's a direct JSON string
-        const parsed = JSON.parse(amenities);
-        setProcessedAmenities(parsed);
+        try {
+          // Try to parse if it looks like JSON
+          if (amenities.startsWith('[') || amenities.startsWith('{')) {
+            setProcessedAmenities(JSON.parse(amenities));
+          } else {
+            // If it's just a single string value, wrap it in an array
+            setProcessedAmenities([amenities]);
+          }
+        } catch {
+          // If parsing fails, wrap the string in an array
+          setProcessedAmenities([amenities]);
+        }
       }
     } catch (error) {
-      console.error("Error parsing amenities:", error);
-      setProcessedAmenities([]);
+      console.error("Error handling amenities:", error);
+      // Fallback to using the raw amenities data
+      setProcessedAmenities(Array.isArray(amenities) ? amenities : [amenities]);
     }
+    
+    // Ensure processedAmenities is always an array
+    setProcessedAmenities(prev => Array.isArray(prev) ? prev : [prev]);
   }, [amenities]);
 
   console.log("smdalskdmalsk",processedAmenities);
