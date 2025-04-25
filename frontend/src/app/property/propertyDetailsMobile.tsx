@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { getCurrencySymbol } from "@/constants/currency";
 import BottomDrawer from "../components/BottomDrawer";
+import ImageSlider from "../components/ImageSlider";
 
 const CURRENCY_SYMBOLS = {
   'USD': '$',
@@ -28,6 +29,7 @@ const CURRENCY_SYMBOLS = {
 } as const;
 
 interface BedroomDetail {
+  images: unknown;
   name: string;
   sizeSqFt: number;
   sharedKitchen: boolean;
@@ -410,12 +412,12 @@ const PropertyDetailsMobile: React.FC<PropertyDetailsMobileProps> = ({
         {bedroomDetails && bedroomDetails.map((bedroom, index) => (
           <div key={index} className="bg-white rounded-lg shadow p-4 mb-4">
             <h3 className="font-semibold text-base mb-3">{bedroom.name}</h3>
+
             <div className="flex items-start gap-3">
-              <img
-                src="/bedroom-placeholder.jpg" 
-                alt={bedroom.name}
-                className="w-24 h-24 rounded-lg object-cover"
-              />
+              <div className="w-24 h-24">
+                <ImageSlider images={bedroom?.images} />
+              </div>
+
               <div className="flex flex-col gap-1 flex-1">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-sm text-gray-600">
