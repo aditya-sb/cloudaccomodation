@@ -14,6 +14,7 @@ import Header from "@/app/components/Header";
 import PropertyGallery from "../PropertyGallery";
 import PropertyDetails from "../PropertyDetails";
 import Map from "../Map";
+import NearbyPlaces from "../NearbyPlaces";
 import BuyerReviews from "../BuyerReviews";
 import Dropdown from "@/app/components/Dropdown";
 import PropertyCard from "@/app/components/PropertyCard";
@@ -88,15 +89,28 @@ export default function PropertyPage() {
           </div>
           </div>
 
-          {/* Remove the standalone Map component */}
+          {/* NearbyPlaces component */}
+          <div className="mt-6 bg-white rounded-lg shadow-sm">
+            {/* <h2 className="text-2xl font-semibold p-4 border-b">Explore Nearby Places</h2> */}
+            {thisProperty?.latitude && thisProperty?.longitude ? (
+              <NearbyPlaces 
+                latitude={parseFloat(thisProperty.latitude)} 
+                longitude={parseFloat(thisProperty.longitude)} 
+              />
+            ) : (
+              <div className="p-6 text-center text-gray-500">
+                Location coordinates are not available for this property.
+              </div>
+            )}
+          </div>
 
-          {/* Buyer Reviews */}
+{/* 
+          Buyer Reviews
           <BuyerReviews />
 
-          {/* Add Review Form */}
           <div className="mt-6">
             <ReviewForm propertyId={propertyId as string} />
-          </div>
+          </div> */}
         </div>
 
         {/* Right Section: 40% */}
@@ -180,25 +194,40 @@ export default function PropertyPage() {
 
         <section className="pb-5 grid grid-cols-1 md:grid-cols-3 gap-8 px-10 max-w-[1440px] mx-auto">
           <PropertyCard
-            images="/images/mordenhouse.webp"
+            images={["/images/mordenhouse.webp"]}
             title="Modern Family Home"
             location="Beverly Hills, CA"
             price={250}
-            description="A beautiful home with four bedrooms, a spacious living area, and a private pool."
+            beds={4}
+            baths={3}
+            area={2500}
+            rating={4.8}
+            reviewsCount={24}
+            country="USA"
           />
           <PropertyCard
-            images="/images/luxuryinside.jpeg"
+            images={["/images/luxuryinside.jpeg"]}
             title="Luxury City Apartment"
             location="New York, NY"
-            price={1800000}
-            description="Stylish two-bedroom apartment with stunning views of the skyline."
+            price={1800}
+            beds={2}
+            baths={2}
+            area={1200}
+            rating={4.9}
+            reviewsCount={42}
+            country="USA"
           />
           <PropertyCard
-            image="/images/cottage.jpeg"
+            images={["/images/cottage.jpeg"]}
             title="Cozy Country Cottage"
             location="Aspen, CO"
-            price={850000}
-            description="Charming cottage with two bedrooms and a beautiful garden in a tranquil setting."
+            price={850}
+            beds={2}
+            baths={1}
+            area={900}
+            rating={4.7}
+            reviewsCount={18}
+            country="USA"
           />
         </section>
       </div>

@@ -102,15 +102,17 @@ const PropertyDetails = ({
   };
   
   return (
-    <div className="mt-4 bg-[var(--card)] text-[var(--copy-primary)] rounded-lg boreder shadow-lg p-4 md:p-6 border border-[var(--border)]">
+    <div className=" bg-[var(--card)] text-[var(--copy-primary)] rounded-lg boreder shadow-lg p-4 md:p-6 border border-[var(--border)]">
       {/* Title and Location */}
       <div className="flex items-center justify-between">
-      <h2 className="text-2xl md:text-3xl font-semibold">{title} </h2>
-      <span className="text-2xl md:text-xl font-semibold">
-        {currencySymbol}{price}<span className="text-lg max-sm:text-sm"> /month</span>
-      </span>
+        <h2 className="text-2xl md:text-3xl font-semibold">{title} </h2>
+        <div className="flex flex-col items-end">
+          <span className="text-base">From</span>
+          <span className="text-3xl font-semibold">{currencySymbol}{price}</span>
+          <span className="text-base">per month</span>
+        </div>
       </div>
-      <p className="text-lg md:text-xl mt-2">{location}</p>
+      {/* <p className="text-lg md:text-xl mt-2">{location}</p> */}
 
       {/* Navigation Tabs */}
       <div className="flex flex-wrap mt-6 mb-4 border-b border-[var(--gray-border)] space-x-1 md:space-x-0 text-[var(--gray-text)]">

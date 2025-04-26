@@ -72,7 +72,7 @@ export default function PropertyGallery({ images }: PropertyGalleryProps) {
 
   // Mobile View
   const MobileView = () => (
-    <div className="relative h-[300px] overflow-hidden">
+    <div className="relative h-[250px] overflow-hidden">
       {loadedImages.length > 0 && (
         <div
           className={`absolute w-full h-full transition-opacity duration-500 ${
@@ -96,7 +96,7 @@ export default function PropertyGallery({ images }: PropertyGalleryProps) {
   const DesktopView = () => (
     <div className="grid grid-cols-12 p-4 gap-4">
       {/* Main Image */}
-      <div className="col-span-8 relative h-[400px] rounded-xl overflow-hidden group">
+      <div className="col-span-8 relative h-[300px] rounded-xl overflow-hidden group">
         {loadedImages.length > 0 && (
           <div
             className={`absolute w-full h-full transition-opacity duration-500 ${
@@ -123,7 +123,7 @@ export default function PropertyGallery({ images }: PropertyGalleryProps) {
       </div>
 
       {/* Thumbnails */}
-      <div className="col-span-4 grid grid-cols-2 gap-4 h-[400px] overflow-y-auto pl-1 pt-1 pr-2">
+      <div className="col-span-4 grid grid-cols-2 gap-4 h-[300px] overflow-y-hidden pl-1 pt-1 pr-2">
         {loadedImages.map((image, index) => (
           <button
             key={index}
