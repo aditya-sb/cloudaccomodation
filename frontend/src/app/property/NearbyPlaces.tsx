@@ -18,8 +18,9 @@ import {
 import { loadGoogleMapsAsync } from "../utils/googleMapsLoader";
 
 interface NearbyPlacesProps {
-  latitude: number;
-  longitude: number;
+  latitude?: number;
+  longitude?: number;
+  location?: string; // Add location prop for address
 }
 
 type PlaceType = 'restaurant' | 'shopping_mall' | 'university' | 'transit_station' | 'hospital' | 'office';
@@ -47,7 +48,7 @@ interface Place {
   };
 }
 
-const NearbyPlaces: React.FC<NearbyPlacesProps> = ({ latitude, longitude }) => {
+const NearbyPlaces: React.FC<NearbyPlacesProps> = ({ latitude, longitude, location }) => {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(false);
@@ -59,6 +60,9 @@ const NearbyPlaces: React.FC<NearbyPlacesProps> = ({ latitude, longitude }) => {
   const markersRef = useRef<google.maps.Marker[]>([]);
   const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
+  const [propertyCoords, setPropertyCoords] = useState<{lat: number, lng: number} | null>(
+    latitude && longitude ? { lat: latitude, lng: longitude } : null
+  );
   
   const placeCategories: PlaceCategory[] = [
     { type: 'restaurant', label: 'Restaurants', icon: <FaUtensils />, color: '#FF5252' },
@@ -91,7 +95,12 @@ const NearbyPlaces: React.FC<NearbyPlacesProps> = ({ latitude, longitude }) => {
         
         // If component is still mounted, initialize the map
         if (isMounted) {
-          initializeMap();
+          // Check if we need to geocode the address
+          if (!propertyCoords && location) {
+            await geocodeAddress(location);
+          } else {
+            initializeMap();
+          }
         }
       } catch (err) {
         console.error('Failed to load Google Maps:', err);
@@ -107,15 +116,46 @@ const NearbyPlaces: React.FC<NearbyPlacesProps> = ({ latitude, longitude }) => {
     return () => {
       isMounted = false;
     };
-  }, [latitude, longitude]);
+  }, [latitude, longitude, location, propertyCoords]);
+
+  // Geocode address to get coordinates
+  const geocodeAddress = async (address: string) => {
+    setLoading(true);
+    try {
+      const geocoder = new google.maps.Geocoder();
+      
+      geocoder.geocode({ address }, (results, status) => {
+        if (status === google.maps.GeocoderStatus.OK && results && results[0]) {
+          const location = results[0].geometry.location;
+          const coords = {
+            lat: location.lat(),
+            lng: location.lng()
+          };
+          
+          setPropertyCoords(coords);
+          setLoading(false);
+          // Initialize map now that we have coordinates
+          initializeMap();
+        } else {
+          console.error('Geocode was not successful:', status);
+          setError('Could not locate the property address on the map.');
+          setLoading(false);
+        }
+      });
+    } catch (err) {
+      console.error('Error geocoding address:', err);
+      setError('Failed to locate address on the map.');
+      setLoading(false);
+    }
+  };
 
   // Initialize map and fetch places when map is ready
   const initializeMap = () => {
-    if (!mapContainerRef.current || !latitude || !longitude) return;
+    if (!mapContainerRef.current || !propertyCoords) return;
 
     try {
       const mapOptions: google.maps.MapOptions = {
-        center: { lat: latitude, lng: longitude },
+        center: propertyCoords,
         zoom: 15,
         mapTypeControl: true,
         fullscreenControl: false,
@@ -140,7 +180,7 @@ const NearbyPlaces: React.FC<NearbyPlacesProps> = ({ latitude, longitude }) => {
 
       // Add marker for the property location
       const propertyMarker = new google.maps.Marker({
-        position: { lat: latitude, lng: longitude },
+        position: propertyCoords,
         map: mapRef.current,
         icon: {
           path: google.maps.SymbolPath.CIRCLE,
@@ -178,7 +218,7 @@ const NearbyPlaces: React.FC<NearbyPlacesProps> = ({ latitude, longitude }) => {
         fillColor: '#4285F4',
         fillOpacity: 0.05,
         map: mapRef.current,
-        center: { lat: latitude, lng: longitude },
+        center: propertyCoords,
         radius: 1000, // 1km radius in meters
         clickable: false
       });
@@ -193,14 +233,14 @@ const NearbyPlaces: React.FC<NearbyPlacesProps> = ({ latitude, longitude }) => {
 
   // Fetch nearby places when category changes
   useEffect(() => {
-    if (mapRef.current) {
+    if (mapRef.current && propertyCoords) {
       fetchNearbyPlaces(selectedCategory);
     }
-  }, [selectedCategory]);
+  }, [selectedCategory, propertyCoords]);
 
   // Calculate nearby places from Google Places API
   const fetchNearbyPlaces = async (type: PlaceType) => {
-    if (!mapRef.current) return;
+    if (!mapRef.current || !propertyCoords) return;
     
     setLoading(true);
     setError(null);
@@ -214,7 +254,7 @@ const NearbyPlaces: React.FC<NearbyPlacesProps> = ({ latitude, longitude }) => {
       const service = new google.maps.places.PlacesService(mapRef.current);
       
       const request = {
-        location: { lat: latitude, lng: longitude },
+        location: propertyCoords,
         radius: 1000, // 1km radius
         type: type
       };
@@ -231,8 +271,8 @@ const NearbyPlaces: React.FC<NearbyPlacesProps> = ({ latitude, longitude }) => {
             category: type,
             geometry: {
               location: {
-                lat: place.geometry?.location?.lat() || latitude,
-                lng: place.geometry?.location?.lng() || longitude
+                lat: place.geometry?.location?.lat() || propertyCoords.lat,
+                lng: place.geometry?.location?.lng() || propertyCoords.lng
               }
             }
           }));
@@ -243,7 +283,7 @@ const NearbyPlaces: React.FC<NearbyPlacesProps> = ({ latitude, longitude }) => {
               place.geometry.location.lat,
               place.geometry.location.lng
             );
-            const propertyLocation = new google.maps.LatLng(latitude, longitude);
+            const propertyLocation = new google.maps.LatLng(propertyCoords.lat, propertyCoords.lng);
             
             // Calculate distance in meters and convert to kilometers
             try {
@@ -257,8 +297,8 @@ const NearbyPlaces: React.FC<NearbyPlacesProps> = ({ latitude, longitude }) => {
               } else {
                 // Fallback to haversine formula if geometry library isn't available
                 place.distance = calculateHaversineDistance(
-                  latitude, 
-                  longitude,
+                  propertyCoords.lat, 
+                  propertyCoords.lng,
                   place.geometry.location.lat,
                   place.geometry.location.lng
                 );
@@ -266,8 +306,8 @@ const NearbyPlaces: React.FC<NearbyPlacesProps> = ({ latitude, longitude }) => {
             } catch (e) {
               // Fallback to haversine formula if geometry library fails
               place.distance = calculateHaversineDistance(
-                latitude, 
-                longitude,
+                propertyCoords.lat, 
+                propertyCoords.lng,
                 place.geometry.location.lat,
                 place.geometry.location.lng
               );
@@ -345,7 +385,7 @@ const NearbyPlaces: React.FC<NearbyPlacesProps> = ({ latitude, longitude }) => {
                   </div>
                   
                   <div style="margin-top: 12px; display: flex; justify-content: center;">
-                    <a href="https://www.google.com/maps/dir/?api=1&origin=${latitude},${longitude}&destination=${place.geometry.location.lat},${place.geometry.location.lng}&travelmode=walking" 
+                    <a href="https://www.google.com/maps/dir/?api=1&origin=${propertyCoords.lat},${propertyCoords.lng}&destination=${place.geometry.location.lat},${place.geometry.location.lng}&travelmode=walking" 
                        target="_blank" 
                        style="text-decoration: none; background-color: #4285F4; color: white; padding: 6px 12px; border-radius: 4px; font-size: 13px; display: inline-flex; align-items: center;">
                       <span style="margin-right: 6px;">Get Directions</span>
@@ -367,7 +407,7 @@ const NearbyPlaces: React.FC<NearbyPlacesProps> = ({ latitude, longitude }) => {
                 // Pan map to center between property and selected place
                 if (mapRef.current) {
                   const bounds = new google.maps.LatLngBounds();
-                  bounds.extend({ lat: latitude, lng: longitude });
+                  bounds.extend({ lat: propertyCoords.lat, lng: propertyCoords.lng });
                   bounds.extend({ lat: place.geometry.location.lat, lng: place.geometry.location.lng });
                   mapRef.current.fitBounds(bounds, { padding: 100 });
                 }
@@ -495,24 +535,28 @@ const NearbyPlaces: React.FC<NearbyPlacesProps> = ({ latitude, longitude }) => {
           className={`${isFullScreen ? 'h-[calc(100vh-175px)]' : 'h-[400px]'} w-full md:w-2/3 relative`}
           ref={mapContainerRef}
         >
-          {/* Property location legend */}
-          <div className="absolute bottom-4 left-4 bg-white rounded-lg shadow-md p-3 z-10 text-sm">
-            <div className="flex items-center gap-2 mb-2 pb-2 border-b">
-              <div className="w-4 h-4 rounded-full bg-blue-500 border-2 border-white"></div>
-              <span className="font-medium">Your Property</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: placeCategories.find(c => c.type === selectedCategory)?.color || '#FF0000' }}></div>
-              <span>{placeCategories.find(c => c.type === selectedCategory)?.label || 'Places'}</span>
-            </div>
-          </div>
+          {propertyCoords ? (
+            <>
+              {/* Property location legend */}
+              <div className="absolute bottom-4 left-4 bg-white rounded-lg shadow-md p-3 z-10 text-sm">
+                <div className="flex items-center gap-2 mb-2 pb-2 border-b">
+                  <div className="w-4 h-4 rounded-full bg-blue-500 border-2 border-white"></div>
+                  <span className="font-medium">Your Property</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded-full" style={{ backgroundColor: placeCategories.find(c => c.type === selectedCategory)?.color || '#FF0000' }}></div>
+                  <span>{placeCategories.find(c => c.type === selectedCategory)?.label || 'Places'}</span>
+                </div>
+              </div>
+            </>
+          ) : null}
           
           {/* Loading overlay */}
           {loading && (
             <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center z-50">
               <div className="bg-white rounded-lg p-4 shadow-lg flex flex-col items-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mb-2"></div>
-                <p className="text-gray-700">Loading nearby places...</p>
+                <p className="text-gray-700">{!propertyCoords && location ? 'Locating address...' : 'Loading nearby places...'}</p>
               </div>
             </div>
           )}
@@ -520,7 +564,13 @@ const NearbyPlaces: React.FC<NearbyPlacesProps> = ({ latitude, longitude }) => {
         
         {/* Places List */}
         <div className={`w-full md:w-1/3 overflow-y-auto ${isFullScreen ? 'max-h-[calc(100vh-175px)]' : 'max-h-[400px]'} border-l`}>
-          {loading ? (
+          {!propertyCoords && !loading && !location ? (
+            <div className="p-6 text-center">
+              <FaInfoCircle className="text-red-500 text-xl mb-2 mx-auto" />
+              <p className="text-red-500">No location data available for this property.</p>
+              <p className="text-gray-500 text-sm mt-2">Please provide either coordinates or an address.</p>
+            </div>
+          ) : loading ? (
             <div className="flex justify-center items-center h-32">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
             </div>
@@ -589,7 +639,7 @@ const NearbyPlaces: React.FC<NearbyPlacesProps> = ({ latitude, longitude }) => {
                         {selectedPlace?.id === place.id && (
                           <div className="mt-3">
                             <a 
-                              href={`https://www.google.com/maps/dir/?api=1&origin=${latitude},${longitude}&destination=${place.geometry.location.lat},${place.geometry.location.lng}&travelmode=walking`}
+                              href={`https://www.google.com/maps/dir/?api=1&origin=${propertyCoords.lat},${propertyCoords.lng}&destination=${place.geometry.location.lat},${place.geometry.location.lng}&travelmode=walking`}
                               target="_blank"
                               className="text-blue-600 text-sm flex items-center hover:underline"
                             >
@@ -611,4 +661,4 @@ const NearbyPlaces: React.FC<NearbyPlacesProps> = ({ latitude, longitude }) => {
   );
 };
 
-export default NearbyPlaces; 
+export default NearbyPlaces;

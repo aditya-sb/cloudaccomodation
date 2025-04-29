@@ -68,7 +68,7 @@ interface BookingDetailsType {
   selectedBedroom?: BedroomDetail | null;
 }
 
-const BookingForm = ({ price, propertyId, currency, securityDeposit, bookingOptions, bedroomDetails }: { 
+const BookingForm = ({ price, propertyId, currency, securityDeposit, bookingOptions, bedroomDetails, initialSelectedBedroom }: { 
   price: number; 
   propertyId: string;
   currency: string;
@@ -79,6 +79,7 @@ const BookingForm = ({ price, propertyId, currency, securityDeposit, bookingOpti
     allowFirstAndLastRent: boolean;
   };
   bedroomDetails?: BedroomDetail[];
+  initialSelectedBedroom?: BedroomDetail | null;
 }) => {
   const [rentalDays, setRentalDays] = useState(30);
   const [moveInMonth, setMoveInMonth] = useState("");
@@ -89,7 +90,7 @@ const BookingForm = ({ price, propertyId, currency, securityDeposit, bookingOpti
   const [bookingId, setBookingId] = useState<string | null>(null);
   const [showPayment, setShowPayment] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedBedroom, setSelectedBedroom] = useState<BedroomDetail | null>(null);
+  const [selectedBedroom, setSelectedBedroom] = useState<BedroomDetail | null>(initialSelectedBedroom || null);
   const [bookingDetails, setBookingDetails] = useState<BookingDetailsType>({
     name: "",
     email: "",
@@ -194,7 +195,8 @@ const BookingForm = ({ price, propertyId, currency, securityDeposit, bookingOpti
       moveInMonth,
       propertyId,
       price: selectedBedroom ? selectedBedroom.rent : price,
-      selectedBedroomName: selectedBedroom ? selectedBedroom.name : undefined
+      selectedBedroomName: selectedBedroom ? selectedBedroom.name : undefined,
+      bedroomName: selectedBedroom ? selectedBedroom.name : undefined
     };
 
     try {
@@ -273,6 +275,13 @@ const BookingForm = ({ price, propertyId, currency, securityDeposit, bookingOpti
       selectedBedroom: selectedBedroom || undefined
     });
   }, [name, email, phone, rentalDays, moveInMonth, propertyId, price, currency, options, securityDeposit, selectedBedroom]);
+
+  // Use effect to set the selected bedroom when initialSelectedBedroom changes
+  useEffect(() => {
+    if (initialSelectedBedroom) {
+      setSelectedBedroom(initialSelectedBedroom);
+    }
+  }, [initialSelectedBedroom]);
 
   return (
     <div className="flex flex-col text-sm space-y-3">
@@ -583,7 +592,8 @@ const BookingDetails = ({
     allowFirstRent: false,
     allowFirstAndLastRent: false
   },
-  bedroomDetails
+  bedroomDetails,
+  selectedBedroom
 }: {
   price: number;
   booking: boolean;
@@ -596,6 +606,7 @@ const BookingDetails = ({
     allowFirstAndLastRent: boolean;
   };
   bedroomDetails?: BedroomDetail[];
+  selectedBedroom?: BedroomDetail | null;
 }) => {
   const [isMinimized, setIsMinimized] = useState(true);
   const [activeForm, setActiveForm] = useState<"booking" | "enquiry">("enquiry");
@@ -787,6 +798,7 @@ const BookingDetails = ({
                   background:  "linear-gradient(to right, var(--cta), var(--cta-active))",
                   color: "var(--cta-text)",
                 }}
+                data-action="book"
               >
                 <FaMoneyBillTransfer className="mr-2" />
                 <span className="block md:hidden">Book</span>
@@ -818,6 +830,7 @@ const BookingDetails = ({
                 securityDeposit={securityDeposit}
                 bookingOptions={bookingOptions}
                 bedroomDetails={bedroomDetails}
+                initialSelectedBedroom={selectedBedroom}
               />
             ) : (
               <EnquiryForm price={price} propertyId={propertyId} />

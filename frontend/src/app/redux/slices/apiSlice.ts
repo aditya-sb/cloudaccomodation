@@ -211,6 +211,14 @@ export const apiSlice = createApi({
       query: (id) => `/booking/${id}`,
       providesTags: (result, error, id) => [{ type: "Booking", id }],
     }),
+    getUserBookings: builder.query({
+      query: (userId) => `/booking/user/${userId}`,
+      providesTags: ["Booking"],
+    }),
+    getPropertyBookings: builder.query({
+      query: ({ id }) => `/booking/property/${id}`,
+      providesTags: ["Booking"],
+    }),
     updateBookingStatus: builder.mutation({
       query: ({ id, status }) => ({
         url: `/booking/${id}/status`,
@@ -305,22 +313,6 @@ export const apiSlice = createApi({
         return Array.isArray(response) ? response : [];
       },
     }),
-
-    // User-specific bookings endpoint
-    getUserBookings: builder.query({
-      query: (userId) => {
-        console.log('Fetching bookings for userId:', userId);
-        return {
-          url: `/booking/user/${userId}`,
-          method: 'GET',
-        };
-      },
-      transformResponse: (response: { bookings: any[] }) => {
-        console.log('Received response:', response);
-        return response.bookings || [];
-      },
-      providesTags: ['Booking'],
-    }),
   }),
 });
 
@@ -369,6 +361,7 @@ export const {
   useGetUniversitiesByLocationQuery,
   // User-specific bookings hook
   useGetUserBookingsQuery,
+  useGetPropertyBookingsQuery,
 } = apiSlice;
 
 // Function to handle logout and invalidate user queries

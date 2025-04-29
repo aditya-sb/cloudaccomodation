@@ -14,6 +14,7 @@ import {
 } from "react-icons/fa";
 import { getCurrencySymbol } from "@/constants/currency";
 import Map from "./Map";
+import BedroomDetails from "./BedroomDetails";
 
 const PropertyDetails = ({
   title,
@@ -32,7 +33,7 @@ const PropertyDetails = ({
 }: {
   title: string;
   location: string;
-  overview: { bedrooms: number; bathrooms: number; squareFeet: number };
+  overview: { bedrooms: number; bathrooms: number; squareFeet: number; bedroomDetails?: any[] };
   price: string;
   securityDeposit: string;
   termsOfStay: string;
@@ -214,6 +215,7 @@ const PropertyDetails = ({
             </div>
           </div>
         )}
+        
         {activeSection === 'amenities' && processedAmenities.length > 0 && (
           <div className="space-y-2">
             <h3 className="text-xl font-semibold mb-4">Amenities</h3>

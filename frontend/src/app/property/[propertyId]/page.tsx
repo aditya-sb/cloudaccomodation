@@ -7,6 +7,7 @@ import {
   FaUndo,
   FaCheck,
   FaLocationArrow,
+  FaAngleDown,
 } from "react-icons/fa";
 import { use } from "react";
 import { useParams } from "next/navigation";
@@ -26,6 +27,14 @@ import { getCurrencySymbol } from "@/constants/currency";
 import { Pin } from "lucide-react";
 import { FaLocationPin, FaMapLocationDot } from "react-icons/fa6";
 import ReviewForm from "@/app/components/ReviewForm";
+import { useEffect, useState } from "react";
+import { BedroomDetail as BookingBedroomDetail } from "@/app/components/SelectedBedroomDropdown";
+import BedroomSection, { BedroomDetail as BedroomSectionDetail } from "../bedroomsDetails";
+
+// Function to format the date as Month DD, YYYY
+const formatDate = (date: Date): string => {
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+};
 
 export default function PropertyPage() {
   const { propertyId } = useParams();
@@ -33,6 +42,173 @@ export default function PropertyPage() {
   console.log(property);
   const thisProperty = property?.[0];
   const currencySymbol = getCurrencySymbol(thisProperty?.country);
+  const [bedroomInView, setBedroomInView] = useState<BedroomSectionDetail | null>(null);
+  const [selectedBedroomForBooking, setSelectedBedroomForBooking] = useState<BookingBedroomDetail | null>(null);
+
+  useEffect(() => {
+    if (thisProperty?.overview?.bedroomDetails?.length > 0) {
+      setBedroomInView(thisProperty.overview.bedroomDetails[0]);
+    }
+  }, [thisProperty]);
+
+  // Handler for when the Book button is clicked in the BedroomSection
+  const handleBedroomBookClick = (bedroom: BedroomSectionDetail) => {
+    // Convert to BedroomDetail interface from SelectedBedroomDropdown
+    const formattedBedroom: BookingBedroomDetail = {
+      name: bedroom.name,
+      rent: bedroom.rent,
+      sizeSqFt: bedroom.sizeSqFt,
+      furnished: bedroom.furnished,
+      privateWashroom: bedroom.privateWashroom || false,
+      sharedWashroom: bedroom.sharedWashroom,
+      sharedKitchen: bedroom.sharedKitchen
+    };
+    
+    setSelectedBedroomForBooking(formattedBedroom);
+    
+    // Scroll to the booking form or open the booking panel
+    const bookingDetailsElement = document.getElementById("bookingDetails");
+    if (bookingDetailsElement) {
+      bookingDetailsElement.scrollIntoView({ behavior: "smooth" });
+      
+      // If the booking panel is minimized, we need to expand it
+      // Find the book button and trigger it programmatically
+      const bookButton = bookingDetailsElement.querySelector('button[data-action="book"]');
+      if (bookButton && bookButton instanceof HTMLButtonElement) {
+        bookButton.click();
+      }
+    }
+  };
+
+  // Function to render rent payment details
+  const renderRentPaymentDetails = () => {
+    if (!thisProperty) return null;
+
+    return (
+      <div className="mt-6 w-full px-4 py-5 bg-white rounded-lg shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold">Rent payment</h2>
+          {thisProperty?.overview?.bedroomDetails && thisProperty.overview.bedroomDetails.length > 0 && (
+            <div className="relative">
+              <select 
+                className="appearance-none bg-white border border-gray-200 rounded-md px-3 py-1 pr-8 text-blue-500 focus:outline-none focus:border-blue-500"
+                defaultValue={bedroomInView?.name || "bedroom-1"}
+                onChange={(e) => {
+                  const selectedBedroom = thisProperty.overview.bedroomDetails.find(
+                    (b: BedroomSectionDetail) => b.name === e.target.value
+                  );
+                  if (selectedBedroom) setBedroomInView(selectedBedroom);
+                }}
+              >
+                {thisProperty.overview.bedroomDetails.map((bedroom: BedroomSectionDetail, index: number) => (
+                  <option key={index} value={bedroom.name || `Bedroom ${index + 1}`}>
+                    {bedroom.name || `Bedroom ${index + 1}`}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-blue-500">
+                <FaAngleDown className="h-4 w-4" />
+              </div>
+            </div>
+          )}
+        </div>
+        
+        <div className="w-full">
+          <div className="grid grid-cols-3 font-medium text-gray-500 pb-2 border-b">
+            <div>Payment type</div>
+            <div>Due date</div>
+            <div className="text-right">Amount</div>
+          </div>
+
+          {thisProperty.securityDeposit && (
+            <div className="grid grid-cols-3 py-3 border-b">
+              <div>Security deposit</div>
+              <div>Now</div>
+              <div className="text-right font-medium">{currencySymbol}{thisProperty.securityDeposit}</div>
+            </div>
+          )}
+
+          <div className="grid grid-cols-3 py-3 border-b">
+            <div>First rent</div>
+            <div>On arrival</div>
+            <div className="text-right font-medium">{currencySymbol}{bedroomInView?.rent || thisProperty.price}</div>
+          </div>
+
+          {/* Optional last month rent */}
+          {thisProperty?.bookingOptions?.allowFirstAndLastRent && (
+            <div className="grid grid-cols-3 py-3 border-b">
+              <div>Last month rent</div>
+              <div>On arrival</div>
+              <div className="text-right font-medium">{currencySymbol}{bedroomInView?.rent || thisProperty.price}</div>
+            </div>
+          )}
+
+          {/* Total amount */}
+          <div className="grid grid-cols-3 py-3 mt-2">
+            <div className="col-span-2 font-medium">Total</div>
+            <div className="text-right font-bold text-blue-600">
+              {currencySymbol}{((thisProperty.securityDeposit || 0) + 
+              (bedroomInView?.rent || thisProperty.price) + 
+              (thisProperty?.bookingOptions?.allowFirstAndLastRent ? (bedroomInView?.rent || thisProperty.price) : 0))}
+            </div>
+          </div>
+
+          <div className="flex justify-end mt-2">
+            <a href="#" className="text-blue-500 text-sm">See rent details</a>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Function to render cancellation policy
+  const renderCancellationPolicy = () => {
+    return (
+      <div className="mt-6 w-full bg-white rounded-lg shadow-sm">
+        <div className="px-4 py-4 flex items-center justify-between border-b">
+          <h2 className="text-xl font-semibold">Cancellation policy</h2>
+          <button className="text-blue-500">
+            <FaAngleDown />
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  // Function to render lease terms
+  const renderLeaseTerms = () => {
+    if (!thisProperty) return null;
+    
+    return (
+      <div className="mt-6 w-full bg-white rounded-lg shadow-sm">
+        <div className="px-4 py-4 flex items-center justify-between border-b">
+          <h2 className="text-xl font-semibold">Lease terms</h2>
+          <button className="text-blue-500">
+            <FaAngleDown />
+          </button>
+        </div>
+        <div className="p-4">
+          <div className="grid grid-cols-4 gap-3">
+            <div className="col-span-1 text-gray-500">Lease</div>
+            <div className="col-span-1 font-medium">Month to month</div>
+            
+            <div className="col-span-1 text-gray-500">Floor</div>
+            <div className="col-span-1 font-medium">7</div>
+            
+            <div className="col-span-1 text-gray-500">Security Deposit</div>
+            <div className="col-span-1 font-medium">{currencySymbol}{thisProperty.securityDeposit || thisProperty.price}</div>
+            
+            <div className="col-span-1 text-gray-500">Move-In</div>
+            <div className="col-span-1 font-medium">{formatDate(new Date())}</div>
+            
+            <div className="col-span-4 text-sm text-gray-500 mt-2">
+              Note: Only for females
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <>
@@ -67,7 +243,14 @@ export default function PropertyPage() {
               country={thisProperty?.country}
               description={thisProperty?.description}
               amenities={thisProperty?.amenities}
-              overview={thisProperty?.overview} features={[]} currency={thisProperty?.currency}
+              overview={{
+                bedrooms: thisProperty?.overview?.bedrooms,
+                bathrooms: thisProperty?.overview?.bathrooms,
+                squareFeet: thisProperty?.overview?.squareFeet,
+                bedroomDetails: thisProperty?.overview?.bedroomDetails
+              }}
+              features={[]}
+              currency={thisProperty?.currency}
               latitude={thisProperty?.latitude}
               longitude={thisProperty?.longitude}
             />
@@ -85,9 +268,33 @@ export default function PropertyPage() {
               bookingOptions={thisProperty?.bookingOptions}
               availableFrom={thisProperty?.availableFrom}
               currency={thisProperty?.currency}
-              overview={thisProperty?.overview} distanceFromUniversity={""} utilities={[]} securityDeposit={thisProperty?.securityDeposit} rentPayments={[]} rent={0}/>
+              overview={{
+                bedrooms: thisProperty?.overview?.bedrooms,
+                bathrooms: thisProperty?.overview?.bathrooms,
+                squareFeet: thisProperty?.overview?.squareFeet
+              }}
+              distanceFromUniversity={""}
+              utilities={[]}
+              securityDeposit={thisProperty?.securityDeposit}
+              rentPayments={[]}
+              rent={0}
+            />
           </div>
           </div>
+
+          {/* Bedroom Details Section */}
+          <BedroomSection 
+            bedrooms={thisProperty?.overview?.bedroomDetails || []} 
+            securityDeposit={thisProperty?.securityDeposit}
+            currency={thisProperty?.currency}
+            floor={7}
+            onBookClick={handleBedroomBookClick}
+          />
+
+          {/* Payment Details Section */}
+          {renderRentPaymentDetails()}
+          {renderCancellationPolicy()}
+          {renderLeaseTerms()}
 
           {/* NearbyPlaces component */}
           <div className="mt-6 bg-white rounded-lg shadow-sm">
@@ -97,9 +304,13 @@ export default function PropertyPage() {
                 latitude={parseFloat(thisProperty.latitude)} 
                 longitude={parseFloat(thisProperty.longitude)} 
               />
+            ) : thisProperty?.location ? (
+              <NearbyPlaces 
+                location={thisProperty.location}
+              />
             ) : (
               <div className="p-6 text-center text-gray-500">
-                Location coordinates are not available for this property.
+                Location information is not available for this property.
               </div>
             )}
           </div>
@@ -235,12 +446,13 @@ export default function PropertyPage() {
       {/* Booking Details */}
       <BookingDetails 
         currency={thisProperty?.currency} 
-        price={thisProperty?.price || "$5,000"} 
+        price={thisProperty?.price || 5000} 
         booking={true} 
         propertyId={propertyId as string} 
         bedroomDetails={thisProperty?.overview?.bedroomDetails}
         securityDeposit={thisProperty?.securityDeposit}
         bookingOptions={thisProperty?.bookingOptions}
+        selectedBedroom={selectedBedroomForBooking}
       />
       <Footer />
     </>

@@ -9,7 +9,6 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   transpilePackages: ['@stripe/stripe-js', '@stripe/react-stripe-js'],
-  // devDomains: ['localhost', 'cloudaccommodation.com'],
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
@@ -19,6 +18,19 @@ const nextConfig: NextConfig = {
   },
   images: {
     domains: ["145.223.23.97",'localhost', 'cloudaccommodation.com'],
+  },
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: "font-src 'self' https://js.stripe.com data:;"
+          }
+        ],
+      },
+    ];
   },
 };
 

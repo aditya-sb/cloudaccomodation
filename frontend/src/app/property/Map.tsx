@@ -4,19 +4,31 @@ import { FaMapMarkerAlt, FaExpand, FaCompress } from "react-icons/fa";
 
 interface MapProps {
   location: string;
-  lat: number;
-  lon: number;
+  lat?: number;
+  lon?: number;
 }
 
 const Map: React.FC<MapProps> = ({ location, lat, lon }) => {
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [mapUrl, setMapUrl] = useState('');
 
   useEffect(() => {
     const iframe = document.getElementById("iframeId") as HTMLIFrameElement;
-    if (iframe) {
-      iframe.src = `https://maps.google.com/maps?q=${lat},${lon}&z=15&hl=en&output=embed`;
+    
+    // If we have coordinates, use them directly
+    if (lat && lon) {
+      setMapUrl(`https://maps.google.com/maps?q=${lat},${lon}&z=15&hl=en&output=embed`);
+    } 
+    // Otherwise use the location name for geocoding
+    else if (location) {
+      const encodedLocation = encodeURIComponent(location);
+      setMapUrl(`https://maps.google.com/maps?q=${encodedLocation}&z=15&hl=en&output=embed`);
     }
-  }, [lat, lon]);
+    
+    if (iframe && mapUrl) {
+      iframe.src = mapUrl;
+    }
+  }, [lat, lon, location, mapUrl]);
 
   const toggleFullScreen = () => {
     setIsFullScreen(!isFullScreen);
@@ -29,7 +41,10 @@ const Map: React.FC<MapProps> = ({ location, lat, lon }) => {
       }`}
     >
       <div className="flex justify-between items-center mb-4">
-        
+        <h3 className="text-xl font-semibold p-4">
+          <FaMapMarkerAlt className="inline mr-2 text-blue-500" />
+          {location}
+        </h3>
         <button
           onClick={toggleFullScreen}
           className="text-[var(--cta-text)] bg-[var(--cta)] p-2 rounded-full hover:bg-[var(--cta-active)] transition"

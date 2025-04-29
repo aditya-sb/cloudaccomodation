@@ -146,7 +146,7 @@ export default function Bookings() {
           </div>
         ) : (
           <div className="grid gap-4">
-            {filteredBookings.map((booking: { _id: Key | null | undefined; propertyId: { title: any; }; status: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; moveInMonth: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; rentalDays: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; createdAt: any; currency: any; price: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; }) => (
+            {filteredBookings.map((booking: { _id: Key | null | undefined; propertyId: { title: any; }; status: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; moveInMonth: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; rentalDays: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; createdAt: any; currency: any; price: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; bedroomName: string; bedroomStatus: string; }) => (
               <div
                 key={booking._id}
                 className="bg-white rounded-lg shadow-sm hover:shadow transition-shadow border border-gray-100 overflow-hidden"
@@ -161,6 +161,11 @@ export default function Bookings() {
                         <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusColor(booking.status)}`}>
                           {booking.status}
                         </span>
+                        {booking.bedroomName && (
+                          <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full">
+                            {booking.bedroomName}
+                          </span>
+                        )}
                       </div>
                       
                       <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
@@ -176,6 +181,22 @@ export default function Bookings() {
                           </svg>
                           <span className="truncate">Duration: {booking.rentalDays} days</span>
                         </div>
+                        {booking.bedroomStatus && (
+                          <div className="flex items-center text-gray-600">
+                            <svg className="w-3 h-3 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span className="truncate">Room Status: 
+                              <span className={`ml-1 ${
+                                booking.bedroomStatus === 'available' ? 'text-green-600' : 
+                                booking.bedroomStatus === 'reserved' ? 'text-yellow-600' : 
+                                booking.bedroomStatus === 'occupied' ? 'text-blue-600' : 'text-red-600'
+                              }`}>
+                                {booking.bedroomStatus.charAt(0).toUpperCase() + booking.bedroomStatus.slice(1)}
+                              </span>
+                            </span>
+                          </div>
+                        )}
                       </div>
 
                       <div className="mt-2 text-gray-500 text-xs">
