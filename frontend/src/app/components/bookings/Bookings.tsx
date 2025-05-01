@@ -1,7 +1,29 @@
 "use client";
 import { useGetUserBookingsQuery } from "../../redux/slices/apiSlice";
 import Loader from "@/loader/loader";
-import { AwaitedReactNode, JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useState } from "react";
+import { AwaitedReactNode, JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useState, useEffect } from "react";
+
+// Define booking interface to solve type issues
+interface Booking {
+  _id: string;
+  propertyId: {
+    title: string;
+  };
+  status: string;
+  moveInMonth: string;
+  rentalDays: number;
+  createdAt: string;
+  currency?: string;
+  price: number;
+  bedroomName?: string;
+  bedroomStatus?: string;
+  securityDeposit?: number;
+  securityDepositPaid?: boolean;
+  paymentStatus?: string;
+  paymentAmount?: number;
+  lastMonthPayment?: number;
+  lastMonthPaymentPaid?: boolean;
+}
 
 export default function Bookings() {
   const [activeTab, setActiveTab] = useState("all"); // "all", "active", "completed"
@@ -27,6 +49,7 @@ export default function Bookings() {
   };
 
   const userId = getUserId();
+  console.log("User ID extracted from token:", userId);
   
   const {
     data,
@@ -37,6 +60,13 @@ export default function Bookings() {
     refetchOnMountOrArgChange: true,
     skip: !userId
   });
+
+  // Debug API response
+  useEffect(() => {
+    console.log("API Response - Bookings data:", data);
+    console.log("API Response - Error:", error);
+  }, [data, error]);
+
   if (isLoading) return <Loader />;
   if (error) {
     console.error('Bookings error:', error);
@@ -49,24 +79,42 @@ export default function Bookings() {
     );
   }
 
-  const bookings = data || [];
+  // Ensure bookings is always an array and handle potential nested response structure
+  let bookings: Booking[] = [];
+  
+  if (Array.isArray(data)) {
+    bookings = data;
+  } else if (data && typeof data === 'object') {
+    // Check for common API response patterns
+    if (Array.isArray(data.bookings)) {
+      bookings = data.bookings;
+    } else if (Array.isArray(data.data)) {
+      bookings = data.data;
+    } else if (data.result && Array.isArray(data.result)) {
+      bookings = data.result;
+    }
+  }
+  
+  console.log("Processed bookings array:", bookings);
   
   // Filter bookings based on active tab
-  const filteredBookings = bookings.filter(booking => {
+  const filteredBookings = bookings.filter((booking: Booking) => {
     if (activeTab === "all") return true;
     if (activeTab === "active") return booking.status === "confirmed" || booking.status === "pending";
     if (activeTab === "completed") return booking.status === "completed" || booking.status === "cancelled";
     return true;
   });
 
+  console.log("Filtered bookings:", filteredBookings);
+
   // Format date to be more readable
-  const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
   // Get status color
-  const getStatusColor = (status) => {
+  const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'confirmed':
         return 'bg-green-100 text-green-800';
@@ -81,11 +129,29 @@ export default function Bookings() {
     }
   };
 
+  // Get payment status color
+  const getPaymentStatusColor = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case 'completed':
+        return 'text-green-600';
+      case 'pending':
+        return 'text-yellow-600';
+      case 'processing':
+        return 'text-blue-600';
+      case 'failed':
+        return 'text-red-600';
+      case 'refunded':
+        return 'text-purple-600';
+      default:
+        return 'text-gray-600';
+    }
+  };
+
   // Get currency symbol based on currency code
   const getCurrencySymbol = (currencyCode: string) => {
     if (!currencyCode) return null;
     
-    const currencyMap = {
+    const currencyMap: Record<string, string> = {
       'usd': '$',
       'eur': '€',
       'gbp': '£',
@@ -146,7 +212,7 @@ export default function Bookings() {
           </div>
         ) : (
           <div className="grid gap-4">
-            {filteredBookings.map((booking: { _id: Key | null | undefined; propertyId: { title: any; }; status: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; moveInMonth: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; rentalDays: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; createdAt: any; currency: any; price: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; bedroomName: string; bedroomStatus: string; }) => (
+            {filteredBookings.map((booking: Booking) => (
               <div
                 key={booking._id}
                 className="bg-white rounded-lg shadow-sm hover:shadow transition-shadow border border-gray-100 overflow-hidden"
@@ -181,19 +247,14 @@ export default function Bookings() {
                           </svg>
                           <span className="truncate">Duration: {booking.rentalDays} days</span>
                         </div>
-                        {booking.bedroomStatus && (
+                        <div className="flex items-center text-gray-600">
+                          Bedroom: <span className="font-semibold ml-1 text-gray-700">{booking.bedroomName}</span>
+                        </div>
+                        {booking.paymentStatus && (
                           <div className="flex items-center text-gray-600">
-                            <svg className="w-3 h-3 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            <span className="truncate">Room Status: 
-                              <span className={`ml-1 ${
-                                booking.bedroomStatus === 'available' ? 'text-green-600' : 
-                                booking.bedroomStatus === 'reserved' ? 'text-yellow-600' : 
-                                booking.bedroomStatus === 'occupied' ? 'text-blue-600' : 'text-red-600'
-                              }`}>
-                                {booking.bedroomStatus.charAt(0).toUpperCase() + booking.bedroomStatus.slice(1)}
-                              </span>
+                            Payment: 
+                            <span className={`ml-1 font-medium ${getPaymentStatusColor(booking.paymentStatus)}`}>
+                              {booking.paymentStatus.charAt(0).toUpperCase() + booking.paymentStatus.slice(1)}
                             </span>
                           </div>
                         )}
@@ -204,11 +265,41 @@ export default function Bookings() {
                       </div>
                     </div>
                     
-                    <div className="sm:text-right flex sm:block justify-between items-center w-full sm:w-auto mt-2 sm:mt-0">
-                      {booking.currency && (
-                        <p className="text-lg sm:text-xl font-bold text-blue-600">
-                          {getCurrencySymbol(booking?.currency)}{booking.price}
-                        </p>
+                    <div className="sm:text-right flex flex-col sm:block justify-between items-end w-full sm:w-auto mt-2 sm:mt-0 gap-1">
+                      {/* First Month Payment */}
+                      {booking.price > 0 && (
+                        <div>
+                          <p className="text-sm text-gray-500">First Month Payment</p>
+                          <p className="text-lg sm:text-xl font-bold text-blue-600">
+                            {getCurrencySymbol(booking.currency || 'inr')}{booking.price}
+                          </p>
+                        </div>
+                      )}
+                      
+                      {/* Security Deposit */}
+                      {booking.securityDepositPaid && booking.securityDeposit > 0 && (
+                        <div className="mt-1 text-right">
+                          <p className="text-xs text-gray-500">Security Deposit</p>
+                          <p className={`text-sm font-semibold ${booking.securityDepositPaid ? 'text-green-600' : 'text-yellow-600'}`}>
+                            {getCurrencySymbol(booking.currency || 'inr')}{booking.securityDeposit}
+                            <span className="text-xs ml-1">
+                              {booking.securityDepositPaid ? '(Paid)' : '(Pending)'}
+                            </span>
+                          </p>
+                        </div>
+                      )}
+                      
+                      {/* Last Month Payment */}
+                      {booking.lastMonthPaymentPaid && booking.lastMonthPayment > 0 && (
+                        <div className="mt-1 text-right">
+                          <p className="text-xs text-gray-500">Last Month Payment</p>
+                          <p className={`text-sm font-semibold ${booking.lastMonthPaymentPaid ? 'text-green-600' : 'text-yellow-600'}`}>
+                            {getCurrencySymbol(booking.currency || 'inr')}{booking.lastMonthPayment}
+                            <span className="text-xs ml-1">
+                              {booking.lastMonthPaymentPaid ? '(Paid)' : '(Pending)'}
+                            </span>
+                          </p>
+                        </div>
                       )}
                     </div>
                   </div>

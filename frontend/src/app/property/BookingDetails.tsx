@@ -66,6 +66,7 @@ interface BookingDetailsType {
   country?: string;
   userId?: string; // This will be added during payment processing
   selectedBedroom?: BedroomDetail | null;
+  bedroomName?: string; // Add explicit bedroomName field
 }
 
 const BookingForm = ({ price, propertyId, currency, securityDeposit, bookingOptions, bedroomDetails, initialSelectedBedroom }: { 
@@ -196,7 +197,10 @@ const BookingForm = ({ price, propertyId, currency, securityDeposit, bookingOpti
       propertyId,
       price: selectedBedroom ? selectedBedroom.rent : price,
       selectedBedroomName: selectedBedroom ? selectedBedroom.name : undefined,
-      bedroomName: selectedBedroom ? selectedBedroom.name : undefined
+      bedroomName: selectedBedroom ? selectedBedroom.name : undefined,
+      currency: currency || "inr",
+      securityDeposit: paymentDetails.securityDeposit || 0,
+      lastMonthPayment: paymentDetails.lastMonthPayment || 0
     };
 
     try {
@@ -242,7 +246,8 @@ const BookingForm = ({ price, propertyId, currency, securityDeposit, bookingOpti
         ...paymentDetails,
         currency: currency || "inr",
         country: countryCode,
-        selectedBedroom: selectedBedroom || undefined
+        selectedBedroom: selectedBedroom || undefined,
+        bedroomName: selectedBedroom ? selectedBedroom.name : undefined
       };
 
       setBookingDetails(bookingData);
@@ -272,7 +277,8 @@ const BookingForm = ({ price, propertyId, currency, securityDeposit, bookingOpti
       ...paymentDetails,
       currency: currency || "inr",
       country: countryCode,
-      selectedBedroom: selectedBedroom || undefined
+      selectedBedroom: selectedBedroom || undefined,
+      bedroomName: selectedBedroom ? selectedBedroom.name : undefined
     });
   }, [name, email, phone, rentalDays, moveInMonth, propertyId, price, currency, options, securityDeposit, selectedBedroom]);
 

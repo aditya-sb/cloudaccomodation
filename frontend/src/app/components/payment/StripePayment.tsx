@@ -59,6 +59,8 @@ interface BookingDetails {
   lastMonthPayment?: number;
   currency?: string;
   country?: string;
+  bedroomName?: string;
+  selectedBedroom?: any; // Include selectedBedroom
 }
 
 interface StripePaymentProps {
@@ -180,7 +182,9 @@ const CheckoutForm = ({
           amount: totalAmount,
           currency: bookingDetails.currency || 'inr',
           securityDeposit: bookingDetails.securityDeposit || 0,
-          lastMonthPayment: bookingDetails.lastMonthPayment || 0
+          lastMonthPayment: bookingDetails.lastMonthPayment || 0,
+          // Extract and pass bedroom name from selectedBedroom if available
+          bedroomName: bookingDetails.selectedBedroom?.name || bookingDetails.bedroomName || null
         }
       }).unwrap();
 
