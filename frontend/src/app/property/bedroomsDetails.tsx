@@ -59,7 +59,7 @@ export default function BedroomSection({
               className={`px-6 py-3 text-sm font-medium rounded-lg transition-all duration-200 flex items-center gap-2 ${
                 activeBedroom?.id === bedroom.id
                   ? "bg-white text-blue-600 shadow-sm border border-gray-200"
-                  : "text-gray-600 hover:bg-white/50 hover:text-blue-500"
+                  : "text-gray-600 hover:bg-white/50 hover:text-blue-500 bg-blue-500"
               }`}
               onClick={() => setActiveBedroom(bedroom)}
               aria-pressed={activeBedroom?.id === bedroom.id}

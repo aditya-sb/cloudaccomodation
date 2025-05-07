@@ -599,7 +599,11 @@ const BookingDetails = ({
     allowFirstAndLastRent: false
   },
   bedroomDetails,
-  selectedBedroom
+  selectedBedroom,
+  activeForm: initialActiveForm = "enquiry",
+  isMinimized: initialIsMinimized = true,
+  setIsMinimized: externalSetIsMinimized,
+  setActiveForm: externalSetActiveForm
 }: {
   price: number;
   booking: boolean;
@@ -613,27 +617,58 @@ const BookingDetails = ({
   };
   bedroomDetails?: BedroomDetail[];
   selectedBedroom?: BedroomDetail | null;
+  activeForm?: "booking" | "enquiry";
+  isMinimized?: boolean;
+  setIsMinimized?: (isMinimized: boolean) => void;
+  setActiveForm?: (activeForm: "booking" | "enquiry" | null) => void;
 }) => {
-  const [isMinimized, setIsMinimized] = useState(true);
-  const [activeForm, setActiveForm] = useState<"booking" | "enquiry">("enquiry");
   const [shake, setShake] = useState(false);
-  const [showPayment, setShowPayment] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState("");
+  const [showPayment, setShowPayment] = useState(false);
+  
+  // Use state with props as initial values and allow external control
+  const [activeForm, setActiveFormInternal] = useState<"booking" | "enquiry">(initialActiveForm);
+  const [isMinimized, setIsMinimizedInternal] = useState<boolean>(initialIsMinimized);
   const [bookingDetails, setBookingDetails] = useState<BookingDetailsType>({
-    name: "",
-    email: "",
-    phone: "",
+    name: '',
+    email: '',
+    phone: '',
     rentalDays: 30,
-    moveInMonth: "",
+    moveInMonth: '',
     propertyId,
     price,
     securityDeposit: 0,
-    lastMonthPayment: 0,
-    currency: currency || "inr",
-    country: "IN",
     selectedBedroom: null
   });
+
+  // Effect to sync internal state with external state when props change
+  useEffect(() => {
+    if (initialActiveForm !== activeForm) {
+      setActiveFormInternal(initialActiveForm);
+    }
+  }, [initialActiveForm]);
+
+  useEffect(() => {
+    if (initialIsMinimized !== isMinimized) {
+      setIsMinimizedInternal(initialIsMinimized);
+    }
+  }, [initialIsMinimized]);
+
+  // Methods that update state and call external handlers
+  const updateActiveForm = (form: "booking" | "enquiry") => {
+    setActiveFormInternal(form);
+    if (externalSetActiveForm) {
+      externalSetActiveForm(form);
+    }
+  };
+
+  const updateIsMinimized = (minimized: boolean) => {
+    setIsMinimizedInternal(minimized);
+    if (externalSetIsMinimized) {
+      externalSetIsMinimized(minimized);
+    }
+  };
 
   useEffect(() => {
     if (isMinimized) {
@@ -687,8 +722,8 @@ const BookingDetails = ({
 
   const handleAuthCheck = (formType: "booking" | "enquiry") => {
     if (isAuthenticated()) {
-      setActiveForm(formType);
-      setIsMinimized(false);
+      updateActiveForm(formType);
+      updateIsMinimized(false);
     } else {
       setIsModalOpen(true);
     }
@@ -746,7 +781,7 @@ const BookingDetails = ({
       {!isMinimized && (
         <div
           className="fixed inset-0 bg-black bg-opacity-65 backdrop-blur-sm z-10"
-          onClick={() => setIsMinimized(true)}
+          onClick={() => updateIsMinimized(true)}
         />
       )}
 
@@ -782,7 +817,7 @@ const BookingDetails = ({
       <div
         id="bookingDetails"
         className={`fixed transition-all duration-500 ease-in-out transform ${
-          isMinimized ? "bottom-4 left-6 right-6 md:left-auto md:right-6 h-12 flex justify-center md:justify-end items-center gap-2" : "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full md:max-w-md p-4 md:p-6 rounded-lg z-20"
+          isMinimized ? "hidden" : "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full md:max-w-md p-4 md:p-6 rounded-lg z-20"
         }`}
         style={{
           background: isMinimized ? "transparent" : "var(--card)",
@@ -792,40 +827,6 @@ const BookingDetails = ({
           overflow: isMinimized ? "visible" : "auto"
         }}
       >
-        {isMinimized && (
-          <div className="flex justify-center w-full md:w-[400px] gap-4 px-4">
-            {booking && (
-              <button
-                className={`px-6 py-3 w-full border-2 items-center flex rounded-full font-semibold ${
-                  shake ? "animate-shake" : ""
-                }`}
-                onClick={() => handleAuthCheck("booking")}
-                style={{
-                  background:  "linear-gradient(to right, var(--cta), var(--cta-active))",
-                  color: "var(--cta-text)",
-                }}
-                data-action="book"
-              >
-                <FaMoneyBillTransfer className="mr-2" />
-                <span className="block md:hidden">Book</span>
-                <span className="hidden md:block">Book Now</span>
-              </button>
-            )}
-            <button
-              className={`px-6 py-3 w-full border-2 flex items-center rounded-full font-semibold ${
-                shake ? "animate-shake" : ""
-              }`}
-              onClick={() => handleAuthCheck("enquiry")}
-              style={{
-                background:  "linear-gradient(to right, var(--cta), var(--cta-active))",
-                color: "var(--cta-text)",
-              }}
-            >
-              <FaQuestionCircle className="mr-2" /> Enquire
-            </button>
-          </div>
-        )}
-
         {!isMinimized && (
           <div className="max-h-[80vh] md:max-h-none overflow-y-auto">
             {booking && activeForm === "booking" ? (
@@ -843,7 +844,7 @@ const BookingDetails = ({
             )}
 
             <button
-              onClick={() => setIsMinimized(true)}
+              onClick={() => updateIsMinimized(true)}
               className="absolute top-2 right-2 transition-all hover:opacity-75"
               style={{ color: "var(--copy-secondary)" }}
             >

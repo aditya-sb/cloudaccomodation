@@ -27,7 +27,7 @@ import { getCurrencySymbol } from "@/constants/currency";
 import { Pin } from "lucide-react";
 import { FaLocationPin, FaMapLocationDot } from "react-icons/fa6";
 import ReviewForm from "@/app/components/ReviewForm";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { BedroomDetail as BookingBedroomDetail } from "@/app/components/SelectedBedroomDropdown";
 import BedroomSection, { BedroomDetail as BedroomSectionDetail } from "../bedroomsDetails";
 
@@ -44,12 +44,33 @@ export default function PropertyPage() {
   const currencySymbol = getCurrencySymbol(thisProperty?.country);
   const [bedroomInView, setBedroomInView] = useState<BedroomSectionDetail | null>(null);
   const [selectedBedroomForBooking, setSelectedBedroomForBooking] = useState<BookingBedroomDetail | null>(null);
+  const bedroomSectionRef = useRef<HTMLDivElement>(null);
+  const [bookingFormType, setBookingFormType] = useState<"booking" | "enquiry" | null>(null);
+  const [isBookingMinimized, setIsBookingMinimized] = useState(true);
 
   useEffect(() => {
     if (thisProperty?.overview?.bedroomDetails?.length > 0) {
       setBedroomInView(thisProperty.overview.bedroomDetails[0]);
     }
   }, [thisProperty]);
+
+  const scrollToBedroomSection = () => {
+    if (bedroomSectionRef.current) {
+      bedroomSectionRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  // Function to open the booking panel
+  const openBookingPanel = (formType: "booking" | "enquiry") => {
+    setBookingFormType(formType);
+    setIsBookingMinimized(false);
+    
+    // Scroll to the booking details element
+    const bookingDetailsElement = document.getElementById("bookingDetails");
+    if (bookingDetailsElement) {
+      bookingDetailsElement.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   // Handler for when the Book button is clicked in the BedroomSection
   const handleBedroomBookClick = (bedroom: BedroomSectionDetail) => {
@@ -66,18 +87,8 @@ export default function PropertyPage() {
     
     setSelectedBedroomForBooking(formattedBedroom);
     
-    // Scroll to the booking form or open the booking panel
-    const bookingDetailsElement = document.getElementById("bookingDetails");
-    if (bookingDetailsElement) {
-      bookingDetailsElement.scrollIntoView({ behavior: "smooth" });
-      
-      // If the booking panel is minimized, we need to expand it
-      // Find the book button and trigger it programmatically
-      const bookButton = bookingDetailsElement.querySelector('button[data-action="book"]');
-      if (bookButton && bookButton instanceof HTMLButtonElement) {
-        bookButton.click();
-      }
-    }
+    // Open the booking panel
+    openBookingPanel("booking");
   };
 
   // Function to render rent payment details
@@ -187,7 +198,7 @@ export default function PropertyPage() {
             <FaAngleDown />
           </button>
         </div>
-        <div className="p-4">
+        {/* <div className="p-4">
           <div className="grid grid-cols-4 gap-3">
             <div className="col-span-1 text-gray-500">Lease</div>
             <div className="col-span-1 font-medium">Month to month</div>
@@ -205,7 +216,39 @@ export default function PropertyPage() {
               Note: Only for females
             </div>
           </div>
-        </div>
+        </div> */}
+      </div>
+    );
+  };
+
+  // Function to render action buttons
+  const renderActionButtons = () => {
+    if (!thisProperty) return null;
+
+    return (
+      <div className="flex flex-col w-full gap-3 mt-3">
+        <button 
+          onClick={scrollToBedroomSection}
+          className="w-full py-3 bg-white text-blue-600 border border-blue-600 rounded-md font-medium hover:bg-blue-50 transition-colors"
+        >
+          View Rooms
+        </button>
+        
+        {thisProperty.instantBooking ? (
+          <button 
+            onClick={() => openBookingPanel("booking")}
+            className="w-full py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-colors"
+          >
+            Book Now
+          </button>
+        ) : (
+          <button 
+            onClick={() => openBookingPanel("enquiry")}
+            className="w-full py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-colors"
+          >
+            Enquire Now
+          </button>
+        )}
       </div>
     );
   };
@@ -283,13 +326,15 @@ export default function PropertyPage() {
           </div>
 
           {/* Bedroom Details Section */}
-          <BedroomSection 
-            bedrooms={thisProperty?.overview?.bedroomDetails || []} 
-            securityDeposit={thisProperty?.securityDeposit}
-            currency={thisProperty?.currency}
-            floor={7}
-            onBookClick={handleBedroomBookClick}
-          />
+          <div ref={bedroomSectionRef} id="bedroomSection">
+            <BedroomSection 
+              bedrooms={thisProperty?.overview?.bedroomDetails || []} 
+              securityDeposit={thisProperty?.securityDeposit}
+              currency={thisProperty?.currency}
+              floor={7}
+              onBookClick={handleBedroomBookClick}
+            />
+          </div>
 
           {/* Payment Details Section */}
           {renderRentPaymentDetails()}
@@ -345,6 +390,9 @@ export default function PropertyPage() {
               <FaMapLocationDot className="text-blue-500 mr-1" />
                {thisProperty?.location}
             </p>
+            
+            {/* Action Buttons (View Rooms, Book Now/Enquire Now) */}
+            {renderActionButtons()}
             
             <div className="rounded-lg overflow-hidden mt-4">
               <Dropdown
@@ -453,6 +501,10 @@ export default function PropertyPage() {
         securityDeposit={thisProperty?.securityDeposit}
         bookingOptions={thisProperty?.bookingOptions}
         selectedBedroom={selectedBedroomForBooking}
+        activeForm={bookingFormType || "enquiry"}
+        isMinimized={isBookingMinimized}
+        setIsMinimized={setIsBookingMinimized}
+        setActiveForm={setBookingFormType}
       />
       <Footer />
     </>
