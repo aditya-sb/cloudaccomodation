@@ -277,7 +277,7 @@ export default function Bookings() {
                       )}
                       
                       {/* Security Deposit */}
-                      {booking.securityDepositPaid && booking.securityDeposit > 0 && (
+                      {booking.securityDepositPaid && booking.securityDeposit && booking.securityDeposit > 0 && (
                         <div className="mt-1 text-right">
                           <p className="text-xs text-gray-500">Security Deposit</p>
                           <p className={`text-sm font-semibold ${booking.securityDepositPaid ? 'text-green-600' : 'text-yellow-600'}`}>
@@ -290,7 +290,7 @@ export default function Bookings() {
                       )}
                       
                       {/* Last Month Payment */}
-                      {booking.lastMonthPaymentPaid && booking.lastMonthPayment > 0 && (
+                      {booking.lastMonthPaymentPaid && booking.lastMonthPayment && booking.lastMonthPayment > 0 && (
                         <div className="mt-1 text-right">
                           <p className="text-xs text-gray-500">Last Month Payment</p>
                           <p className={`text-sm font-semibold ${booking.lastMonthPaymentPaid ? 'text-green-600' : 'text-yellow-600'}`}>

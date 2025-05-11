@@ -65,8 +65,9 @@ interface BookingDetailsType {
   currency?: string;
   country?: string;
   userId?: string; // This will be added during payment processing
-  selectedBedroom?: BedroomDetail | null;
+  selectedBedroom?: { _id?: string; name: string } | null;
   bedroomName?: string; // Add explicit bedroomName field
+  bedroomId?: string;
 }
 
 const BookingForm = ({ price, propertyId, currency, securityDeposit, bookingOptions, bedroomDetails, initialSelectedBedroom }: { 
@@ -246,8 +247,11 @@ const BookingForm = ({ price, propertyId, currency, securityDeposit, bookingOpti
         ...paymentDetails,
         currency: currency || "inr",
         country: countryCode,
-        selectedBedroom: selectedBedroom || undefined,
-        bedroomName: selectedBedroom ? selectedBedroom.name : undefined
+        bedroomName: selectedBedroom ? selectedBedroom.name : undefined,
+        // Only include essential bedroom info to minimize payload size
+        selectedBedroom: selectedBedroom ? {
+          name: selectedBedroom.name
+        } : null
       };
 
       setBookingDetails(bookingData);
@@ -277,8 +281,11 @@ const BookingForm = ({ price, propertyId, currency, securityDeposit, bookingOpti
       ...paymentDetails,
       currency: currency || "inr",
       country: countryCode,
-      selectedBedroom: selectedBedroom || undefined,
-      bedroomName: selectedBedroom ? selectedBedroom.name : undefined
+      bedroomName: selectedBedroom ? selectedBedroom.name : undefined,
+      // Instead of _id, which may not exist, create a simplified bedroom object
+      selectedBedroom: selectedBedroom ? {
+        name: selectedBedroom.name
+      } : null
     });
   }, [name, email, phone, rentalDays, moveInMonth, propertyId, price, currency, options, securityDeposit, selectedBedroom]);
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, ReactNode } from "react";
-import { FaArrowRight } from "react-icons/fa";
+import { FaArrowRight, FaEye, FaEyeSlash } from "react-icons/fa";
 import ImageSlider from "../components/ImageSlider";
 
 // Define the BedroomDetail interface
@@ -18,7 +18,7 @@ export interface BedroomDetail {
   sharedWashroom: boolean;
   sharedKitchen: boolean;
   available: string;
-  status?: 'available' | 'reserved' | 'occupied' | 'unavailable';
+  status?: 'booked' | 'available' 
 }
 
 interface BedroomSectionProps {
@@ -36,30 +36,78 @@ export default function BedroomSection({
   floor = 7,
   onBookClick,
 }: BedroomSectionProps) {
-  const [activeBedroom, setActiveBedroom] = useState<BedroomDetail | null>(
-    null
+  const [activeBedroom, setActiveBedroom] = useState<BedroomDetail | null>(null);
+  const [showBookedRooms, setShowBookedRooms] = useState(false);
+  console.log("activeBedroom", activeBedroom);
+  // Separate available and booked bedrooms
+  const availableBedrooms = bedrooms.filter(
+    bedroom => !bedroom.status || bedroom.status === 'available' || bedroom.status === 'reserved'
+  );
+  
+  const bookedBedrooms = bedrooms.filter(
+    bedroom => bedroom.status === 'booked' || bedroom.status === 'occupied' || bedroom.status === 'unavailable'
   );
 
   useEffect(() => {
-    if (bedrooms?.length > 0) {
+    // Initially set an available bedroom as active if possible
+    if (availableBedrooms.length > 0) {
+      setActiveBedroom(availableBedrooms[0]);
+    } else if (bedrooms.length > 0) {
       setActiveBedroom(bedrooms[0]);
     }
-  }, [bedrooms]);
+  }, [bedrooms, availableBedrooms]);
 
   if (!activeBedroom || bedrooms.length === 0) return null;
 
+  const handleBookClick = (bedroom: BedroomDetail) => {
+    if (bedroom.status !== 'occupied' && 
+        bedroom.status !== 'unavailable' && 
+        onBookClick) {
+      onBookClick(bedroom);
+    }
+  };
+
   return (
     <div className="mt-6 w-full bg-white border border-gray-100 rounded-lg overflow-hidden shadow-sm">
+      {/* Section header with available rooms count and toggle */}
+      <div className="px-4 py-3 bg-white border-b border-gray-200 flex justify-between items-center">
+        <h2 className="text-xl font-semibold">Bedrooms</h2>
+        <div className="flex items-center gap-4">
+          <div className="text-sm text-gray-500">
+            <span className="font-medium">{availableBedrooms.length}</span> of <span className="font-medium">{bedrooms.length}</span> rooms available
+          </div>
+          {bookedBedrooms.length >= 0 && (
+            <button 
+              onClick={() => setShowBookedRooms(!showBookedRooms)}
+              className="flex items-center gap-2 bg-black-500 border-2z text-sm text-blue-600 hover:text-blue-700 transition-colors"
+            >
+              {showBookedRooms ? (
+                <>
+                  <FaEyeSlash size={14} />
+                  <span>Hide booked rooms</span>
+                </>
+              ) : (
+                <>
+                  <FaEye size={14} />
+                  <span>Show booked rooms ({bookedBedrooms.length})</span>
+                </>
+              )}
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* Bedroom Tabs */}
       <div className="border-b border-gray-200 bg-gray-50">
         <div className="flex overflow-x-auto px-4 py-2 gap-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-          {bedrooms.map((bedroom, index) => (
+          {/* Available rooms */}
+          {availableBedrooms.map((bedroom, index) => (
             <button
               key={bedroom.id || `bedroom-${index}`}
               className={`px-6 py-3 text-sm font-medium rounded-lg transition-all duration-200 flex items-center gap-2 ${
                 activeBedroom?.id === bedroom.id
                   ? "bg-white text-blue-600 shadow-sm border border-gray-200"
-                  : "text-gray-600 hover:bg-white/50 hover:text-blue-500 bg-blue-500"
+                  : "text-gray-600 hover:bg-white/50 hover:text-blue-500"
               }`}
               onClick={() => setActiveBedroom(bedroom)}
               aria-pressed={activeBedroom?.id === bedroom.id}
@@ -70,7 +118,31 @@ export default function BedroomSection({
                 bedroom.status === 'reserved' ? 'bg-yellow-500' : 
                 bedroom.status === 'occupied' ? 'bg-red-500' :
                 bedroom.status === 'unavailable' ? 'bg-gray-500' :
-                'bg-green-500' // default is available
+                'bg-green-500'
+              }`}></span>
+              <span>{bedroom.name || `Bedroom ${bedroom.id || index + 1}`}</span>
+            </button>
+          ))}
+
+          {/* Booked rooms - only shown when toggle is on */}
+          {showBookedRooms && bookedBedrooms.map((bedroom, index) => (
+            <button
+              key={bedroom.id || `booked-bedroom-${index}`}
+              className={`px-6 py-3 text-sm font-medium rounded-lg transition-all duration-200 flex items-center gap-2 ${
+                activeBedroom?.id === bedroom.id
+                  ? "bg-white text-blue-600 shadow-sm border border-gray-200"
+                  : "text-gray-600 hover:bg-white/50 hover:text-blue-500"
+              }`}
+              onClick={() => setActiveBedroom(bedroom)}
+              aria-pressed={activeBedroom?.id === bedroom.id}
+              role="tab"
+              aria-controls={`bedroom-panel-${bedroom.id || index}`}
+            >
+              <span className={`w-2 h-2 rounded-full ${
+                bedroom.status === 'reserved' ? 'bg-yellow-500' : 
+                bedroom.status === 'occupied' ? 'bg-red-500' :
+                bedroom.status === 'unavailable' ? 'bg-gray-500' :
+                'bg-green-500'
               }`}></span>
               <span>{bedroom.name || `Bedroom ${bedroom.id || index + 1}`}</span>
             </button>
@@ -97,12 +169,9 @@ export default function BedroomSection({
                   activeBedroom.status === 'reserved' ? 'bg-yellow-500' : 
                   activeBedroom.status === 'occupied' ? 'bg-red-500' :
                   activeBedroom.status === 'unavailable' ? 'bg-gray-500' :
-                  'bg-green-500' // default is available
+                  'bg-green-500'
                 }`}>
-                  {activeBedroom.status ? 
-                    `Status: ${activeBedroom.status.charAt(0).toUpperCase() + activeBedroom.status.slice(1)}` : 
-                    `Available from: ${activeBedroom.availableFrom}`
-                  }
+                  Available from: {activeBedroom.availableFrom}
                 </span>
               </div>
 
@@ -183,7 +252,7 @@ export default function BedroomSection({
                     ? 'bg-gray-400 cursor-not-allowed' 
                     : 'bg-blue-500 hover:bg-blue-600 transition-colors'
                   } text-white`}
-                  onClick={() => activeBedroom.status !== 'occupied' && activeBedroom.status !== 'unavailable' && onBookClick && onBookClick(activeBedroom)}
+                  onClick={() => handleBookClick(activeBedroom)}
                   disabled={activeBedroom.status === 'occupied' || activeBedroom.status === 'unavailable'}
                 >
                   {activeBedroom.status === 'occupied' || activeBedroom.status === 'unavailable' 

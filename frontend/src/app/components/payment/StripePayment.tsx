@@ -174,18 +174,25 @@ const CheckoutForm = ({
         (bookingDetails.securityDeposit || 0) + 
         (bookingDetails.lastMonthPayment || 0);
 
+      // Extract only necessary bedroom info before sending to API
+      const simplifiedBookingDetails = {
+        ...bookingDetails,
+        userId: userId,
+        amount: totalAmount,
+        currency: bookingDetails.currency || 'inr',
+        securityDeposit: bookingDetails.securityDeposit || 0,
+        lastMonthPayment: bookingDetails.lastMonthPayment || 0,
+        // Extract and pass bedroom name
+        bedroomName: bookingDetails.selectedBedroom?.name || bookingDetails.bedroomName || null,
+        // Include only the name from selectedBedroom to reduce metadata size
+        selectedBedroom: bookingDetails.selectedBedroom ? {
+          name: bookingDetails.selectedBedroom.name
+        } : null
+      };
+
       const response = await createPaymentIntent({
         amount: totalAmount,
-        bookingDetails: {
-          ...bookingDetails,
-          userId: userId,
-          amount: totalAmount,
-          currency: bookingDetails.currency || 'inr',
-          securityDeposit: bookingDetails.securityDeposit || 0,
-          lastMonthPayment: bookingDetails.lastMonthPayment || 0,
-          // Extract and pass bedroom name from selectedBedroom if available
-          bedroomName: bookingDetails.selectedBedroom?.name || bookingDetails.bedroomName || null
-        }
+        bookingDetails: simplifiedBookingDetails
       }).unwrap();
 
       if (!response?.clientSecret) {
