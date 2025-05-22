@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 
 // Define the BedroomDetail interface
 export interface BedroomDetail {
+  _id: string;
   floor: ReactNode;
   leaseTerms: ReactNode;
   note: string;
@@ -190,7 +191,7 @@ export default function BedroomSection({
                 </button>
               ) : (
                 <button 
-                  onClick={() => window.location.href = `/booking?propertyId=${encodeURIComponent(propertyId.toString())}&bedroomName=${encodeURIComponent(bedroom.name)}&price=${encodeURIComponent(bedroom.rent)}`}
+                  onClick={() => window.location.href = `/booking?propertyId=${encodeURIComponent(propertyId.toString())}&bedRoomId=${encodeURIComponent(bedroom?._id || "")}&bedroomName=${encodeURIComponent(bedroom.name)}&price=${encodeURIComponent(bedroom.rent)}`}
                   className="px-8 py-2 rounded-md text-sm font-medium bg-blue-500 hover:bg-blue-600 transition-colors text-white"
                 >
                   Book

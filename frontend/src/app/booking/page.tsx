@@ -1,9 +1,16 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCreateBookingMutation } from "../redux/slices/apiSlice";
+import { useCreateBookingMutation, useGetPropertiesQuery } from "../redux/slices/apiSlice";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import StripePayment from "../components/payment/StripePayment";
+
+// Add interface for payment result
+interface PaymentResult {
+  paymentId: string;
+  status: string;
+}
 
 // Booking form page component
 export default function BookingPage() {
@@ -11,10 +18,70 @@ export default function BookingPage() {
   const searchParams = useSearchParams();
   const [createBooking, { isLoading, isSuccess, error }] = useCreateBookingMutation();
   
+  // Payment state and handlers
+  const [showPayment, setShowPayment] = useState(false);
+
   // Get property details from URL params
   const propertyId = searchParams.get("propertyId");
-  const bedroomName = searchParams.get("bedroomName");
+  const bedroomId = searchParams.get("bedroomId");
   const price = searchParams.get("price");
+
+  // State for payment modal and booking data
+  const [pendingBookingData, setPendingBookingData] = useState<BookingData | null>(null);
+  const [selectedBedroomId, setSelectedBedroomId] = useState(bedroomId || "");
+
+  // Handle successful payment
+  const handlePaymentSuccess = () => {
+    try {
+      if (pendingBookingData) {
+        createBooking(pendingBookingData)
+          .unwrap()
+          .then(() => {
+            alert("Booking created successfully!");
+            router.push("/bookings");
+          })
+          .catch((err) => {
+            console.error("Error creating booking:", err);
+            alert("Booking creation failed. Please try again.");
+          });
+      }
+    } catch (err) {
+      console.error("Error in payment success handler:", err);
+      alert("An error occurred while processing your booking. Please try again.");
+    }
+  };
+
+  // Handle payment error
+  const handlePaymentError = (message: string) => {
+    console.error("Payment error:", message);
+    alert(`Payment failed: ${message}`);
+  };
+
+  // Fetch property details
+  const { data: propertyData, isLoading: isLoadingProperty } = useGetPropertiesQuery(
+    propertyId ? { id: propertyId } : null
+  );
+
+  // Extract the first property from the results
+  const property = propertyData?.[0];
+  // Find selected bedroom details using bedroomId
+  const selectedBedroom = property?.overview?.bedroomDetails?.find(
+    (bed: any, index: number) => bedroomId ? index.toString() === bedroomId : false
+  );
+
+  // Update form price when bedroom selection changes
+  useEffect(() => {
+    if (!bedroomId && selectedBedroomId && property?.overview?.bedroomDetails) {
+      const bedroom = property.overview.bedroomDetails[parseInt(selectedBedroomId)];
+      if (bedroom) {
+        // Update the URL parameters
+        const params = new URLSearchParams(window.location.search);
+        params.set("bedroomId", selectedBedroomId);
+        params.set("price", bedroom.rent.toString());
+        window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}`);
+      }
+    }
+  }, [selectedBedroomId, property, bedroomId]);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -107,7 +174,17 @@ export default function BookingPage() {
         alert("User authentication error");
         return;
       }
-      
+
+      // Get the selected bedroom details
+      const selectedBedroomDetails = property?.overview?.bedroomDetails?.[
+        parseInt(bedroomId || selectedBedroomId)
+      ];
+
+      if (!selectedBedroomDetails) {
+        alert("Please select a room");
+        return;
+      }
+
       // Calculate days between move in and move out
       const moveInDate = new Date(formData.moveInDate);
       const moveOutDate = formData.moveOutDate ? new Date(formData.moveOutDate) : null;
@@ -115,31 +192,78 @@ export default function BookingPage() {
       
       // Format move-in month for display
       const moveInMonth = moveInDate.toLocaleString('default', { month: 'long', year: 'numeric' });
-      
+
       // Prepare booking data
       const bookingData = {
         userId,
-        name: formData.fullName,
-        email: formData.emailAddress,
-        phone: formData.mobileNumber,
         propertyId,
-        bedroomName: bedroomName || "",
+        // bedroomId: bedroomId || selectedBedroomId,
+        bedroomName: selectedBedroomDetails.name,
+        
+        // Personal Information
+        name: formData.fullName,
+        dateOfBirth: formData.dateOfBirth,
+        gender: formData.gender,
+        nationality: formData.nationality,
+        email: formData.emailAddress,
+        phone: `${formData.code}${formData.mobileNumber}`,
+        
+        // Address Information
+        address: formData.address,
+        addressLine2: formData.addressLine2,
+        country: formData.country,
+        stateProvince: formData.stateProvince,
+        
+        // Booking Dates
+        leaseStart: formData.moveInDate,
+        leaseEnd: formData.moveOutDate || null,
+        moveInDate: formData.moveInDate,
+        moveOutDate: formData.moveOutDate || null,
         rentalDays,
         moveInMonth,
-        price: Number(price) || 0,
-        currency: "inr", // Default currency, adjust as needed
+        
+        // University Information
+        universityName: formData.universityName,
+        courseName: formData.courseName,
+        universityAddress: formData.universityAddress,
+        enrollmentStatus: formData.enrollmentStatus,
+        
+        // Medical Information
+        hasMedicalConditions: formData.hasMedicalConditions,
+        medicalDetails: formData.medicalDetails,
+        
+        // Pricing Information
+        price: selectedBedroomDetails.rent,
+        currency: property?.currency || "inr",
+        BedRoomStatus:"booked"
+        // Status
       };
-      
-      // Send to API
-      await createBooking(bookingData).unwrap();
-      alert("Booking created successfully!");
-      
-      // Redirect to bookings page
-      router.push("/bookings");
+      <StripePayment
+          bookingDetails={{
+            ...bookingData,
+            // StripePayment will extract the userId from the token internally
+            userId: 'pending' // Temporary userId that will be replaced in StripePayment
+          }}
+          isOpen={showPayment}
+          onClose={() => setShowPayment(false)}
+          onSuccess={handlePaymentSuccess}
+          onError={handlePaymentError}
+        />
+      // Send booking request
+      createBooking(bookingData)
+        .unwrap()
+        .then(() => {
+          alert("Booking created successfully!");
+          router.push("/bookings");
+        })
+        .catch((err) => {
+          console.error("Booking error:", err);
+          alert(err.data?.message || "Failed to create booking. Please try again.");
+        });
       
     } catch (err) {
-      console.error("Booking error:", err);
-      alert("Failed to create booking");
+      console.error("Form submission error:", err);
+      alert("Failed to process booking. Please check your information and try again.");
     }
   };
 
@@ -164,17 +288,50 @@ export default function BookingPage() {
 
   return (
     <>
-      <Header />
+      <Header isPropertyPage={false} />
       <div className="max-w-5xl mx-auto p-4 my-6">
         {/* Property Info */}
         <div className="bg-white p-4 rounded-lg shadow-sm mb-6 flex items-start gap-4">
           <div className="w-32 h-24 bg-gray-200 rounded overflow-hidden">
-            {/* Property image would go here */}
-          </div>
-          <div>
-            <h2 className="text-lg font-semibold">Wellesley St East & Parliament St, Toronto</h2>
-            <p className="text-sm text-gray-600">Toronto, Ontario, CA</p>
-            <p className="text-sm text-gray-600 mt-1">Room Type: {bedroomName || "Standard Room"}</p>
+            {property?.images?.length > 0 && (
+              <img 
+                src={property.images[0]} 
+                alt={property.title} 
+                className="w-full h-full object-cover"
+              />
+            )}
+          </div>          <div>
+            <h2 className="text-lg font-semibold">{property?.title || "Loading..."}</h2>
+            <p className="text-sm text-gray-600">{property?.location || "Loading..."}</p>
+              {!bedroomId && property?.overview?.bedroomDetails && (
+              <div className="mb-3">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Select Room
+                </label>
+                <select
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  value={selectedBedroomId}
+                  onChange={(e) => setSelectedBedroomId(e.target.value)}
+                  required
+                >
+                  <option value="">Select a room</option>
+                  {property.overview.bedroomDetails.map((bedroom, index) => (
+                    <option key={index} value={index.toString()}>
+                      {bedroom.name} - ${bedroom.rent}/month ({bedroom.sizeSqFt} sq ft)
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+              <p className="text-sm text-gray-600 mt-1">
+              Selected Bedroom: {selectedBedroom?.name || "Please select a bedroom"}
+            </p>
+            
+            {selectedBedroom && (
+              <p className="text-sm text-gray-600 mt-1">
+                Price: ${selectedBedroom.rent.toLocaleString()} per month
+              </p>
+            )}
           </div>
         </div>
 
@@ -560,4 +717,33 @@ export default function BookingPage() {
       <Footer />
     </>
   );
-} 
+}
+
+interface BookingData {
+  userId: string;
+  name: string;
+  dateOfBirth: string;
+  gender: string;
+  nationality: string;
+  email: string;
+  phone: string;
+  address: string;
+  addressLine2?: string;
+  leaseStart: string;
+  leaseEnd?: string | null;
+  moveInDate: string;
+  moveOutDate?: string | null;
+  rentalDays: number;
+  moveInMonth: string;
+  universityName?: string;
+  courseName?: string;
+  universityAddress?: string;
+  enrollmentStatus?: string;
+  hasMedicalConditions: boolean;
+  medicalDetails?: string;
+  propertyId: string;
+  bedroomId: string;
+  bedroomName: string;
+  price: number;
+  currency: string;
+}

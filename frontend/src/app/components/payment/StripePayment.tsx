@@ -177,7 +177,7 @@ const CheckoutForm = ({
       // Extract only necessary bedroom info before sending to API
       const simplifiedBookingDetails = {
         ...bookingDetails,
-        userId: userId,
+        // userId: userId,
         amount: totalAmount,
         currency: bookingDetails.currency || 'inr',
         securityDeposit: bookingDetails.securityDeposit || 0,
