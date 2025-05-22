@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { FaBed, FaRuler, FaCheck, FaTrash, FaCouch, FaBath, FaUtensils, FaEye, FaEyeSlash } from "react-icons/fa";
 import { getCurrencySymbol } from "@/constants/currency";
 import ImageSlider from "../components/ImageSlider";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 
 interface BedroomDetail {
   name: string;
@@ -33,6 +35,8 @@ const BedroomDetails: React.FC<BedroomDetailsProps> = ({
 }) => {
   const [showUnavailable, setShowUnavailable] = useState(true);
   const [activeBedroom, setActiveBedroom] = useState<BedroomDetail | null>(null);
+  const params = useParams();
+  const propertyId = params?.propertyId || "";
 
   if (!bedroomDetails || bedroomDetails.length === 0) {
     return (
@@ -209,9 +213,12 @@ const BedroomDetails: React.FC<BedroomDetailsProps> = ({
             {/* Display book button only for available bedrooms */}
             {(!activeBedroom.status || activeBedroom.status.toLowerCase() !== 'booked') && (
               <div className="mt-4 flex justify-end">
-                <button className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium">
+                <Link 
+                  href={`/booking?propertyId=${encodeURIComponent(propertyId.toString())}&bedroomName=${encodeURIComponent(activeBedroom.name)}&price=${encodeURIComponent(activeBedroom.rent)}`}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
+                >
                   Book Now
-                </button>
+                </Link>
               </div>
             )}
           </div>

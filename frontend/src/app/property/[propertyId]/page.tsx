@@ -74,27 +74,17 @@ export default function PropertyPage() {
 
   // Handler for when the Book button is clicked in the BedroomSection
   const handleBedroomBookClick = (bedroom: BedroomSectionDetail) => {
-    // Convert to BedroomDetail interface from SelectedBedroomDropdown
-    const formattedBedroom: BookingBedroomDetail = {
-      name: bedroom.name,
-      rent: bedroom.rent,
-      sizeSqFt: bedroom.sizeSqFt,
-      furnished: bedroom.furnished,
-      privateWashroom: bedroom.privateWashroom || false,
-      sharedWashroom: bedroom.sharedWashroom,
-      sharedKitchen: bedroom.sharedKitchen
-    };
-    
-    setSelectedBedroomForBooking(formattedBedroom);
-    
-    // Open the booking panel
-    openBookingPanel("booking");
+    // Instead of opening the modal, navigate directly to the booking page
+    window.location.href = `/booking?propertyId=${encodeURIComponent(propertyId as string)}&bedroomName=${encodeURIComponent(bedroom.name)}&price=${encodeURIComponent(bedroom.rent)}`;
   };
-
+  const removeHtmlTags = (str: string): string => {
+    if (!str) return "";
+    return str.replace(/<[^>]*>/g, "");
+  };
   // Function to render rent payment details
   const renderRentPaymentDetails = () => {
     if (!thisProperty) return null;
-
+    
     return (
       <div className="mt-6 w-full px-4 py-5 bg-white rounded-lg shadow-sm">
         <div className="flex items-center justify-between mb-4">
@@ -171,17 +161,30 @@ export default function PropertyPage() {
       </div>
     );
   };
-
   // Function to render cancellation policy
   const renderCancellationPolicy = () => {
+    const [isCancellationOpen, setIsCancellationOpen] = useState(false);
+
+    if (!thisProperty?.cancellationPolicy) return null;
+
     return (
       <div className="mt-6 w-full bg-white rounded-lg shadow-sm">
-        <div className="px-4 py-4 flex items-center justify-between border-b">
+        <div 
+          className="px-4 py-4 flex items-center justify-between border-b cursor-pointer"
+          onClick={() => setIsCancellationOpen(!isCancellationOpen)}
+        >
           <h2 className="text-xl font-semibold">Cancellation policy</h2>
-          <button className="text-blue-500">
+          <button className="text-blue-500 transition-transform duration-200" style={{ transform: isCancellationOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
             <FaAngleDown />
           </button>
         </div>
+        {isCancellationOpen && (
+          <div className="p-4">
+            <div className="text-sm text-gray-600 whitespace-pre-wrap">
+              {removeHtmlTags(thisProperty.cancellationPolicy)}
+            </div>
+          </div>
+        )}
       </div>
     );
   };
@@ -236,7 +239,7 @@ export default function PropertyPage() {
         
         {thisProperty.instantBooking ? (
           <button 
-            onClick={() => openBookingPanel("booking")}
+            onClick={() => window.location.href = `/booking?propertyId=${encodeURIComponent(propertyId as string)}&bedroomName=Default&price=${encodeURIComponent(thisProperty.price)}`}
             className="w-full py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-colors"
           >
             Book Now
@@ -338,8 +341,8 @@ export default function PropertyPage() {
 
           {/* Payment Details Section */}
           {renderRentPaymentDetails()}
-          {renderCancellationPolicy()}
-          {renderLeaseTerms()}
+          {renderCancellationPolicy(thisProperty?.cancellationPolicy)}
+          {/* {renderLeaseTerms()} */}
 
           {/* NearbyPlaces component */}
           <div className="mt-6 bg-white rounded-lg shadow-sm">
@@ -491,21 +494,23 @@ export default function PropertyPage() {
         </section>
       </div>
 
-      {/* Booking Details */}
-      <BookingDetails 
-        currency={thisProperty?.currency} 
-        price={thisProperty?.price || 5000} 
-        booking={true} 
-        propertyId={propertyId as string} 
-        bedroomDetails={thisProperty?.overview?.bedroomDetails}
-        securityDeposit={thisProperty?.securityDeposit}
-        bookingOptions={thisProperty?.bookingOptions}
-        selectedBedroom={selectedBedroomForBooking}
-        activeForm={bookingFormType || "enquiry"}
-        isMinimized={isBookingMinimized}
-        setIsMinimized={setIsBookingMinimized}
-        setActiveForm={setBookingFormType}
-      />
+      {/* Booking Details - Only show for enquiries */}
+      {bookingFormType === "enquiry" && (
+        <BookingDetails 
+          currency={thisProperty?.currency} 
+          price={thisProperty?.price || 5000} 
+          booking={false} 
+          propertyId={propertyId as string} 
+          bedroomDetails={thisProperty?.overview?.bedroomDetails}
+          securityDeposit={thisProperty?.securityDeposit}
+          bookingOptions={thisProperty?.bookingOptions}
+          selectedBedroom={selectedBedroomForBooking}
+          activeForm="enquiry"
+          isMinimized={isBookingMinimized}
+          setIsMinimized={setIsBookingMinimized}
+          setActiveForm={setBookingFormType}
+        />
+      )}
       <Footer />
     </>
   );
