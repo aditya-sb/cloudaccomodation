@@ -6,10 +6,47 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import StripePayment from "../components/payment/StripePayment";
 
-// Add interface for payment result
+// Update PaymentResult interface
 interface PaymentResult {
   paymentId: string;
   status: string;
+}
+
+// Update BookingData interface
+interface BookingData {
+  userId: string;
+  name: string;
+  dateOfBirth: string;
+  gender: string;
+  nationality: string;
+  email: string;
+  phone: string;
+  address: string;
+  addressLine2?: string;
+  leaseStart: string;
+  leaseEnd?: string | null;
+  moveInDate: string;
+  moveOutDate?: string | null;
+  rentalDays: number;
+  moveInMonth: string;
+  universityName?: string;
+  courseName?: string;
+  universityAddress?: string;
+  enrollmentStatus?: string;
+  hasMedicalConditions: boolean;
+  medicalDetails?: string;
+  propertyId: string;
+  bedroomId?: string;
+  bedroomName: string;
+  price: number;
+  currency: string;
+  leaseDuration: string;
+}
+
+// Add interface for payment details
+interface PaymentDetails {
+  amount: number;
+  currency: string;
 }
 
 // Booking form page component
@@ -31,19 +68,24 @@ export default function BookingPage() {
   const [selectedBedroomId, setSelectedBedroomId] = useState(bedroomId || "");
 
   // Handle successful payment
-  const handlePaymentSuccess = () => {
+  const handlePaymentSuccess = async (paymentResult: PaymentResult) => {
     try {
       if (pendingBookingData) {
-        createBooking(pendingBookingData)
-          .unwrap()
-          .then(() => {
-            alert("Booking created successfully!");
-            router.push("/bookings");
-          })
-          .catch((err) => {
-            console.error("Error creating booking:", err);
-            alert("Booking creation failed. Please try again.");
-          });
+        // Add payment information to booking data
+        const bookingDataWithPayment = {
+          ...pendingBookingData,
+          paymentIntentId: paymentResult.paymentId,
+          paymentStatus: 'completed',
+          status: 'confirmed'
+        };
+
+        // Create booking after successful payment
+        const result = await createBooking(bookingDataWithPayment).unwrap();
+        
+        if (result) {
+          alert("Booking created successfully!");
+          router.push("/bookings");
+        }
       }
     } catch (err) {
       console.error("Error in payment success handler:", err);
@@ -93,6 +135,7 @@ export default function BookingPage() {
     
     // Personal details
     fullName: "",
+    leaseDuration: "",
     dateOfBirth: "",
     gender: "",
     code: "",
@@ -176,9 +219,9 @@ export default function BookingPage() {
       }
 
       // Get the selected bedroom details
-      const selectedBedroomDetails = property?.overview?.bedroomDetails?.[
-        parseInt(bedroomId || selectedBedroomId)
-      ];
+      const selectedBedroomDetails = property?.overview?.bedroomDetails?.find(
+        (bedroom: any) => bedroom._id === (bedroomId || selectedBedroomId)
+      );
 
       if (!selectedBedroomDetails) {
         alert("Please select a room");
@@ -197,10 +240,10 @@ export default function BookingPage() {
       const bookingData = {
         userId,
         propertyId,
-        // bedroomId: bedroomId || selectedBedroomId,
+        bedroomId: bedroomId || selectedBedroomId,
         bedroomName: selectedBedroomDetails.name,
-        
         // Personal Information
+        leaseDuration: formData.leaseDuration,
         name: formData.fullName,
         dateOfBirth: formData.dateOfBirth,
         gender: formData.gender,
@@ -235,32 +278,12 @@ export default function BookingPage() {
         // Pricing Information
         price: selectedBedroomDetails.rent,
         currency: property?.currency || "inr",
-        BedRoomStatus:"booked"
-        // Status
       };
-      <StripePayment
-          bookingDetails={{
-            ...bookingData,
-            // StripePayment will extract the userId from the token internally
-            userId: 'pending' // Temporary userId that will be replaced in StripePayment
-          }}
-          isOpen={showPayment}
-          onClose={() => setShowPayment(false)}
-          onSuccess={handlePaymentSuccess}
-          onError={handlePaymentError}
-        />
-      // Send booking request
-      createBooking(bookingData)
-        .unwrap()
-        .then(() => {
-          alert("Booking created successfully!");
-          router.push("/bookings");
-        })
-        .catch((err) => {
-          console.error("Booking error:", err);
-          alert(err.data?.message || "Failed to create booking. Please try again.");
-        });
-      
+
+      // Store the booking data and show payment modal
+      setPendingBookingData(bookingData);
+      setShowPayment(true);
+        
     } catch (err) {
       console.error("Form submission error:", err);
       alert("Failed to process booking. Please check your information and try again.");
@@ -315,8 +338,8 @@ export default function BookingPage() {
                   required
                 >
                   <option value="">Select a room</option>
-                  {property.overview.bedroomDetails.map((bedroom, index) => (
-                    <option key={index} value={index.toString()}>
+                  {property.overview.bedroomDetails.map((bedroom: any) => (
+                    <option key={bedroom._id} value={bedroom._id}>
                       {bedroom.name} - ${bedroom.rent}/month ({bedroom.sizeSqFt} sq ft)
                     </option>
                   ))}
@@ -714,36 +737,22 @@ export default function BookingPage() {
           </div>
         </form>
       </div>
+      <StripePayment
+        displayData={{
+          ...pendingBookingData,
+          userId: 'pending', // Temporary userId that will be replaced in StripePayment
+          leaseDuration: formData.leaseDuration
+        }}
+        paymentDetails={{
+          amount: pendingBookingData?.price || 0,
+          currency: pendingBookingData?.currency || 'inr'
+        }}
+        isOpen={showPayment}
+        onClose={() => setShowPayment(false)}
+        onSuccess={handlePaymentSuccess}
+        onError={handlePaymentError}
+      />
       <Footer />
     </>
   );
-}
-
-interface BookingData {
-  userId: string;
-  name: string;
-  dateOfBirth: string;
-  gender: string;
-  nationality: string;
-  email: string;
-  phone: string;
-  address: string;
-  addressLine2?: string;
-  leaseStart: string;
-  leaseEnd?: string | null;
-  moveInDate: string;
-  moveOutDate?: string | null;
-  rentalDays: number;
-  moveInMonth: string;
-  universityName?: string;
-  courseName?: string;
-  universityAddress?: string;
-  enrollmentStatus?: string;
-  hasMedicalConditions: boolean;
-  medicalDetails?: string;
-  propertyId: string;
-  bedroomId: string;
-  bedroomName: string;
-  price: number;
-  currency: string;
 }

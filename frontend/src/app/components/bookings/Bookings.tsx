@@ -16,7 +16,6 @@ interface Booking {
   currency?: string;
   price: number;
   bedroomName?: string;
-  bedroomStatus?: string;
   securityDeposit?: number;
   securityDepositPaid?: boolean;
   paymentStatus?: string;

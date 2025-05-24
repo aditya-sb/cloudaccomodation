@@ -47,11 +47,13 @@ const CARD_ELEMENT_OPTIONS = {
 };
 
 interface BookingDetails {
+  leaseDuration: string;
   userId?: string; // Make userId optional since it will be extracted from token
   name: string;
   email: string;
   phone: string;
   rentalDays: number;
+  moveInDate: string; // Use ISO date string for consistency
   moveInMonth: string;
   propertyId: string;
   price: number;
@@ -63,9 +65,20 @@ interface BookingDetails {
   selectedBedroom?: any; // Include selectedBedroom
 }
 
+interface PaymentDetails {
+  amount: number;
+  currency: string;
+}
+
+interface PaymentResult {
+  paymentId: string;
+  status: string;
+}
+
 interface StripePaymentProps {
-  bookingDetails: BookingDetails;
-  onSuccess: () => void;
+  displayData: BookingDetails;
+  paymentDetails: PaymentDetails;
+  onSuccess: (paymentResult: PaymentResult) => void;
   onError: (message: string) => void;
   isOpen: boolean;
   onClose: () => void;
@@ -108,13 +121,15 @@ const PaymentModal = ({ isOpen, onClose, children }) => {
 
 // The checkout form component
 const CheckoutForm = ({
-  bookingDetails,
+  displayData,
+  paymentDetails,
   onSuccess,
   onError,
   onClose,
 }: {
-  bookingDetails: BookingDetails;
-  onSuccess: () => void;
+  displayData: BookingDetails;
+  paymentDetails: PaymentDetails;
+  onSuccess: (paymentResult: PaymentResult) => void;
   onError: (message: string) => void;
   onClose: () => void;
 }) => {
@@ -156,43 +171,20 @@ const CheckoutForm = ({
         }).join(''));
 
         const parsedToken = JSON.parse(jsonPayload);
-        userId = parsedToken._id || parsedToken.id; // Try both common userId fields
+        userId = parsedToken._id || parsedToken.id;
 
         if (!userId) {
           throw new Error("User ID not found in token");
         }
-
-        console.log("Extracted userId:", userId); // Debug log
       } catch (error) {
         console.error("Error parsing token:", error);
         throw new Error("Failed to get user ID from token");
       }
 
-      // Update the payment intent creation with proper total amount calculation
-      const totalAmount = 
-        (bookingDetails.price || 0) + 
-        (bookingDetails.securityDeposit || 0) + 
-        (bookingDetails.lastMonthPayment || 0);
-
-      // Extract only necessary bedroom info before sending to API
-      const simplifiedBookingDetails = {
-        ...bookingDetails,
-        // userId: userId,
-        amount: totalAmount,
-        currency: bookingDetails.currency || 'inr',
-        securityDeposit: bookingDetails.securityDeposit || 0,
-        lastMonthPayment: bookingDetails.lastMonthPayment || 0,
-        // Extract and pass bedroom name
-        bedroomName: bookingDetails.selectedBedroom?.name || bookingDetails.bedroomName || null,
-        // Include only the name from selectedBedroom to reduce metadata size
-        selectedBedroom: bookingDetails.selectedBedroom ? {
-          name: bookingDetails.selectedBedroom.name
-        } : null
-      };
-
+      // Create payment intent with minimal data
       const response = await createPaymentIntent({
-        amount: totalAmount,
-        bookingDetails: simplifiedBookingDetails
+        amount: paymentDetails.amount,
+        currency: paymentDetails.currency
       }).unwrap();
 
       if (!response?.clientSecret) {
@@ -211,21 +203,18 @@ const CheckoutForm = ({
           payment_method: {
             card: cardElement,
             billing_details: {
-              name: bookingDetails.name,
-              email: bookingDetails.email,
+              name: displayData.name,
+              email: displayData.email,
             },
           },
         });
 
       if (stripeError) {
-        // Handle Stripe errors more gracefully
         if (stripeError.type === "validation_error") {
           throw new Error(stripeError.message);
         } else if (stripeError.code === "currency_not_supported") {
           throw new Error("This currency is not supported for this payment method");
         } else if (stripeError.code === "processing_error") {
-          // Payment succeeded but error in processing
-          // We can still consider this a success if the payment intent status is succeeded
           if (paymentIntent?.status === "succeeded") {
             await handleSuccessfulPayment(paymentIntent);
             return;
@@ -243,10 +232,8 @@ const CheckoutForm = ({
       }
     } catch (err) {
       console.error("Payment error:", err);
-      // Don't show technical error messages to users
       if (err.message.includes("Indian regulations")) {
-        // Payment actually succeeded, we can ignore this specific error
-        onSuccess();
+        onSuccess({ paymentId: "success", status: "succeeded" });
         return;
       }
       setError("Payment processing failed. Please try again.");
@@ -266,15 +253,13 @@ const CheckoutForm = ({
       if (confirmResponse.success) {
         setClientSecret(null);
         elements?.getElement(CardElement)?.clear();
-        onSuccess();
+        onSuccess({ paymentId: paymentIntent.id, status: paymentIntent.status });
       } else {
         throw new Error("Failed to confirm payment");
       }
     } catch (error) {
-      // If we get here, the payment succeeded but confirmation failed
-      // We can still consider this a success
       console.warn("Payment succeeded but confirmation failed:", error);
-      onSuccess();
+      onSuccess({ paymentId: paymentIntent.id, status: paymentIntent.status });
     }
   };
 
@@ -303,47 +288,49 @@ const CheckoutForm = ({
         </h3>
         <div className="space-y-1.5 text-xs">
           <div className="flex justify-between">
-            <span className="text-gray-600">Duration</span>
+            <span className="text-gray-600">Lease Duration</span>
             <span className="font-medium">
-              {bookingDetails.rentalDays} days
+              {displayData?.leaseDuration} months
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-600">Move-in</span>
-            <span className="font-medium">{bookingDetails.moveInMonth}</span>
+            <span className="text-gray-600">Move-in Date</span>
+            <span className="font-medium">
+              {new Date(displayData?.moveInDate).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}
+            </span>
           </div>
-          {bookingDetails.price > 0 && (
+          {displayData?.price > 0 && (
             <div className="flex justify-between">
               <span className="text-gray-600">First Month Rent</span>
               <span className="font-medium">
-                ${bookingDetails.price.toLocaleString()}
+                ${displayData?.price.toLocaleString()}
               </span>
             </div>
           )}
-          {bookingDetails.securityDeposit > 0 && (
+          {displayData?.securityDeposit > 0 && (
             <div className="flex justify-between">
               <span className="text-gray-600">Security Deposit</span>
               <span className="font-medium">
-                ${bookingDetails.securityDeposit.toLocaleString()}
+                ${displayData?.securityDeposit.toLocaleString()}
               </span>
             </div>
           )}
-          {bookingDetails.lastMonthPayment > 0 && (
+          {displayData?.lastMonthPayment > 0 && (
             <div className="flex justify-between">
               <span className="text-gray-600">Last Month Rent</span>
               <span className="font-medium">
-                ${bookingDetails.lastMonthPayment.toLocaleString()}
+                ${displayData?.lastMonthPayment.toLocaleString()}
               </span>
             </div>
           )}
           <div className="border-t mt-2 pt-2 flex justify-between items-center">
             <span className="text-sm text-gray-800">Total Amount</span>
             <span className="text-lg font-semibold text-blue-600">
-              ${(
-                (bookingDetails.price || 0) + 
-                (bookingDetails.securityDeposit || 0) + 
-                (bookingDetails.lastMonthPayment || 0)
-              ).toLocaleString()}
+              ${paymentDetails.amount.toLocaleString()}
             </span>
           </div>
         </div>
@@ -382,11 +369,7 @@ const CheckoutForm = ({
           <span>
             {processing
               ? "Processing..."
-              : `Pay $${(
-                  (bookingDetails.price || 0) + 
-                  (bookingDetails.securityDeposit || 0) + 
-                  (bookingDetails.lastMonthPayment || 0)
-                ).toLocaleString()}`}
+              : `Pay $${paymentDetails.amount.toLocaleString()}`}
           </span>
         </button>
       </form>
@@ -402,7 +385,8 @@ const CheckoutForm = ({
 
 // The main Stripe payment component
 const StripePayment: React.FC<StripePaymentProps> = ({
-  bookingDetails,
+  displayData,
+  paymentDetails,
   onSuccess,
   onError,
   isOpen,
@@ -412,7 +396,8 @@ const StripePayment: React.FC<StripePaymentProps> = ({
     <Elements stripe={stripePromise}>
       <PaymentModal isOpen={isOpen} onClose={onClose}>
         <CheckoutForm
-          bookingDetails={bookingDetails}
+          displayData={displayData}
+          paymentDetails={paymentDetails}
           onSuccess={onSuccess}
           onError={onError}
           onClose={onClose}
