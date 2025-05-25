@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   useCreateBookingMutation,
@@ -63,7 +63,7 @@ interface PaymentDetails {
 }
 
 // Booking form page component
-export default function BookingPage() {
+function BookingPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [createBooking, { isLoading, isSuccess, error }] =
@@ -935,5 +935,14 @@ export default function BookingPage() {
       />
       <Footer />
     </>
+  );
+}
+
+// Wrapper component with Suspense
+export default function BookingPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <BookingPageContent />
+    </Suspense>
   );
 }
