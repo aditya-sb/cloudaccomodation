@@ -85,8 +85,68 @@ export default function PropertyPage() {
   const renderRentPaymentDetails = () => {
     if (!thisProperty) return null;
     
+    const getPaymentRows = () => {
+      const rows: { type: string; dueDate: string; amount: number; }[] = [];
+      
+      // Case 1: First and last rent
+      if (thisProperty?.bookingOptions?.allowFirstAndLastRent) {
+        rows.push({
+          type: "First month rent",
+          dueDate: "Now",
+          amount: bedroomInView?.rent || thisProperty.price
+        });
+        
+        rows.push({
+          type: "Last month rent",
+          dueDate: "Now",
+          amount: bedroomInView?.rent || thisProperty.price
+        });
+        
+        return rows;
+      }
+      
+      // Case 2: First rent only
+      if (thisProperty?.bookingOptions?.allowFirstRent) {
+        rows.push({
+          type: "First month rent",
+          dueDate: "On arrival",
+          amount: bedroomInView?.rent || thisProperty.price
+        });
+        
+        return rows;
+      }
+      
+      // Case 3: Security deposit only
+      if (thisProperty?.bookingOptions?.allowSecurityDeposit && thisProperty.securityDeposit) {
+        rows.push({
+          type: "Security deposit",
+          dueDate: "Now",
+          amount: thisProperty.securityDeposit
+        });
+        
+        rows.push({
+          type: "First month rent",
+          dueDate: "On arrival",
+          amount: bedroomInView?.rent || thisProperty.price
+        });
+        
+        return rows;
+      }
+      
+      // Default case - just show the monthly rent
+      rows.push({
+        type: "Monthly rent",
+        dueDate: "On arrival",
+        amount: bedroomInView?.rent || thisProperty.price
+      });
+      
+      return rows;
+    };
+
+    const paymentRows = getPaymentRows();
+    
     return (
-      <div className="mt-6 w-full px-4 py-5 bg-white rounded-lg shadow-sm">
+      <div className="mt-6 w-full px-4 py-5 bg-white rounded-lg shadow-sm max-sm:hidden">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold">Rent payment</h2>
           {thisProperty?.overview?.bedroomDetails && thisProperty.overview.bedroomDetails.length > 0 && (
@@ -121,36 +181,19 @@ export default function PropertyPage() {
             <div className="text-right">Amount</div>
           </div>
 
-          {thisProperty.securityDeposit && (
-            <div className="grid grid-cols-3 py-3 border-b">
-              <div>Security deposit</div>
-              <div>Now</div>
-              <div className="text-right font-medium">{currencySymbol}{thisProperty.securityDeposit}</div>
+          {paymentRows.map((row, index) => (
+            <div key={index} className="grid grid-cols-3 py-3 border-b">
+              <div>{row.type}</div>
+              <div>{row.dueDate}</div>
+              <div className="text-right font-medium">{currencySymbol}{row.amount}</div>
             </div>
-          )}
-
-          <div className="grid grid-cols-3 py-3 border-b">
-            <div>First rent</div>
-            <div>On arrival</div>
-            <div className="text-right font-medium">{currencySymbol}{bedroomInView?.rent || thisProperty.price}</div>
-          </div>
-
-          {/* Optional last month rent */}
-          {thisProperty?.bookingOptions?.allowFirstAndLastRent && (
-            <div className="grid grid-cols-3 py-3 border-b">
-              <div>Last month rent</div>
-              <div>On arrival</div>
-              <div className="text-right font-medium">{currencySymbol}{bedroomInView?.rent || thisProperty.price}</div>
-            </div>
-          )}
+          ))}
 
           {/* Total amount */}
           <div className="grid grid-cols-3 py-3 mt-2">
             <div className="col-span-2 font-medium">Total</div>
             <div className="text-right font-bold text-blue-600">
-              {currencySymbol}{((thisProperty.securityDeposit || 0) + 
-              (bedroomInView?.rent || thisProperty.price) + 
-              (thisProperty?.bookingOptions?.allowFirstAndLastRent ? (bedroomInView?.rent || thisProperty.price) : 0))}
+              {currencySymbol}{paymentRows.reduce((sum, row) => sum + row.amount, 0)}
             </div>
           </div>
 
@@ -168,7 +211,7 @@ export default function PropertyPage() {
     if (!thisProperty?.cancellationPolicy) return null;
 
     return (
-      <div className="mt-6 w-full bg-white rounded-lg shadow-sm">
+      <div className="mt-6 w-full bg-white rounded-lg shadow-sm max-sm:hidden">
         <div 
           className="px-4 py-4 flex items-center justify-between border-b cursor-pointer"
           onClick={() => setIsCancellationOpen(!isCancellationOpen)}
@@ -305,11 +348,13 @@ export default function PropertyPage() {
             <PropertyDetailsMobile
               title={thisProperty?.title}
               location={thisProperty?.location}
+              universities={thisProperty?.nearbyUniversities}
               price={thisProperty?.price}
               country={thisProperty?.country}
               onSiteVerification={thisProperty?.onSiteVerification}
               description={thisProperty?.description}
               amenities={thisProperty?.amenities}
+              instantBooking={thisProperty?.instantBooking}
               bedroomDetails={thisProperty?.overview?.bedroomDetails}
               bookingOptions={thisProperty?.bookingOptions}
               availableFrom={thisProperty?.availableFrom}
@@ -329,11 +374,13 @@ export default function PropertyPage() {
           </div>
 
           {/* Bedroom Details Section */}
-          <div ref={bedroomSectionRef} id="bedroomSection">
+          <div className="hidden md:block" ref={bedroomSectionRef} id="bedroomSection">
             <BedroomSection 
               bedrooms={thisProperty?.overview?.bedroomDetails || []} 
               securityDeposit={thisProperty?.securityDeposit}
               currency={thisProperty?.currency}
+              instantBooking={thisProperty?.instantBooking}
+              country={thisProperty?.country}
               floor={7}
               onBookClick={handleBedroomBookClick}
             />
@@ -374,7 +421,7 @@ export default function PropertyPage() {
 
         {/* Right Section: 40% */}
         <div
-          className="w-full rounded-lg md:w-2/5 p-4"
+          className="w-full rounded-lg md:w-2/5 p-4 max-sm:hidden"
           style={{
             backgroundColor: "var(--background)",
             color: "var(--foreground)",
@@ -439,7 +486,7 @@ export default function PropertyPage() {
       </div>
 
       {/* Related Properties (Full-Width Section) */}
-      <div
+      {/* <div
         className="bg-gray-100 py-10 w-full"
         style={{
           backgroundColor: "var(--background)",
@@ -492,7 +539,7 @@ export default function PropertyPage() {
             country="USA"
           />
         </section>
-      </div>
+      </div> */}
 
       {/* Booking Details - Only show for enquiries */}
       {bookingFormType === "enquiry" && (

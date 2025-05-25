@@ -1,9 +1,16 @@
 import { useState, useEffect, ReactNode } from "react";
-import { FaArrowRight, FaEye, FaEyeSlash, FaChevronDown, FaChevronUp } from "react-icons/fa";
+import {
+  FaArrowRight,
+  FaEye,
+  FaEyeSlash,
+  FaChevronDown,
+  FaChevronUp,
+} from "react-icons/fa";
 import ImageSlider from "../components/ImageSlider";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-
+import { getCurrencySymbol } from "@/constants/currency";
+import { useRouter } from "next/navigation";
 // Define the BedroomDetail interface
 export interface BedroomDetail {
   _id: string;
@@ -23,13 +30,15 @@ export interface BedroomDetail {
   sharedWashroom: boolean;
   sharedKitchen: boolean;
   available: string;
-  status?: 'booked' | 'available' | 'reserved' | 'occupied' | 'unavailable'
+  status?: "booked" | "available" | "reserved" | "occupied" | "unavailable";
 }
 
 interface BedroomSectionProps {
   bedrooms: BedroomDetail[];
   securityDeposit?: number;
   currency?: string;
+  instantBooking?: boolean;
+  country?: string;
   floor?: number;
   onBookClick?: (bedroom: BedroomDetail) => void;
 }
@@ -37,39 +46,51 @@ interface BedroomSectionProps {
 export default function BedroomSection({
   bedrooms,
   securityDeposit,
+  instantBooking,
   currency,
+  country,
   floor,
   onBookClick,
 }: BedroomSectionProps) {
   const [showBookedRooms, setShowBookedRooms] = useState(false);
-  const [expandedLeaseTerms, setExpandedLeaseTerms] = useState<{ [key: number]: boolean }>({});
-  
+  const [expandedLeaseTerms, setExpandedLeaseTerms] = useState<{
+    [key: number]: boolean;
+  }>({});
+  const router = useRouter();
   // Get the property ID from URL
   const params = useParams();
   const propertyId = params?.propertyId || "";
   console.log("BedroomSection - propertyId from params:", propertyId);
-  
+
   // Separate available and booked bedrooms
   const availableBedrooms = bedrooms.filter(
-    bedroom => !bedroom.status || bedroom.status === 'available' || bedroom.status === 'reserved'
+    (bedroom) =>
+      !bedroom.status ||
+      bedroom.status === "available" ||
+      bedroom.status === "reserved"
   );
-  
+
   const bookedBedrooms = bedrooms.filter(
-    bedroom => bedroom.status === 'booked' || bedroom.status === 'occupied' || bedroom.status === 'unavailable'
+    (bedroom) =>
+      bedroom.status === "booked" ||
+      bedroom.status === "occupied" ||
+      bedroom.status === "unavailable"
   );
 
   const handleBookClick = (bedroom: BedroomDetail) => {
-    if (bedroom.status !== 'occupied' && 
-        bedroom.status !== 'unavailable' && 
-        onBookClick) {
+    if (
+      bedroom.status !== "occupied" &&
+      bedroom.status !== "unavailable" &&
+      onBookClick
+    ) {
       onBookClick(bedroom);
     }
   };
 
   const toggleLeaseTerms = (bedroomId: number) => {
-    setExpandedLeaseTerms(prev => ({
+    setExpandedLeaseTerms((prev) => ({
       ...prev,
-      [bedroomId]: !prev[bedroomId]
+      [bedroomId]: !prev[bedroomId],
     }));
   };
 
@@ -79,7 +100,12 @@ export default function BedroomSection({
   };
 
   const renderBedroomCard = (bedroom: BedroomDetail, index: number) => (
-    <div key={bedroom.id || `bedroom-${index}`} className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm mb-4">      {/* Bedroom content */}
+    <div
+      key={bedroom.id || `bedroom-${index}`}
+      className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm mb-4"
+    >
+      {" "}
+      {/* Bedroom content */}
       <div className="p-4">
         {/* Top section with image and key details */}
         <div className="flex flex-col md:flex-row gap-6">
@@ -99,14 +125,21 @@ export default function BedroomSection({
                   bedroom.status === 'unavailable' ? 'bg-gray-500' :
                   'bg-green-500'
                 }`}></span> */}
-                <h3 className="text-lg font-semibold">{bedroom.name || `Bedroom ${bedroom.id || index + 1}`}</h3>
+                <h3 className="text-lg font-semibold">
+                  {bedroom.name || `Bedroom ${bedroom.id || index + 1}`}
+                </h3>
               </div>
-              <span className={`inline-block text-white text-xs px-3 py-1 rounded-md ${
-                bedroom.status === 'reserved' ? 'bg-yellow-500' : 
-                bedroom.status === 'occupied' ? 'bg-red-500' :
-                bedroom.status === 'unavailable' ? 'bg-gray-500' :
-                'bg-green-500'
-              }`}>
+              <span
+                className={`inline-block text-white text-xs px-3 py-1 rounded-md ${
+                  bedroom.status === "reserved"
+                    ? "bg-yellow-500"
+                    : bedroom.status === "occupied"
+                    ? "bg-red-500"
+                    : bedroom.status === "unavailable"
+                    ? "bg-gray-500"
+                    : "bg-green-500"
+                }`}
+              >
                 Available from: {bedroom.availableFrom}
               </span>
             </div>
@@ -169,7 +202,11 @@ export default function BedroomSection({
               </div>
               <div>
                 <div className="text-xs text-gray-500">Security Deposit</div>
-                <div className="font-medium text-sm">${securityDeposit}</div>
+                <div className="font-medium text-sm">
+                  {" "}
+                  {getCurrencySymbol(country)}
+                  {securityDeposit}
+                </div>
               </div>
             </div>
 
@@ -178,23 +215,36 @@ export default function BedroomSection({
               <div>
                 <div className="text-xs text-gray-500">Monthly rent</div>
                 <div className="text-lg font-bold">
-                  {currency === "CAD" ? "CA$" : "$"}
+                  {getCurrencySymbol(country)}
                   {bedroom.rent}/month
                 </div>
               </div>
-              {bedroom.status === 'occupied' || bedroom.status === 'unavailable' ? (
-                <button 
+              {bedroom.status === "booked" ||
+              bedroom.status === "unavailable" ? (
+                <button
                   className="px-8 py-2 rounded-md text-sm font-medium bg-gray-400 cursor-not-allowed text-white"
                   disabled
                 >
-                  Not Available
+                  Booked
                 </button>
               ) : (
-                <button 
-                  onClick={() => window.location.href = `/booking?propertyId=${encodeURIComponent(propertyId.toString())}&bedRoomId=${encodeURIComponent(bedroom?._id || "")}&bedroomName=${encodeURIComponent(bedroom.name)}&price=${encodeURIComponent(bedroom.rent)}`}
+                <button                  onClick={() => {
+                    if (instantBooking) {
+                      window.location.href = `/booking?propertyId=${encodeURIComponent(
+                        propertyId.toString()
+                      )}&bedRoomId=${encodeURIComponent(
+                        bedroom?._id || ""
+                      )}&bedroomName=${encodeURIComponent(
+                        bedroom.name
+                      )}&price=${encodeURIComponent(bedroom.rent)}`;
+                    } else {
+                      router.push(`/enquiry?propertyId=${encodeURIComponent(propertyId.toString())}&bedroomId=${encodeURIComponent(bedroom?._id || "")}&bedroomName=${encodeURIComponent(bedroom.name)}&price=${encodeURIComponent(bedroom.rent)}`);
+                    }
+                  }
+                  }
                   className="px-8 py-2 rounded-md text-sm font-medium bg-blue-500 hover:bg-blue-600 transition-colors text-white"
                 >
-                  Book
+                  {instantBooking ? "Book" : "Enquire"}
                 </button>
               )}
             </div>
@@ -209,15 +259,18 @@ export default function BedroomSection({
         {/* Lease Terms */}
         {bedroom.leaseTerms && (
           <div className="mt-4 pt-4 border-t border-gray-100">
-            <button 
+            <button
               onClick={() => toggleLeaseTerms(bedroom.id)}
               className="w-full flex items-center justify-between text-left hover:bg-gray-50 p-2 rounded-md transition-colors"
             >
-              <div className="text-base font-semibold text-gray-700">Lease Terms</div>
-              {expandedLeaseTerms[bedroom.id] ? 
-                <FaChevronUp className="text-gray-400" /> : 
+              <div className="text-base font-semibold text-gray-700">
+                Lease Terms
+              </div>
+              {expandedLeaseTerms[bedroom.id] ? (
+                <FaChevronUp className="text-gray-400" />
+              ) : (
                 <FaChevronDown className="text-gray-400" />
-              }
+              )}
             </button>
             {expandedLeaseTerms[bedroom.id] && (
               <div className="mt-2 p-3 bg-gray-50 rounded-md border border-gray-200">
@@ -241,10 +294,12 @@ export default function BedroomSection({
         <h2 className="text-xl font-semibold">Bedrooms</h2>
         <div className="flex items-center gap-4">
           <div className="text-sm text-gray-500">
-            <span className="font-medium">{availableBedrooms.length}</span> of <span className="font-medium">{bedrooms.length}</span> rooms available
+            <span className="font-medium">{availableBedrooms.length}</span> of{" "}
+            <span className="font-medium">{bedrooms.length}</span> rooms
+            available
           </div>
           {bookedBedrooms.length >= 0 && (
-            <button 
+            <button
               onClick={() => setShowBookedRooms(!showBookedRooms)}
               className="flex items-center gap-2 bg-black-500 border-2z text-sm text-blue-600 hover:text-blue-700 transition-colors"
             >
@@ -268,15 +323,21 @@ export default function BedroomSection({
       <div className="p-4">
         {/* Available Bedrooms */}
         <div className="space-y-4">
-          {availableBedrooms.map((bedroom, index) => renderBedroomCard(bedroom, index))}
+          {availableBedrooms.map((bedroom, index) =>
+            renderBedroomCard(bedroom, index)
+          )}
         </div>
 
         {/* Booked Bedrooms - only shown when toggle is on */}
         {showBookedRooms && bookedBedrooms.length > 0 && (
           <div className="mt-6">
-            <h3 className="text-lg font-semibold text-gray-600 mb-4">Booked Rooms</h3>
+            <h3 className="text-lg font-semibold text-gray-600 mb-4">
+              Booked Rooms
+            </h3>
             <div className="space-y-4">
-              {bookedBedrooms.map((bedroom, index) => renderBedroomCard(bedroom, index))}
+              {bookedBedrooms.map((bedroom, index) =>
+                renderBedroomCard(bedroom, index)
+              )}
             </div>
           </div>
         )}

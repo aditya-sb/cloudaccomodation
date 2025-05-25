@@ -18,6 +18,10 @@ import {
 import { getCurrencySymbol } from "@/constants/currency";
 import BottomDrawer from "../components/BottomDrawer";
 import ImageSlider from "../components/ImageSlider";
+import { useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
+import { FaAngleDown } from "react-icons/fa";
+import UniversityDistanceInfo from "../components/UniversityDistanceInfo";
 
 const CURRENCY_SYMBOLS = {
   'USD': '$',
@@ -36,6 +40,7 @@ interface BedroomDetail {
   sharedWashroom: boolean;
   furnished: boolean;
   rent: number;
+  _id?: string;
 }
 
 interface PropertyDetailsMobileProps {
@@ -57,6 +62,8 @@ interface PropertyDetailsMobileProps {
   rentPayments?: { type: string; dueDate: string; amount: number }[];
   currency: string;
   country: string;
+  universities: string[];
+  instantBooking?: boolean;
   cancellationPolicy?: string;
   onSiteVerification?: boolean;
   bedroomDetails?: BedroomDetail[];
@@ -64,6 +71,10 @@ interface PropertyDetailsMobileProps {
     allowSecurityDeposit: boolean;
     allowFirstRent: boolean;
     allowFirstAndLastRent: boolean;
+  };
+  propertyLocation: {
+    lat: number;
+    lng: number;
   };
 }
 
@@ -77,6 +88,8 @@ const PropertyDetailsMobile: React.FC<PropertyDetailsMobileProps> = ({
   amenities,
   securityDeposit,
   overview,
+  instantBooking,
+  universities,
   country,
   cancellationPolicy,
   onSiteVerification,
@@ -84,6 +97,9 @@ const PropertyDetailsMobile: React.FC<PropertyDetailsMobileProps> = ({
   bookingOptions,
 }) => {
   const [openDrawer, setOpenDrawer] = useState<"cancellation" | "verification" | null>(null);
+  const router = useRouter();
+  const params = useParams();
+  const propertyId = params?.propertyId || "";
 
   // Function to open specific drawer
   const openCancellationDrawer = () => setOpenDrawer("cancellation");
@@ -145,19 +161,7 @@ const PropertyDetailsMobile: React.FC<PropertyDetailsMobileProps> = ({
   const getPaymentRows = () => {
     const rows: { type: string; dueDate: string; amount: number; }[] = [];
     
-    // Case 1: Security deposit only
-    if (bookingOptions?.allowSecurityDeposit && securityDeposit) {
-      rows.push({
-        type: "Security deposit",
-        dueDate: "Now",
-        amount: securityDeposit
-      });
-      
-      // Return immediately - no other payments when security deposit is required
-      return rows;
-    }
-    
-    // Case 2: First and last rent
+    // Case 1: First and last rent
     if (bookingOptions?.allowFirstAndLastRent) {
       rows.push({
         type: "First month rent",
@@ -171,11 +175,10 @@ const PropertyDetailsMobile: React.FC<PropertyDetailsMobileProps> = ({
         amount: price
       });
       
-      // Return - no security deposit in this case
       return rows;
     }
     
-    // Case 3: First rent only
+    // Case 2: First rent only
     if (bookingOptions?.allowFirstRent) {
       rows.push({
         type: "First month rent",
@@ -183,7 +186,23 @@ const PropertyDetailsMobile: React.FC<PropertyDetailsMobileProps> = ({
         amount: price
       });
       
-      // Return - no security deposit in this case
+      return rows;
+    }
+    
+    // Case 3: Security deposit only
+    if (bookingOptions?.allowSecurityDeposit && securityDeposit) {
+      rows.push({
+        type: "Security deposit",
+        dueDate: "Now",
+        amount: securityDeposit
+      });
+      
+      rows.push({
+        type: "First month rent",
+        dueDate: "On arrival",
+        amount: price
+      });
+      
       return rows;
     }
     
@@ -235,56 +254,14 @@ const PropertyDetailsMobile: React.FC<PropertyDetailsMobileProps> = ({
         </div>
 
         {/* Distance Info */}
-        <div className="space-y-3 border border-blue-400 bg-blue-100 rounded-lg py-5 px-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <MapPin size={16} className="text-gray-600" />
-              <span className="font-medium text-gray-800">
-                1.5 km from{" "}
-                <span className="text-gray-800 font-bold">
-                  University of Toronto
-                </span>
-              </span>
-            </div>
-            <button className="text-blue-600 hover:underline">
-              Select
-              <ChevronRight size={16} className="inline-block mr-1 mb-1" />
-            </button>
-          </div>
-          {/* Transport Options */}
-          <div className="grid grid-cols-4 gap-2">
-            {[
-              { time: 15, icon: <PersonStanding size={16} />, label: "Walk" },
-              { time: 17, icon: <Bike size={16} />, label: "Bike" },
-              { time: 12, icon: <Bus size={16} />, label: "Transit" },
-              { time: 5, icon: <Car size={16} />, label: "Drive" },
-            ].map((item, i) => (
-              <div
-                key={i}
-                className="flex flex-col items-center p-2 bg-gray-100 rounded-md"
-              >
-                {item.icon}
-                <div className="text-sm font-medium text-gray-800">
-                  {item.time} min
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Map and Street View Options */}
-          <div className="flex gap-3 justify-center items-center mt-4">
-            <div className="flex w-fit items-center justify-center px-6 py-2 bg-blue-600 rounded-md">
-              <MapPin size={16} className="text-white" />
-              <span className="ml-2 text-sm font-medium text-white">Map</span>
-            </div>
-            <div className="flex w-fit items-center justify-center px-4 py-2 bg-blue-600 rounded-md">
-              <PersonStanding size={16} className="text-white" />
-              <span className="ml-2 text-sm font-medium text-white">
-                Street
-              </span>
-            </div>
-          </div>
-        </div>
+        <UniversityDistanceInfo 
+          universities={universities}
+          propertyLocation={location}
+          onUniversitySelect={(university) => {
+            // Here you can add logic to fetch distance data for the selected university
+            console.log("Selected university:", university);
+          }}
+        />
 
         {/* Security Deposit */}
         {securityDeposit > 0 && !bookingOptions?.allowSecurityDeposit && (
@@ -349,31 +326,62 @@ const PropertyDetailsMobile: React.FC<PropertyDetailsMobileProps> = ({
           </div>
         </div>
         
-          {/* Booking Options */}{/* Rent Payment Details - Always show this section */}
+        {/* Rent Payment Details - Always show this section */}
         <div className="bg-white rounded-lg shadow p-4 mb-4">
           <div className="flex justify-between items-center mb-3">
             <h3 className="font-semibold text-base">Rent payment</h3>
-            <span className="text-blue-500 text-sm">See rent details</span>
+            {bedroomDetails && bedroomDetails.length > 0 && (
+              <div className="relative">
+                <select 
+                  className="appearance-none bg-white border border-gray-200 rounded-md px-3 py-1 pr-8 text-blue-500 focus:outline-none focus:border-blue-500"
+                  defaultValue={bedroomDetails[0]?.name || "bedroom-1"}
+                  onChange={(e) => {
+                    const selectedBedroom = bedroomDetails.find(
+                      (b) => b.name === e.target.value
+                    );
+                    if (selectedBedroom) {
+                      // Handle bedroom selection if needed
+                    }
+                  }}
+                >
+                  {bedroomDetails.map((bedroom, index) => (
+                    <option key={index} value={bedroom.name || `Bedroom ${index + 1}`}>
+                      {bedroom.name || `Bedroom ${index + 1}`}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-blue-500">
+                  <FaAngleDown className="h-4 w-4" />
+                </div>
+              </div>
+            )}
           </div>
           <div className="border-t border-gray-200 pt-2">
-            <table className="w-full">
-              <thead>
-                <tr className="text-gray-500 text-sm">
-                  <th className="text-left py-1 font-normal">Payment type</th>
-                  <th className="text-left py-1 font-normal">Due date</th>
-                  <th className="text-right py-1 font-normal">Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {paymentRows.map((payment, index) => (
-                  <tr key={index} className="text-sm">
-                    <td className="py-2">{payment.type}</td>
-                    <td className="py-2">{payment.dueDate}</td>
-                    <td className="text-right font-semibold">{currencySymbol}{payment.amount}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="grid grid-cols-3 font-medium text-gray-500 pb-2 border-b">
+              <div>Payment type</div>
+              <div>Due date</div>
+              <div className="text-right">Amount</div>
+            </div>
+
+            {paymentRows.map((row, index) => (
+              <div key={index} className="grid grid-cols-3 py-3 border-b">
+                <div>{row.type}</div>
+                <div>{row.dueDate}</div>
+                <div className="text-right font-medium">{currencySymbol}{row.amount}</div>
+              </div>
+            ))}
+
+            {/* Total amount */}
+            <div className="grid grid-cols-3 py-3 mt-2">
+              <div className="col-span-2 font-medium">Total</div>
+              <div className="text-right font-bold text-blue-600">
+                {currencySymbol}{paymentRows.reduce((sum, row) => sum + row.amount, 0)}
+              </div>
+            </div>
+
+            <div className="flex justify-end mt-2">
+              <a href="#" className="text-blue-500 text-sm">See rent details</a>
+            </div>
           </div>
         </div>
 
@@ -397,14 +405,16 @@ const PropertyDetailsMobile: React.FC<PropertyDetailsMobileProps> = ({
           >
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <div className="flex items-center justify-center w-5 h-5 bg-blue-600 rounded-full text-white">
-                  <Check size={12} />
+                <div className="flex items-center justify-center w-8 h-8 bg-blue-600 rounded-full text-white">
+                  <Check size={16} />
                 </div>
-                <h3 className="font-semibold text-base">On-site Verification</h3>
+                <div>
+                  <h3 className="font-semibold text-base">On-site Verification</h3>
+                  <p className="text-xs text-gray-500">We've verified this property in person</p>
+                </div>
               </div>
               <ChevronRight size={20} className="text-gray-400" />
             </div>
-            <div className="text-xs text-gray-500 mt-1 ml-7">We've verified this property in person</div>
           </div>
         )}
         
@@ -423,7 +433,7 @@ const PropertyDetailsMobile: React.FC<PropertyDetailsMobileProps> = ({
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Square size={16} /> {bedroom.sizeSqFt} sq.ft
                   </div>
-                  <div className="font-semibold text-blue-600">{currencySymbol}{bedroom.rent}</div>
+                  <div className="font-semibold text-blue-600">{currencySymbol}{bedroom.rent} /<span className="text-xs" >month</span></div>
                 </div>
                 <div className="flex flex-wrap gap-2 mt-1">
                   {bedroom.sharedKitchen && (
@@ -441,6 +451,28 @@ const PropertyDetailsMobile: React.FC<PropertyDetailsMobileProps> = ({
                       <Home size={12} /> Furnished
                     </div>
                   )}
+                </div>
+                
+                {/* Add Book/Enquire button */}
+                <div className="mt-4 flex justify-end">
+                  <button
+                    onClick={() => {
+                      if (instantBooking) {
+                        window.location.href = `/booking?propertyId=${encodeURIComponent(
+                          propertyId.toString()
+                        )}&bedRoomId=${encodeURIComponent(
+                          bedroom?._id || ""
+                        )}&bedroomName=${encodeURIComponent(
+                          bedroom.name
+                        )}&price=${encodeURIComponent(bedroom.rent)}`;
+                      } else {
+                        router.push(`/enquiry?propertyId=${encodeURIComponent(propertyId.toString())}&bedroomId=${encodeURIComponent(bedroom?._id || "")}&bedroomName=${encodeURIComponent(bedroom.name)}&price=${encodeURIComponent(bedroom.rent)}`);
+                      }
+                    }}
+                    className="px-6 py-2 rounded-md text-sm font-medium bg-blue-500 hover:bg-blue-600 transition-colors text-white"
+                  >
+                    {instantBooking? "Book" : "Enquire"}
+                  </button>
                 </div>
               </div>
             </div>
