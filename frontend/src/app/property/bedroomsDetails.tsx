@@ -228,7 +228,8 @@ export default function BedroomSection({
                   Booked
                 </button>
               ) : (
-                <button                  onClick={() => {
+                <button
+                  onClick={() => {
                     if (instantBooking) {
                       window.location.href = `/booking?propertyId=${encodeURIComponent(
                         propertyId.toString()
@@ -238,10 +239,9 @@ export default function BedroomSection({
                         bedroom.name
                       )}&price=${encodeURIComponent(bedroom.rent)}`;
                     } else {
-                      router.push(`/enquiry?propertyId=${encodeURIComponent(propertyId.toString())}&bedroomId=${encodeURIComponent(bedroom?._id || "")}&bedroomName=${encodeURIComponent(bedroom.name)}&price=${encodeURIComponent(bedroom.rent)}`);
+                      window.location.href = `/enquiry?propertyId=${encodeURIComponent(propertyId.toString())}&bedroomId=${encodeURIComponent(bedroom?._id || "")}&bedroomName=${encodeURIComponent(bedroom.name)}&price=${encodeURIComponent(bedroom.rent)}`;
                     }
-                  }
-                  }
+                  }}
                   className="px-8 py-2 rounded-md text-sm font-medium bg-blue-500 hover:bg-blue-600 transition-colors text-white"
                 >
                   {instantBooking ? "Book" : "Enquire"}

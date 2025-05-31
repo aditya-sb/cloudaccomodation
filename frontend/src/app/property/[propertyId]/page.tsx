@@ -289,7 +289,7 @@ export default function PropertyPage() {
           </button>
         ) : (
           <button 
-            onClick={() => openBookingPanel("enquiry")}
+            onClick={() => window.location.href = `/enquiry?propertyId=${encodeURIComponent(propertyId as string)}&bedroomName=Default&price=${encodeURIComponent(thisProperty.price)}`}
             className="w-full py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-colors"
           >
             Enquire Now

@@ -1,15 +1,11 @@
 "use client";
 import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  useCreateBookingMutation,
-  useGetPropertiesQuery,
-} from "../redux/slices/apiSlice";
+import { useGetPropertiesQuery, useSubmitEnquiryMutation } from "../redux/slices/apiSlice";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import StripePayment from "../components/payment/StripePayment";
 import Dropdown from "../components/Dropdown";
-import { getCurrencySymbol } from "@/constants/currency";
+import { Toaster } from "react-hot-toast";
 import {
   FaBolt,
   FaDollarSign,
@@ -19,105 +15,18 @@ import {
   FaLocationArrow,
   FaAngleDown,
 } from "react-icons/fa";
+import { toast } from "react-hot-toast";
 
-// Update PaymentResult interface
-interface PaymentResult {
-  paymentId: string;
-  status: string;
-}
-
-// Update BookingData interface
-interface BookingData {
-  userId: string;
-  name: string;
-  dateOfBirth: string;
-  gender: string;
-  nationality: string;
-  email: string;
-  phone: string;
-  address: string;
-  addressLine2?: string;
-  leaseStart: string;
-  leaseEnd?: string | null;
-  moveInDate: string;
-  moveOutDate?: string | null;
-  rentalDays: number;
-  moveInMonth: string;
-  universityName?: string;
-  courseName?: string;
-  universityAddress?: string;
-  enrollmentStatus?: string;
-  hasMedicalConditions: boolean;
-  medicalDetails?: string;
-  propertyId: string;
-  bedroomId?: string;
-  bedroomName: string;
-  price: number;
-  currency: string;
-  leaseDuration: string;
-}
-
-// Add interface for payment details
-interface PaymentDetails {
-  amount: number;
-  currency: string;
-}
-
-// Booking form page component
-function BookingPageContent() {
+// Enquiry form page component
+function EnquiryPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [createBooking, { isLoading, isSuccess, error }] =
-    useCreateBookingMutation();
-
-  // Payment state and handlers
-  const [showPayment, setShowPayment] = useState(false);
+  const [submitEnquiry, { isLoading, isSuccess, error }] = useSubmitEnquiryMutation();
 
   // Get property details from URL params
   const propertyId = searchParams.get("propertyId");
   const bedroomId = searchParams.get("bedroomId");
-  const bedroomName = searchParams.get("bedroomName");
   const price = searchParams.get("price");
-
-  // State for payment modal and booking data
-  const [pendingBookingData, setPendingBookingData] =
-    useState<BookingData | null>(null);
-  const [selectedBedroomId, setSelectedBedroomId] = useState(bedroomId || "");
-  const [selectedBedroomName, setSelectedBedroomName] = useState(bedroomName || "");
-
-  // Handle successful payment
-  const handlePaymentSuccess = async (paymentResult: PaymentResult) => {
-    try {
-      if (pendingBookingData) {
-        // Add payment information to booking data
-        const bookingDataWithPayment = {
-          ...pendingBookingData,
-          paymentIntentId: paymentResult.paymentId,
-          paymentStatus: "completed",
-          status: "confirmed",
-        };
-
-        // Create booking after successful payment
-        const result = await createBooking(bookingDataWithPayment).unwrap();
-
-        if (result) {
-          alert("Booking created successfully!");
-          router.push("/bookings");
-        }
-      }
-    } catch (err) {
-      console.error("Error in payment success handler:", err);
-      alert(
-        "An error occurred while processing your booking. Please try again."
-      );
-    }
-  };
-
-  // Handle payment error
-  const handlePaymentError = (message: string) => {
-    console.error("Payment error:", message);
-    alert(`Payment failed: ${message}`);
-  };
 
   // Fetch property details
   const { data: propertyData, isLoading: isLoadingProperty } =
@@ -125,55 +34,10 @@ function BookingPageContent() {
 
   // Extract the first property from the results
   const property = propertyData?.[0];
-  
   // Find selected bedroom details using bedroomId
   const selectedBedroom = property?.overview?.bedroomDetails?.find(
-    (bed: any) => bed._id === (bedroomId || selectedBedroomId)
+    (bed: any) => bed._id === bedroomId
   );
-
-  // Update form price when bedroom selection changes
-  useEffect(() => {
-    if (property?.overview?.bedroomDetails) {
-      if (bedroomId) {
-        // If bedroomId is in URL, use it
-        const bedroom = property.overview.bedroomDetails.find(
-          (bed: any) => bed._id === bedroomId
-        );
-        if (bedroom) {
-          setSelectedBedroomId(bedroomId);
-          setSelectedBedroomName(bedroom.name);
-          // Update the URL parameters
-          const params = new URLSearchParams(window.location.search);
-          params.set("bedroomId", bedroomId);
-          params.set("bedroomName", bedroom.name);
-          params.set("price", bedroom.rent.toString());
-          window.history.replaceState(
-            {},
-            "",
-            `${window.location.pathname}?${params.toString()}`
-          );
-        }
-      } else if (selectedBedroomId) {
-        // If selectedBedroomId is set but not in URL
-        const bedroom = property.overview.bedroomDetails.find(
-          (bed: any) => bed._id === selectedBedroomId
-        );
-        if (bedroom) {
-          setSelectedBedroomName(bedroom.name);
-          // Update the URL parameters
-          const params = new URLSearchParams(window.location.search);
-          params.set("bedroomId", selectedBedroomId);
-          params.set("bedroomName", bedroom.name);
-          params.set("price", bedroom.rent.toString());
-          window.history.replaceState(
-            {},
-            "",
-            `${window.location.pathname}?${params.toString()}`
-          );
-        }
-      }
-    }
-  }, [property, bedroomId, selectedBedroomId]);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -182,6 +46,7 @@ function BookingPageContent() {
     leaseEnd: "",
     moveInDate: "",
     moveOutDate: "",
+    selectedBedroomId: bedroomId || "",
 
     // Personal details
     fullName: "",
@@ -235,7 +100,12 @@ function BookingPageContent() {
     e.preventDefault();
 
     if (!propertyId) {
-      alert("Property information is missing");
+      toast.error("Property information is missing");
+      return;
+    }
+
+    if (!formData.selectedBedroomId) {
+      toast.error("Please select a bedroom");
       return;
     }
 
@@ -243,96 +113,29 @@ function BookingPageContent() {
       // Get user ID from localStorage
       const token = localStorage.getItem("auth_Token");
       if (!token) {
-        alert("Please login to book a property");
-        router.push("/auth/login?redirect=/booking");
+        toast.error("Please login to submit an enquiry");
+        router.push("/auth/login?redirect=/enquiry");
         return;
       }
 
-      // Extract userId from token
-      const getUserId = () => {
-        try {
-          const base64Url = token.split(".")[1];
-          const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-          const jsonPayload = decodeURIComponent(
-            atob(base64)
-              .split("")
-              .map(function (c) {
-                return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-              })
-              .join("")
-          );
-
-          const parsedToken = JSON.parse(jsonPayload);
-          return parsedToken._id || parsedToken.id;
-        } catch (error) {
-          console.error("Error extracting userId:", error);
-          return null;
-        }
-      };
-
-      const userId = getUserId();
-
-      if (!userId) {
-        alert("User authentication error");
-        return;
-      }
-
-      // Get the selected bedroom details
-      const selectedBedroomDetails = property?.overview?.bedroomDetails?.find(
-        (bedroom: any) => bedroom._id === (bedroomId || selectedBedroomId)
-      );
-
-      if (!selectedBedroomDetails) {
-        alert("Please select a room");
-        return;
-      }
-
-      // Calculate days between move in and move out
-      const moveInDate = new Date(formData.moveInDate);
-      const moveOutDate = formData.moveOutDate
-        ? new Date(formData.moveOutDate)
-        : null;
-      const rentalDays = moveOutDate
-        ? Math.ceil(
-            (moveOutDate.getTime() - moveInDate.getTime()) /
-              (1000 * 60 * 60 * 24)
-          )
-        : 30;
-
-      // Format move-in month for display
-      const moveInMonth = moveInDate.toLocaleString("default", {
-        month: "long",
-        year: "numeric",
-      });
-
-      // Prepare booking data
-      const bookingData = {
-        userId,
-        propertyId,
-        bedroomId: bedroomId || selectedBedroomId,
-        bedroomName: selectedBedroomDetails.name,
+      // Prepare enquiry data
+      const enquiryData = {
         // Personal Information
-        leaseDuration: formData.leaseDuration,
         name: formData.fullName,
         dateOfBirth: formData.dateOfBirth,
         gender: formData.gender,
         nationality: formData.nationality,
         email: formData.emailAddress,
         phone: `${formData.code}${formData.mobileNumber}`,
-
-        // Address Information
         address: formData.address,
         addressLine2: formData.addressLine2,
         country: formData.country,
         stateProvince: formData.stateProvince,
 
-        // Booking Dates
-        leaseStart: formData.moveInDate,
-        leaseEnd: formData.moveOutDate || null,
+        // Accommodation Details
+        leaseDuration: formData.leaseDuration,
         moveInDate: formData.moveInDate,
         moveOutDate: formData.moveOutDate || null,
-        rentalDays,
-        moveInMonth,
 
         // University Information
         universityName: formData.universityName,
@@ -344,52 +147,90 @@ function BookingPageContent() {
         hasMedicalConditions: formData.hasMedicalConditions,
         medicalDetails: formData.medicalDetails,
 
-        // Pricing Information
-        price: selectedBedroomDetails.rent,
+        // Property Information
+        propertyId: propertyId,
+        bedroomId: formData.selectedBedroomId,
+        bedroomName: property?.overview?.bedroomDetails?.find(
+          (bed: any) => bed._id === formData.selectedBedroomId
+        )?.name || "",
+        price: property?.overview?.bedroomDetails?.find(
+          (bed: any) => bed._id === formData.selectedBedroomId
+        )?.rent || property?.price,
         currency: property?.currency || "inr",
       };
 
-      // Store the booking data and show payment modal
-      setPendingBookingData(bookingData);
-      setShowPayment(true);
+      // Submit enquiry using the API slice mutation
+      await submitEnquiry(enquiryData).unwrap();
+      
+      // Show success toast and redirect
+      toast.success("Enquiry submitted successfully!", {
+        duration: 3000,
+        position: "top-center",
+      });
+      
+      // Wait for toast to be visible before redirecting
+      setTimeout(() => {
+        router.push("/");
+      }, 3000);
     } catch (err) {
       console.error("Form submission error:", err);
-      alert(
-        "Failed to process booking. Please check your information and try again."
-      );
+      toast.error("Failed to submit enquiry. Please check your information and try again.", {
+        duration: 3000,
+        position: "top-center",
+      });
     }
   };
 
-  // Effect for success
-  useEffect(() => {
-    if (isSuccess) {
-      alert("Booking created successfully!");
-      router.push("/bookings");
-    }
-  }, [isSuccess, router]);
-
-  // Effect for errors
+  // Effect for errors only
   useEffect(() => {
     if (error) {
       if ("data" in error) {
-        alert((error.data as any)?.error || "An error occurred");
+        toast.error((error.data as any)?.error || "An error occurred", {
+          duration: 3000,
+          position: "top-center",
+        });
       } else {
-        alert("An unexpected error occurred");
+        toast.error("An unexpected error occurred", {
+          duration: 3000,
+          position: "top-center",
+        });
       }
     }
   }, [error]);
 
   return (
     <>
+      <Toaster 
+        position="top-center"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+          success: {
+            duration: 3000,
+            theme: {
+              primary: '#4aed88',
+            },
+          },
+          error: {
+            duration: 3000,
+            theme: {
+              primary: '#ff4b4b',
+            },
+          },
+        }}
+      />
       <Header isPropertyPage={false} />
 
       {/* Thanks Banner */}
-      <div className="max-w-7xl mt-20  mx-auto gap-10 p-2 my-3 flex flex-row max-sm:flex-col items-center">
+      <div className="max-w-7xl mt-20 mx-auto gap-10 p-2 my-3 flex flex-row max-sm:flex-col items-center">
         <div className="flex-shrink-0 max-sm:hidden">
-          <h1 className="text-3xl font-bold text-black-800">Booking Form</h1>
+          <h1 className="text-3xl font-bold text-black-800">Enquiry Form</h1>
         </div>
         <div className="bg-green-100 rounded-lg p-5 w-full flex items-start gap-4">
-          <div className="flex-shrink-0 w-10 h-10  md:ml-6 flex items-center justify-center bg-green-700 rounded-full text-white">
+          <div className="flex-shrink-0 w-10 h-10 md:ml-6 flex items-center justify-center bg-green-700 rounded-full text-white">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-6 w-6"
@@ -406,8 +247,7 @@ function BookingPageContent() {
           <div>
             <h3 className="text-lg font-semibold text-black-800">Thanks !</h3>
             <p className="text-sm text-gray-700">
-              We're excited to receive your request! Fasten up the booking by
-              filling out the details.
+              We're excited to receive your enquiry! Please fill out the details below.
             </p>
           </div>
         </div>
@@ -419,7 +259,6 @@ function BookingPageContent() {
           {/* Left Column - Property Info */}
           <div className="lg:w-[30%] lg:sticky lg:top-4 lg:self-start">
             <div className="bg-white rounded-lg shadow-sm border border-gray-300 rounded-lg p-3 bg-white shadow-sm mb-6 lg:mb-0">
-              {/* <h2 className="text-xl font-semibold mb-4">Property Details</h2> */}
               <div className="flex max-sm:p-2 flex-col items-start gap-4">
                 <div className="w-100 h-50 max-sm:w-full max-sm:mt-8 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
                   {property?.images?.length > 0 && (
@@ -437,12 +276,13 @@ function BookingPageContent() {
                   <p className="text-sm text-gray-600">
                     {property?.location || "Loading..."}
                   </p>
-                  <p className="text-sm text-gray-600 mt-2">
-                    Selected Bedroom: {selectedBedroomName || "Please select a bedroom"}
-                  </p>
+                  {/* <p className="text-sm text-gray-600 mt-2">
+                    Selected Bedroom:{" "}
+                    {selectedBedroom?.name || "Please select a bedroom"}
+                  </p> */}
                   {selectedBedroom && (
                     <p className="text-sm text-gray-600 mt-1">
-                      Price: {getCurrencySymbol(property?.country)}{selectedBedroom.rent.toLocaleString()} per month
+                      Price: ${selectedBedroom.rent.toLocaleString()} per month
                     </p>
                   )}
                 </div>
@@ -486,17 +326,15 @@ function BookingPageContent() {
               </Dropdown>
             </div>
           </div>
-          
 
-          {/* Right Column - Booking Form */}
-          <div className="lg:w-[70%] ">
+          {/* Right Column - Enquiry Form */}
+          <div className="lg:w-[70%]">
             <div className="flex justify-end gap-2 items-center mb-10 max-sm:hidden">
               <p className="text-sm">Need help? We are here.</p>
               <button
                 type="button"
                 className="text-black-500 font-semibold underline text-sm hover:underline"
               >
-                {" "}
                 Contact us
               </button>
             </div>
@@ -516,48 +354,27 @@ function BookingPageContent() {
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Select Room *
-                    </label>
-                    <select
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                      value={selectedBedroomId}
-                      onChange={(e) => {
-                        const selectedId = e.target.value;
-                        setSelectedBedroomId(selectedId);
-                        const selectedBedroom = property?.overview?.bedroomDetails?.find(
-                          (bed: any) => bed._id === selectedId
-                        );
-                        if (selectedBedroom) {
-                          setSelectedBedroomName(selectedBedroom.name);
-                          // Update URL parameters
-                          const params = new URLSearchParams(window.location.search);
-                          params.set("bedroomId", selectedId);
-                          params.set("bedroomName", selectedBedroom.name);
-                          params.set("price", selectedBedroom.rent.toString());
-                          window.history.replaceState(
-                            {},
-                            "",
-                            `${window.location.pathname}?${params.toString()}`
-                          );
-                        }
-                      }}
-                      required
-                    >
-                      <option value="">Select a room</option>
-                      {property?.overview?.bedroomDetails
-                        ?.filter((bedroom: any) => bedroom.status === 'available')
-                        .map((bedroom: any) => (
+                  {!bedroomId && (
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Select Bedroom *
+                      </label>
+                      <select
+                        name="selectedBedroomId"
+                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                        value={formData.selectedBedroomId}
+                        onChange={handleChange}
+                        required
+                      >
+                        <option value="">Select a bedroom</option>
+                        {property?.overview?.bedroomDetails?.map((bedroom: any) => (
                           <option key={bedroom._id} value={bedroom._id}>
-                            {bedroom.name} - {getCurrencySymbol(property?.country)}{bedroom.rent}/month
-                            {bedroom.sizeSqFt ? ` (${bedroom.sizeSqFt} sq ft)` : ''}
-                            {bedroom.furnished ? ' - Furnished' : ''}
-                            {bedroom.privateWashroom ? ' - Private Bathroom' : ''}
+                            {bedroom.name} - ${bedroom.rent}/month
                           </option>
                         ))}
-                    </select>
-                  </div>
+                      </select>
+                    </div>
+                  )}
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -614,7 +431,7 @@ function BookingPageContent() {
                   <h3 className="text-lg font-semibold">Personal Details</h3>
                 </div>
                 <p className="text-sm text-gray-600 mb-4">
-                  Please add details to book your spot
+                  Please add details to submit your enquiry
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -713,20 +530,6 @@ function BookingPageContent() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Email Address *
-                    </label>
-                    <input
-                      type="email"
-                      name="emailAddressConfirm"
-                      placeholder="name@example.com"
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
                       Nationality *
                     </label>
                     <select
@@ -742,7 +545,6 @@ function BookingPageContent() {
                       <option value="india">India</option>
                       <option value="uk">United Kingdom</option>
                       <option value="australia">Australia</option>
-                      {/* Add more countries as needed */}
                     </select>
                   </div>
 
@@ -763,7 +565,7 @@ function BookingPageContent() {
 
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Address line 2 *
+                      Address line 2
                     </label>
                     <input
                       type="text"
@@ -942,10 +744,10 @@ function BookingPageContent() {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                         ></path>
                       </svg>
-                      Processing...
+                      Submitting...
                     </>
                   ) : (
-                    "Save and Next →"
+                    "Submit Enquiry"
                   )}
                 </button>
               </div>
@@ -953,43 +755,16 @@ function BookingPageContent() {
           </div>
         </div>
       </div>
-      <StripePayment
-        displayData={{
-          ...pendingBookingData,
-          userId: "pending",
-          leaseDuration: formData.leaseDuration,
-          name: formData.fullName,
-          email: formData.emailAddress,
-          phone: `${formData.code}${formData.mobileNumber}`,
-          rentalDays: pendingBookingData?.rentalDays || 30,
-          moveInDate: formData.moveInDate,
-          moveInMonth: new Date(formData.moveInDate).toLocaleString("default", {
-            month: "long",
-            year: "numeric",
-          }),
-          propertyId: propertyId || "",
-          price: pendingBookingData?.price || 0,
-          currency: pendingBookingData?.currency || "inr",
-        }}
-        paymentDetails={{
-          amount: pendingBookingData?.price || 0,
-          currency: pendingBookingData?.currency || "inr",
-        }}
-        isOpen={showPayment}
-        onClose={() => setShowPayment(false)}
-        onSuccess={handlePaymentSuccess}
-        onError={handlePaymentError}
-      />
       <Footer />
     </>
   );
 }
 
 // Wrapper component with Suspense
-export default function BookingPage() {
+export default function EnquiryPage() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <BookingPageContent />
+      <EnquiryPageContent />
     </Suspense>
   );
-}
+} 
