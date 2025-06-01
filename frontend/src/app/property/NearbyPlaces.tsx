@@ -70,7 +70,7 @@ const NearbyPlaces: React.FC<NearbyPlacesProps> = ({ latitude, longitude, locati
     { type: 'university', label: 'Education', icon: <FaGraduationCap />, color: '#448AFF' },
     { type: 'transit_station', label: 'Transport', icon: <FaSubway />, color: '#FF9800' },
     { type: 'hospital', label: 'Healthcare', icon: <FaHospital />, color: '#4CAF50' },
-    { type: 'office', label: 'Offices', icon: <FaBriefcase />, color: '#607D8B' }
+    // { type: 'office', label: 'Offices', icon: <FaBriefcase />, color: '#607D8B' }
   ];
 
   const GOOGLE_PLACES_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY || '';

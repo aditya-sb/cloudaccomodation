@@ -45,6 +45,8 @@ export default function PropertyPage() {
   const [bedroomInView, setBedroomInView] = useState<BedroomSectionDetail | null>(null);
   const [selectedBedroomForBooking, setSelectedBedroomForBooking] = useState<BookingBedroomDetail | null>(null);
   const bedroomSectionRef = useRef<HTMLDivElement>(null);
+  const nearbyPlacesRef = useRef<HTMLDivElement>(null);
+  const rentDetailsRef = useRef<HTMLDivElement>(null);
   const [bookingFormType, setBookingFormType] = useState<"booking" | "enquiry" | null>(null);
   const [isBookingMinimized, setIsBookingMinimized] = useState(true);
 
@@ -342,6 +344,12 @@ export default function PropertyPage() {
               currency={thisProperty?.currency}
               latitude={thisProperty?.latitude}
               longitude={thisProperty?.longitude}
+              onExploreNearbyClick={() => {
+                nearbyPlacesRef.current?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              onRentDetailsClick={() => {
+                rentDetailsRef.current?.scrollIntoView({ behavior: 'smooth' });
+              }}
             />
           </div>
           <div className="block md:hidden">
@@ -387,12 +395,13 @@ export default function PropertyPage() {
           </div>
 
           {/* Payment Details Section */}
-          {renderRentPaymentDetails()}
-          {renderCancellationPolicy(thisProperty?.cancellationPolicy)}
-          {/* {renderLeaseTerms()} */}
+          <div ref={rentDetailsRef}>
+            {renderRentPaymentDetails()}
+            {renderCancellationPolicy()}
+          </div>
 
           {/* NearbyPlaces component */}
-          <div className="mt-6 bg-white rounded-lg shadow-sm">
+          <div ref={nearbyPlacesRef} className="mt-6 bg-white rounded-lg shadow-sm">
             {/* <h2 className="text-2xl font-semibold p-4 border-b">Explore Nearby Places</h2> */}
             {thisProperty?.latitude && thisProperty?.longitude ? (
               <NearbyPlaces 

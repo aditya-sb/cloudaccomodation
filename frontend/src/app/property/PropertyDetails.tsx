@@ -30,6 +30,8 @@ const PropertyDetails = ({
   country,
   latitude,
   longitude,
+  onExploreNearbyClick,
+  onRentDetailsClick,
 }: {
   title: string;
   location: string;
@@ -44,6 +46,8 @@ const PropertyDetails = ({
   country: string;
   latitude?: number;
   longitude?: number;
+  onExploreNearbyClick?: () => void;
+  onRentDetailsClick?: () => void;
 }) => {
   const currencySymbol = getCurrencySymbol(country);
   const [activeSection, setActiveSection] = React.useState('overview'); // state to track selected section
@@ -140,7 +144,10 @@ const PropertyDetails = ({
           <span>Amenities</span>
         </button>
         <button
-          onClick={() => setActiveSection('exploreNearby')}
+          onClick={() => {
+            setActiveSection('exploreNearby');
+            onExploreNearbyClick?.();
+          }}
           className={`flex items-center space-x-2 px-3 py-2 text-sm md:text-[16px] transition ${
             activeSection === 'exploreNearby'
               ? 'text-[var(--copy-primary)] font-bold'
@@ -151,7 +158,10 @@ const PropertyDetails = ({
           <span>Explore Nearby</span>
         </button>
         <button
-          onClick={() => setActiveSection('rentDetails')}
+          onClick={() => {
+            setActiveSection('rentDetails');
+            onRentDetailsClick?.();
+          }}
           className={`flex items-center space-x-2 px-3 py-2 text-sm md:text-[16px] transition ${
             activeSection === 'rentDetails'
               ? 'text-[var(--copy-primary)] font-bold'
@@ -204,15 +214,15 @@ const PropertyDetails = ({
                 <FaRuler className="mr-2 text-blue-500" />
                 <span>{overview?.squareFeet} sq.ft</span>
               </div>
-              <div className="flex items-center mb-2">
+              {/* <div className="flex items-center mb-2">
                 <FaCalendarAlt className="mr-2 text-blue-500" />
-                <span>Year of Construction: 2020</span>
-              </div>
+                <span></span>
+              </div> */}
             </div>
-            <div className="mt-4 text-[var(--copy-secondary)]">
+            {/* <div className="mt-4 text-[var(--copy-secondary)]">
               <p>North facing</p>
               <p>Semi furnished</p>
-            </div>
+            </div> */}
           </div>
         )}
         
@@ -232,7 +242,7 @@ const PropertyDetails = ({
           </div>
         )}
 
-        {activeSection === 'exploreNearby' && (
+        {/* {activeSection === 'exploreNearby' && (
           <div>
               {latitude && longitude && (
                 <Map 
@@ -243,9 +253,9 @@ const PropertyDetails = ({
               )}
            
           </div>
-        )}
+        )} */}
 
-        {activeSection === 'rentDetails' && (
+        {/* {activeSection === 'rentDetails' && (
           <div>
             <h3 className="text-xl font-semibold mb-4">Rent Details</h3>
             <div className="space-y-4">
@@ -272,7 +282,7 @@ const PropertyDetails = ({
               </div>
             </div>
           </div>
-        )}
+        )} */}
 
         {activeSection === 'termsOfStay' && (
           <div>
