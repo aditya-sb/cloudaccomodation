@@ -38,6 +38,8 @@ export const handleLogin = async (token: string): Promise<boolean> => {
       const userData = await response.json();
       // Here you could store user data in a state management solution if needed
       notifyAuthStateChange();
+      setAuthToken(token);
+
       return true;
     } else {
       console.error('Failed to validate user token');

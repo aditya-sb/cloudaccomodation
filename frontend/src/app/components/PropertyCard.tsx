@@ -117,11 +117,11 @@ export default function PropertyCard({
             <span className="flex justify-center items-center gap-1 text-lg font-bold text-gray-800">
               {currencySymbol}{formatPrice(price)}<p className="text-sm">/month</p>
             </span>
-            <div className="flex items-center space-x-1">
+            {/* <div className="flex items-center space-x-1">
               <FaStar className="text-yellow-500" />
               <span className="text-sm text-gray-700 font-medium">{rating}</span>
               <span className="text-sm text-gray-500">({reviewsCount} reviews)</span>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

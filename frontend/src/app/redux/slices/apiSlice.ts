@@ -50,7 +50,7 @@ export const apiSlice = createApi({
     return result;
   },
 
-  tagTypes: ["User", "Auth", "Property", "Booking", "Dashboard", "Payment", "Enquiry", "Review"], 
+  tagTypes: ["User", "Auth", "Property", "Booking", "Dashboard", "Payment", "Enquiry", "Review", "Verification"], 
   endpoints: (builder) => ({
     register: builder.mutation({
       query: (userData) => ({
@@ -77,6 +77,22 @@ export const apiSlice = createApi({
         body: googleUserData,
       }),
       invalidatesTags: ["User", "Auth"],
+    }),
+    verifyEmail: builder.mutation({
+      query: ({ email, otp }) => ({
+        url: "/user/verify-email",
+        method: "POST",
+        body: { email, otp },
+      }),
+      invalidatesTags: ["User", "Verification"],
+    }),
+    resendVerification: builder.mutation({
+      query: ({ email }) => ({
+        url: "/user/resend-verification",
+        method: "POST",
+        body: { email },
+      }),
+      invalidatesTags: ["Verification"],
     }),
     getUserDetails: builder.query({
       query: () => "/user/getUserDetails",
@@ -319,6 +335,8 @@ export const apiSlice = createApi({
 export const {
   useRegisterMutation,
   useLoginMutation,
+  useVerifyEmailMutation,
+  useResendVerificationMutation,
   useGoogleAuthMutation,
   useGetUserDetailsQuery,
   useSaveUserDetailsMutation,

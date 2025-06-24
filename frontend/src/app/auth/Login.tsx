@@ -43,7 +43,7 @@ const Login: React.FC<LoginProps> = ({ openForgetPassword }) => {
       .then(async (response) => {
         setMessage({ type: "success", text: response.message });
         
-        const loginSuccess = await handleLogin(response.signature);
+        const loginSuccess = await handleLogin(response.token);
         
         if (loginSuccess) {
           notifyAuthStateChange();

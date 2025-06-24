@@ -54,19 +54,22 @@ const ExploreProperties = () => {
           >
             All Cities
           </button> */}
-          {canadianCities.map((city) => (
-            <button
-              key={city}
-              onClick={() => setSelectedCity(city)}
-              className={`px-4 py-2 rounded-full text-sm ${
-                selectedCity === city
-                  ? "bg-blue-100 text-blue-700 border border-blue-400"
-                  : "bg-white hover:bg-blue-50 border border-gray-200"
-              }`}
-            >
-              {city}
-            </button>
-          ))}
+          <div className="flex overflow-x-auto gap-1 sm:flex-wrap sm:justify-center md:justify-start" style={{ overflowX: "scroll", scrollbarWidth: "none" }}>
+            {canadianCities.map((city) => (
+              <button
+                key={city}
+                onClick={() => setSelectedCity(city)}
+                className={`px-4 py-2 rounded-full text-sm ${
+                  selectedCity === city
+                    ? "bg-blue-100 text-blue-700 border border-blue-400"
+                    : "bg-white hover:bg-blue-50 border border-gray-200"
+                } sm:mr-2 sm:mb-2 md:mr-4 md:mb-0`}
+                style={{ whiteSpace: "nowrap" }}
+              >
+                {city}
+              </button>
+            ))}
+          </div>
         </div>
 
         {properties && properties.length >= maxPropertiesToShow && (

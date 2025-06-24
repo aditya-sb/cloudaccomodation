@@ -193,7 +193,17 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
                 <FaSignInAlt className="mr-2" /> Log In
               </button>
               <button
-                onClick={() => openModal(<Register />)}
+                onClick={() => {
+                  const openLoginModal = () => {
+                    closeModal();
+                    openModal(
+                      <Login
+                        openForgetPassword={() => openModal(<ForgetPassword />)}
+                      />
+                    );
+                  };
+                  openModal(<Register onOpenLogin={openLoginModal} />);
+                }}
                 className="flex items-center px-4 py-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors"
               >
                 <FaUserPlus className="mr-2" /> Sign Up

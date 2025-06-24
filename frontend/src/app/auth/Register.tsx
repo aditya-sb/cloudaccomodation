@@ -1,28 +1,81 @@
 "use client";
-import React, { useState } from "react";
-import {
-  Mail,
-  User,
-  Lock,
-  CheckCircle2,
-  Loader2,
-  Eye,
-  EyeOff,
-} from "lucide-react";
-import { useRegisterMutation } from "../redux/slices/apiSlice";
+import { useState, useEffect } from "react";
+import { Mail, User, Lock, Eye, EyeOff, X, Loader2, CheckCircle2 } from "lucide-react";
+import { FcGoogle } from "react-icons/fc";
+import Link from "next/link";
+import { useRegisterMutation, useVerifyEmailMutation, useResendVerificationMutation } from "../redux/slices/apiSlice";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
+import VerifyEmail from './VerifyEmail';
+import toast, { Toaster } from 'react-hot-toast';
 
-const Register = () => {
+interface RegisterProps {
+  onOpenLogin?: () => void;
+}
+
+const Register: React.FC<RegisterProps> = ({ onOpenLogin }) => {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [showVerification, setShowVerification] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState('');
+  const [userId, setUserId] = useState('');
   const [message, setMessage] = useState({ type: "", text: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
-
   const [register, { isLoading }] = useRegisterMutation();
   const router = useRouter();
+
+  // Show success toast and reload the page
+  const handleVerificationComplete = () => {
+    // Show success toast
+    toast.success('Email verified successfully! Redirecting...', {
+      position: 'top-right',
+      duration: 2000,
+    });
+    
+    // Close the verification modal
+    setShowVerification(false);
+    
+    // Reload the page after the toast is shown
+    setTimeout(() => {
+      window.location.reload();
+    }, 2000);
+  };
+
+  // Check for verification success on component mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const showSuccess = sessionStorage.getItem('showVerificationSuccess');
+      if (showSuccess === 'true') {
+        toast.success('Email verified successfully!', {
+          position: 'top-right',
+          duration: 4000,
+        });
+        sessionStorage.removeItem('showVerificationSuccess');
+      }
+    }
+  }, []);
+
+  const handleResendVerification = async () => {
+    try {
+      const response = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: verificationEmail })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setMessage({ type: 'success', text: data.message || 'Verification code resent!' });
+      } else {
+        setMessage({ type: 'error', text: data.message || 'Failed to resend verification code' });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'An error occurred while resending the code' });
+    }
+  };
   
   const checkPasswordStrength = (password: string) => {
     let strength = 0;
@@ -33,7 +86,7 @@ const Register = () => {
     setPasswordStrength(strength);
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setMessage({ type: "", text: "" });
 
@@ -73,31 +126,36 @@ const Register = () => {
       return;
     }
 
-    // Call the mutation
-    register({
-      email: data.email,
-      username: data.username,
-      password: data.password,
-    })
-      .unwrap()
-      .then((response) => {
-        if (response.message === "User already registered") {
-          setMessage({ type: "error", text: response.message });
-          form.reset();
-        } else {
-          setMessage({ type: "success", text: response.message });
-
-          // Optional: Redirect to login page
-          setTimeout(() => {router.push("/login");
-          }, 1000); 
-        }
-      })
-      .catch((error: any) => {
-        setMessage({
-          type: "error",
-          text: error.data?.message || "Registration failed",
+    try {
+      setLoading(true);
+      const response = await register({
+        email: data.email,
+        username: data.username,
+        password: data.password,
+      }).unwrap();
+      
+      if (response.success) {
+        setVerificationEmail(data.email);
+        setUserId(response.user?._id || '');
+        setShowVerification(true);
+        setMessage({ 
+          type: "success", 
+          text: response.message || "Verification code sent to your email." 
         });
+      } else {
+        setMessage({ 
+          type: "error", 
+          text: response.message || "Registration failed. Please try again." 
+        });
+      }
+    } catch (error: any) {
+      setMessage({
+        type: "error",
+        text: error.data?.message || "Registration failed. Please try again.",
       });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGoogleSignUp = async () => {
@@ -115,13 +173,45 @@ const Register = () => {
   };
 
   return (
-    <div className="w-full max-w-xl space-y-6 p-6 rounded-xl">
+    <div className="w-full max-w-xl space-y-6 p-6 rounded-xl relative">
+      {/* Toast container */}
+      <Toaster position="top-right" />
+      {/* Close button */}
+      <button 
+        onClick={() => router.push('/')}
+        className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-100 transition-colors"
+        aria-label="Close"
+      >
+        <X className="h-5 w-5 text-gray-500" />
+      </button>
+      
       <div className="space-y-2 text-center">
         <h1 className="text-2xl font-bold tracking-tight">Create an Account</h1>
         <p className="text-sm text-muted-foreground">
           Enter your details to register
         </p>
       </div>
+      
+      {/* Verification Modal */}
+      {showVerification && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg w-full max-w-md p-6 relative">
+            <button 
+              onClick={() => setShowVerification(false)}
+              className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-100 transition-colors"
+              aria-label="Close"
+            >
+              <X className="h-5 w-5 text-gray-500" />
+            </button>
+            <VerifyEmail 
+              email={verificationEmail}
+              userId={userId}
+              onVerificationComplete={handleVerificationComplete}
+              onResendVerification={handleResendVerification}
+            />
+          </div>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
       {/* Grid container for form fields */}
