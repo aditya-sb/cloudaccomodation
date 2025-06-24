@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import {
   useCreateBookingMutation,
   useGetPropertiesQuery,
+  useGetUserDetailsQuery,
 } from "../redux/slices/apiSlice";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -54,6 +55,8 @@ interface BookingData {
   bedroomName: string;
   price: number;
   currency: string;
+  country: string;
+  stateProvince: string;
   leaseDuration: string;
 }
 
@@ -79,11 +82,92 @@ function BookingPageContent() {
   const bedroomName = searchParams.get("bedroomName");
   const price = searchParams.get("price");
 
+  // Get user details
+  const { data: userData } = useGetUserDetailsQuery({}, {
+    // skip: !localStorage.getItem("auth_Token"),
+  });
+  console.log("userData", userData);
   // State for payment modal and booking data
-  const [pendingBookingData, setPendingBookingData] =
-    useState<BookingData | null>(null);
+  const [pendingBookingData, setPendingBookingData] = useState<BookingData | null>(null);
   const [selectedBedroomId, setSelectedBedroomId] = useState(bedroomId || "");
   const [selectedBedroomName, setSelectedBedroomName] = useState(bedroomName || "");
+  
+  // Form state with user data prefilled
+  const [formData, setFormData] = useState<{
+    // Accommodation details
+    leaseStart: string;
+    leaseEnd: string;
+    moveInDate: string;
+    moveOutDate: string;
+    
+    // Personal details
+    fullName: string;
+    leaseDuration: string;
+    dateOfBirth: string;
+    gender: string;
+    code: string;
+    mobileNumber: string;
+    emailAddress: string;
+    nationality: string;
+    address: string;
+    addressLine2: string;
+    country: string;
+    stateProvince: string;
+    
+    // Medical conditions
+    hasMedicalConditions: boolean;
+    medicalDetails: string;
+    
+    // University details
+    universityName: string;
+    courseName: string;
+    universityAddress: string;
+    enrollmentStatus: string;
+  }>({
+    // Accommodation details
+    leaseStart: "",
+    leaseEnd: "",
+    moveInDate: "",
+    moveOutDate: "",
+    
+    // Personal details
+    fullName: userData?.user?.username || "",
+    leaseDuration: "",
+    dateOfBirth: "",
+    gender: "",
+    code: "",
+    mobileNumber: userData?.user?.phone_no || "",
+    emailAddress: userData?.user?.email || "",
+    nationality: userData?.user?.country_name || "",
+    address: "",
+    addressLine2: "",
+    country: "",
+    stateProvince: "",
+    
+    // Medical conditions
+    hasMedicalConditions: false,
+    medicalDetails: "",
+    
+    // University details
+    universityName: "",
+    courseName: "",
+    universityAddress: "",
+    enrollmentStatus: "",
+  });
+
+  // Update form data when user data is loaded
+  useEffect(() => {
+    if (userData?.user) {
+      setFormData(prev => ({
+        ...prev,
+        fullName: userData.user.username || prev.fullName,
+        emailAddress: userData.user.email || prev.emailAddress,
+        mobileNumber: userData.user.phone_no || prev.mobileNumber,
+        nationality: userData.user.country_name || prev.nationality,
+        // country: userData.user.country_code || prev.country
+      }));
+    }
+  }, [userData]);
 
   // Handle successful payment
   const handlePaymentSuccess = async (paymentResult: PaymentResult) => {
@@ -175,38 +259,7 @@ function BookingPageContent() {
     }
   }, [property, bedroomId, selectedBedroomId]);
 
-  // Form state
-  const [formData, setFormData] = useState({
-    // Accommodation details
-    leaseStart: "",
-    leaseEnd: "",
-    moveInDate: "",
-    moveOutDate: "",
-
-    // Personal details
-    fullName: "",
-    leaseDuration: "",
-    dateOfBirth: "",
-    gender: "",
-    code: "",
-    mobileNumber: "",
-    emailAddress: "",
-    nationality: "",
-    address: "",
-    addressLine2: "",
-    country: "",
-    stateProvince: "",
-
-    // Medical conditions
-    hasMedicalConditions: false,
-    medicalDetails: "",
-
-    // University details
-    universityName: "",
-    courseName: "",
-    universityAddress: "",
-    enrollmentStatus: "",
-  });
+  // Form state is already defined above with user data prefilled
 
   // Handle form input changes
   const handleChange = (
@@ -305,48 +358,49 @@ function BookingPageContent() {
         year: "numeric",
       });
 
-      // Prepare booking data
-      const bookingData = {
+      // Prepare booking data with proper type safety
+      const bookingData: BookingData = {
         userId,
-        propertyId,
-        bedroomId: bedroomId || selectedBedroomId,
-        bedroomName: selectedBedroomDetails.name,
+        propertyId: propertyId || "",
+        bedroomId: bedroomId || selectedBedroomId || "",
+        bedroomName: selectedBedroomDetails?.name || "",
+        
         // Personal Information
-        leaseDuration: formData.leaseDuration,
-        name: formData.fullName,
-        dateOfBirth: formData.dateOfBirth,
-        gender: formData.gender,
-        nationality: formData.nationality,
-        email: formData.emailAddress,
-        phone: `${formData.code}${formData.mobileNumber}`,
-
+        name: formData.fullName || "",
+        email: formData.emailAddress || "",
+        phone: formData.mobileNumber || "",
+        dateOfBirth: formData.dateOfBirth || "",
+        gender: formData.gender || "",
+        nationality: formData.nationality || "",
+        
         // Address Information
-        address: formData.address,
-        addressLine2: formData.addressLine2,
-        country: formData.country,
-        stateProvince: formData.stateProvince,
-
+        address: formData.address || "",
+        addressLine2: formData.addressLine2 || "",
+        country: formData.country || "",
+        stateProvince: formData.stateProvince || "",
+        
         // Booking Dates
-        leaseStart: formData.moveInDate,
+        leaseStart: formData.moveInDate || "",
         leaseEnd: formData.moveOutDate || null,
-        moveInDate: formData.moveInDate,
+        moveInDate: formData.moveInDate || "",
         moveOutDate: formData.moveOutDate || null,
-        rentalDays,
-        moveInMonth,
-
+        rentalDays: rentalDays || 0,
+        moveInMonth: moveInMonth || "",
+        
         // University Information
-        universityName: formData.universityName,
-        courseName: formData.courseName,
-        universityAddress: formData.universityAddress,
-        enrollmentStatus: formData.enrollmentStatus,
-
+        universityName: formData.universityName || "",
+        courseName: formData.courseName || "",
+        universityAddress: formData.universityAddress || "",
+        enrollmentStatus: formData.enrollmentStatus || "",
+        
         // Medical Information
-        hasMedicalConditions: formData.hasMedicalConditions,
-        medicalDetails: formData.medicalDetails,
-
+        hasMedicalConditions: formData.hasMedicalConditions || false,
+        medicalDetails: formData.medicalDetails || "",
+        
         // Pricing Information
-        price: selectedBedroomDetails.rent,
-        currency: property?.currency || "inr",
+        price: selectedBedroomDetails?.rent || 0,
+        currency: property?.currency || "GBP",
+        leaseDuration: formData.leaseDuration || ""
       };
 
       // Store the booking data and show payment modal
@@ -706,20 +760,6 @@ function BookingPageContent() {
                       placeholder="name@example.com"
                       className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                       value={formData.emailAddress}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Email Address *
-                    </label>
-                    <input
-                      type="email"
-                      name="emailAddressConfirm"
-                      placeholder="name@example.com"
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                       onChange={handleChange}
                       required
                     />

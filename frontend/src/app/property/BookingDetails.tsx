@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
+import { BedroomDetail } from "./BedroomDetails";
 import {
   FaAngleDown,
   FaArrowRight,
@@ -13,7 +14,7 @@ import dynamic from 'next/dynamic';
 import StripePayment from '../components/payment/StripePayment'; // Adjust the path as necessary
 import isAuthenticated from "@/utils/auth-util";
 import Login from "../auth/Login";
-import SelectedBedroomDropdown, { BedroomDetail } from "../components/SelectedBedroomDropdown";
+import SelectedBedroomDropdown from "../components/SelectedBedroomDropdown";
 
 // Country code mapping
 const COUNTRY_CODES: Record<string, string> = {
@@ -187,8 +188,6 @@ const BookingForm = ({ price, propertyId, currency, securityDeposit, bookingOpti
   };
 
   const handlePaymentSuccess = async () => {
-    alert("Payment successful! Your booking is being created.");
-    
     const bookingData = {
       name,
       email,
@@ -199,20 +198,37 @@ const BookingForm = ({ price, propertyId, currency, securityDeposit, bookingOpti
       price: selectedBedroom ? selectedBedroom.rent : price,
       selectedBedroomName: selectedBedroom ? selectedBedroom.name : undefined,
       bedroomName: selectedBedroom ? selectedBedroom.name : undefined,
+      bedroomId: selectedBedroom?._id,
       currency: currency || "inr",
       securityDeposit: paymentDetails.securityDeposit || 0,
-      lastMonthPayment: paymentDetails.lastMonthPayment || 0
+      lastMonthPayment: paymentDetails.lastMonthPayment || 0,
+      moveInDate: new Date(), // Set actual move-in date as needed
+      status: 'confirmed',
+      paymentStatus: 'completed'
     };
 
     try {
-      // Commenting out API call
-      // const response = await createBooking(bookingData).unwrap();
-      // console.log("Booking created successfully:", response);
-      // setBookingId(response.booking._id);
+      const response = await createBooking(bookingData).unwrap();
+      console.log("Booking created successfully:", response);
       
-      console.log("Booking data:", bookingData); // For debugging
-      setBookingId("mock-booking-id"); // Mock booking ID
+      // Show success message with link to view booking
+      alert(`Payment successful! Your booking has been confirmed. A confirmation has been sent to ${email}. You can view your booking details at any time from the 'My Bookings' section.`);
+      
+      // Store booking ID in state and local storage for reference
+      setBookingId(response.booking._id);
+      localStorage.setItem('recentBooking', JSON.stringify({
+        id: response.booking._id,
+        propertyId: response.booking.propertyId,
+        date: new Date().toISOString()
+      }));
+      
+      // Close payment modal
       setShowPayment(false);
+      
+      // Redirect to bookings page after a short delay to allow user to see the success message
+      setTimeout(() => {
+        window.location.href = '/bookings';
+      }, 2000);
     } catch (error) {
       console.error("Error creating booking:", error);
       setError("Failed to create booking. Please try again.");

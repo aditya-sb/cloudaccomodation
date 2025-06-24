@@ -21,6 +21,7 @@ import { useTheme } from "../ThemeContext";
 import isAuthenticated from "@/utils/auth-util";
 import { useGetUserDetailsQuery } from "../redux/slices/apiSlice";
 import Loader from "@/loader/loader";
+import { useRouter } from "next/navigation";
 import Bookings from "./bookings/Bookings";
 
 export default function LightHeader() {
@@ -33,6 +34,8 @@ export default function LightHeader() {
     skip: !isAuthenticatedUser
   });
   console.log(data);
+
+  const router = useRouter();
 
   useEffect(() => {
     const checkAuth = () => {
@@ -120,7 +123,7 @@ export default function LightHeader() {
                 <FaComments className="text-xl mr-2 text-blue-500" /> Chat
               </button>
               <button
-                onClick={() => openModal(<Bookings />)}
+                onClick={() => router.push('/bookings')}
                 className="flex items-center px-4 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
               >
                 <FaBookmark className="text-xl mr-2 text-blue-500" /> Bookings

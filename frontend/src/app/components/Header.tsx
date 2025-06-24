@@ -172,7 +172,7 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
                 <FaComments className="text-lg mr-2" /> Chat
               </button>
               <button
-                onClick={() => openModal(<Bookings />)}
+                onClick={() => router.push('/bookings')}
                 className="flex items-center hover:text-blue-500 transition-colors"
               >
                 <FaBookmark className="text-lg mr-2" /> Bookings

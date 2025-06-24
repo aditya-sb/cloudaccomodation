@@ -13,6 +13,8 @@ import {
   useConfirmPaymentMutation,
 } from "../../redux/slices/apiSlice";
 import { FaLock, FaCreditCard, FaSpinner, FaTimes } from "react-icons/fa";
+import { toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 // Initialize Stripe with your publishable key
 const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '';
@@ -119,19 +121,23 @@ const PaymentModal = ({ isOpen, onClose, children }) => {
   );
 };
 
-// The checkout form component
-const CheckoutForm = ({
-  displayData,
-  paymentDetails,
-  onSuccess,
-  onError,
-  onClose,
-}: {
+interface CheckoutFormProps {
   displayData: BookingDetails;
   paymentDetails: PaymentDetails;
   onSuccess: (paymentResult: PaymentResult) => void;
   onError: (message: string) => void;
   onClose: () => void;
+  children?: React.ReactNode;
+}
+
+// The checkout form component
+const CheckoutForm: React.FC<CheckoutFormProps> = ({
+  displayData,
+  paymentDetails,
+  onSuccess,
+  onError,
+  onClose,
+  children
 }) => {
   const stripe = useStripe();
   const elements = useElements();
@@ -148,11 +154,13 @@ const CheckoutForm = ({
 
     if (!stripe || !elements) {
       setError("Payment system is not initialized. Please try again.");
+      toast.error("Payment system is not initialized. Please try again.");
       return;
     }
 
     setProcessing(true);
     setError(null);
+    const loadingToast = toast.loading("Processing your payment...");
 
     try {
       // Get token from localStorage and extract userId
@@ -181,9 +189,14 @@ const CheckoutForm = ({
         throw new Error("Failed to get user ID from token");
       }
 
+      // Calculate total amount including security deposit and last month's payment
+      const securityDeposit = displayData.securityDeposit ?? 0;
+      const lastMonthPayment = displayData.lastMonthPayment ?? 0;
+      const totalAmount = paymentDetails.amount + securityDeposit + lastMonthPayment;
+
       // Create payment intent with minimal data
       const response = await createPaymentIntent({
-        amount: paymentDetails.amount,
+        amount: totalAmount,
         currency: paymentDetails.currency
       }).unwrap();
 
@@ -230,22 +243,51 @@ const CheckoutForm = ({
       } else {
         throw new Error(`Payment status: ${paymentIntent.status}`);
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Payment error:", err);
-      if (err.message.includes("Indian regulations")) {
+      const errorMessage = err instanceof Error ? err.message : "Payment processing failed. Please try again.";
+      
+      if (errorMessage.includes("Indian regulations")) {
         onSuccess({ paymentId: "success", status: "succeeded" });
         return;
       }
-      setError("Payment processing failed. Please try again.");
-      onError("Payment processing failed. Please try again.");
+      
+      setError(errorMessage);
+      onError(errorMessage);
+      
+      // Show error toast
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+      toast.update(loadingToast, { 
+        render: errorMessage, 
+        type: "error", 
+        isLoading: false,
+        autoClose: 5000,
+        closeButton: true
+      });
     } finally {
       setProcessing(false);
+      if (!error) {
+        toast.dismiss(loadingToast);
+      }
     }
   };
 
   // Add helper function to handle successful payments
-  const handleSuccessfulPayment = async (paymentIntent) => {
+  const handleSuccessfulPayment = async (paymentIntent: {
+    id: string;
+    status: string;
+    [key: string]: any;
+  }) => {
     try {
+      toast.dismiss();
+      const loadingToast = toast.loading("Confirming your payment...");
       const confirmResponse = await confirmPayment({
         paymentIntentId: paymentIntent.id
       }).unwrap();
