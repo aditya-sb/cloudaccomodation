@@ -47,7 +47,7 @@ export default function SearchBar() {
       style={{ height: "540px" }}
     >
       <Image
-        src="/images/bg2.jpg"
+        src="/images/bg3.png"
         alt="Cityscape"
         layout="fill"
         objectFit="cover"

@@ -2,13 +2,25 @@
 import React, { useState } from "react";
 import { Mail, Lock, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useLoginMutation } from "../redux/slices/apiSlice";
+import { useLoginMutation, useVerifyOtpMutation, useResendVerificationMutation } from "../redux/slices/apiSlice";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
 import { handleLogin, notifyAuthStateChange } from "../../utils/auth-util";
+import VerifyEmail from "./VerifyEmail";
+import toast from 'react-hot-toast';
 
 interface LoginProps {
   openForgetPassword: () => void;
+}
+
+interface FormValues {
+  email: string;
+  password: string;
+}
+
+interface FormValues {
+  email: string;
+  password: string;
 }
 
 const Login: React.FC<LoginProps> = ({ openForgetPassword }) => {
@@ -16,9 +28,56 @@ const Login: React.FC<LoginProps> = ({ openForgetPassword }) => {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
   const [showPassword, setShowPassword] = useState(false);
+  const [showVerification, setShowVerification] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState("");
+  const [userId, setUserId] = useState("");
+  const [loginCredentials, setLoginCredentials] = useState<FormValues>({ email: '', password: '' });
   const [login, { isLoading }] = useLoginMutation();
+  const [verifyOtp] = useVerifyOtpMutation();
+  const [resendVerification] = useResendVerificationMutation();
   const router = useRouter();
-  
+
+  const handleVerificationComplete = async (otp: string) => {
+    console.log("Verification complete with OTP:", otp);
+    try {
+        // After successful verification, log the user in with stored credentials
+        const loginResponse = await login({
+          email: loginCredentials.email,
+          password: loginCredentials.password
+        }).unwrap();
+        
+        if (loginResponse.token) {
+          await handleLogin(loginResponse.token);
+          notifyAuthStateChange();
+          router.push("/");
+          window.location.reload();
+        }
+    } catch (error: any) {
+      setMessage({
+        type: "error",
+        text: error.data?.message || "Verification failed. Please try again."
+      });
+    }
+  };
+
+  const handleResendVerification = async (email: string) => {
+    try {
+      await resendVerification({ email: email }).unwrap();
+      setMessage({ 
+        type: "success", 
+        text: "Verification email resent successfully!" 
+      });
+      return Promise.resolve();
+    } catch (error: any) {
+      const errorMsg = error.data?.message || "Failed to resend verification email";
+      setMessage({
+        type: "error",
+        text: errorMsg
+      });
+      return Promise.reject(new Error(errorMsg));
+    }
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
@@ -27,13 +86,19 @@ const Login: React.FC<LoginProps> = ({ openForgetPassword }) => {
     const form = event.currentTarget;
     const email = form.email.value.trim();
     const password = form.password.value;
+    setLoginCredentials({ email, password });
+
+    console.log("Form submission started:", { email, password: "***" });
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
+      console.log("Email validation failed:", email);
       setMessage({ type: "error", text: "Please enter a valid email address" });
       setLoading(false);
       return;
     }
+
+    console.log("Email validation passed, attempting login...");
 
     login({
       email: email,
@@ -41,46 +106,136 @@ const Login: React.FC<LoginProps> = ({ openForgetPassword }) => {
     })
       .unwrap()
       .then(async (response) => {
-        setMessage({ type: "success", text: response.message });
+        console.log("Login response received:", response);
         
-        const loginSuccess = await handleLogin(response.token);
-        
-        if (loginSuccess) {
-          notifyAuthStateChange();
-          setTimeout(() => {
-            router.push("/");
-            window.location.reload();
-          }, 1000);
+        // Check if login was successful
+        if (response.success) {
+          console.log("Login successful, processing token...");
+          setMessage({ type: "success", text: response.message });
+
+          const loginSuccess = await handleLogin(response.token);
+          console.log("Handle login result:", loginSuccess);
+
+          if (loginSuccess) {
+            console.log("Login validation successful, redirecting...");
+            notifyAuthStateChange();
+            setTimeout(() => {
+              router.push("/");
+              window.location.reload();
+            }, 1000);
+          } else {
+            console.log("Login validation failed");
+            setMessage({ type: "error", text: "Failed to validate login" });
+          }
         } else {
-          setMessage({ type: "error", text: "Failed to validate login" });
+          console.log("Login unsuccessful, checking verification status...");
+          console.log("Response details:", { 
+            success: response.success, 
+            verified: response.verified, 
+            message: response.message 
+          });
+          
+          // Handle case where success is false
+          if (response.verified === false) {
+            console.log("Email verification required, sending verification code...");
+            console.log("Setting verification email to:", email);
+            console.log("Setting userId to:", response.userId);
+            
+            try {
+              // First, send the verification code
+              await resendVerification({ email }).unwrap();
+              
+              // Then show the verification UI
+              setVerificationEmail(email);
+              setUserId(response.userId || "");
+              setShowVerification(true);
+              setMessage({
+                type: "info",
+                text: response.message || "Please verify your email to continue. A verification code has been sent to your email.",
+              });
+              
+              console.log("Verification code sent and flow setup complete");
+            } catch (error: any) {
+              console.error("Failed to send verification code:", error);
+              setMessage({
+                type: "error",
+                text: error.data?.message || "Failed to send verification code. Please try again."
+              });
+            }
+          } else {
+            console.log("Other failure case:", response.message);
+            // Other failure cases
+            setMessage({
+              type: "error",
+              text: response.message || "Login failed",
+            });
+          }
         }
-        
+
+        console.log("Setting loading to false");
         setLoading(false);
       })
-      .catch((error: any) => {
-        setLoading(false);
-        setMessage({
-          type: "error",
-          text: error.data?.message || "Login failed",
+      .catch(async (error: any) => {
+        console.log("Login error caught:", error);
+        console.log("Error details:", {
+          status: error.status,
+          data: error.data,
+          message: error.data?.message
         });
+        
+        setLoading(false);
+        if (error.status === 403 && error.data?.message?.includes("not verified")) {
+          console.log("403 error with verification needed (from catch block)");
+          const userEmail = form.email.value.trim();
+          
+          try {
+            // First, send the verification code
+            await resendVerification({ email: userEmail }).unwrap();
+            
+            // Then show the verification UI
+            setVerificationEmail(userEmail);
+            setUserId(error.data?.userId || "");
+            setShowVerification(true);
+            setMessage({
+              type: "info",
+              text: "Please verify your email to continue. A verification code has been sent to your email.",
+            });
+          } catch (resendError: any) {
+            console.error("Failed to send verification code:", resendError);
+            setMessage({
+              type: "error",
+              text: resendError.data?.message || "Failed to send verification code. Please try again."
+            });
+          }
+        } else {
+          console.log("Other error case:", error.data?.message);
+          
+         
+          setMessage({
+            type: "error",
+            text: error.data?.message || "Login failed",
+          });
+          if(error.data?.success === false && error.data?.verified === false){
+            setShowVerification(true);
+            setVerificationEmail(form.email.value.trim());
+            await resendVerification({ email: form.email.value.trim() }).unwrap();
+          }
+        }
       });
   };
-
   const handleGoogleSignIn = async () => {
     try {
       setGoogleLoading(true);
-      const result = await signIn("google", { 
-        redirect: false 
-      });
-      
+      const result = await signIn("google", { redirect: false });
+
       if (result?.error) {
         setMessage({ type: "error", text: "Google sign-in failed" });
       } else if (result?.ok) {
-        const token = localStorage.getItem('auth_Token');
-        
+        const token = localStorage.getItem("auth_Token");
+
         if (token) {
           const loginSuccess = await handleLogin(token);
-          
+
           if (loginSuccess) {
             notifyAuthStateChange();
             router.push("/");
@@ -96,11 +251,37 @@ const Login: React.FC<LoginProps> = ({ openForgetPassword }) => {
       setMessage({ type: "error", text: "An error occurred during Google sign-in" });
     } finally {
       setGoogleLoading(false);
+      // Show verification component if email needs verification
+      if (showVerification && verificationEmail) {
+        return (
+          <div className="w-full max-w-md p-6 mx-auto">
+            <VerifyEmail 
+              email={verificationEmail}
+              userId={userId}
+              onVerificationComplete={handleVerificationComplete}
+              onResendVerification={handleResendVerification}
+            />
+          </div>
+        );
+      }
     }
   };
 
+  if (showVerification && verificationEmail) {
+    return (
+      <div className="w-full max-w-md p-6 mx-auto">
+        <VerifyEmail 
+          email={verificationEmail}
+          userId={userId}
+          onVerificationComplete={handleVerificationComplete}
+          onResendVerification={handleResendVerification}
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full space-y-6 p-8 rounded-xl bg-card/50  ">
+    <div className="w-full space-y-6 p-8 rounded-xl bg-card/50">
       <div className="space-y-2 text-center">
         <h1 className="text-2xl font-bold tracking-tight">Welcome Back</h1>
         <p className="text-sm text-muted-foreground">
@@ -210,14 +391,6 @@ const Login: React.FC<LoginProps> = ({ openForgetPassword }) => {
           {message.text}
         </div>
       )}
-
-      {/* <button
-        type="button"
-        onClick={openForgetPassword}
-        className="w-full text-center text-sm text-muted-foreground hover:text-foreground"
-      >
-        Forgot your password?
-      </button> */}
     </div>
   );
 };

@@ -1,9 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MessageSquare, Phone, Mail, MessageCircle, PhoneCall, UserPlus } from "lucide-react";
 import Register from "../auth/Register";
+import isAuthenticated, { useClientSide } from "@/utils/auth-util";
 
 const GetInTouch = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+  
+  const isUserAuthenticated = isClient ? isAuthenticated() : false;
   
   const openModal = () => {
     setIsModalOpen(true);
@@ -81,22 +89,24 @@ const GetInTouch = () => {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="bg-blue-50 rounded-lg shadow-md p-6 sm:p-8 flex flex-col items-center text-center">
-          <h2 className="text-xl sm:text-2xl font-semibold mb-3">
-            Join Cloud Accommodation Today
-          </h2>
-          <p className="text-gray-600 text-sm sm:text-base mb-4 sm:mb-6 max-w-lg">
-            Sign up for an account to access exclusive deals, save your favorite properties, and get personalized accommodation recommendations.
-          </p>
-          <button 
-            onClick={openModal}
-            className="flex items-center px-6 py-3 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-all shadow-md"
-          >
-            <UserPlus className="mr-2 h-5 w-5" /> Sign Up Now
-          </button>
+      {!isUserAuthenticated && (
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          <div className="bg-blue-50 rounded-lg shadow-md p-6 sm:p-8 flex flex-col items-center text-center">
+            <h2 className="text-xl sm:text-2xl font-semibold mb-3">
+              Join Cloud Accommodation Today
+            </h2>
+            <p className="text-gray-600 text-sm sm:text-base mb-4 sm:mb-6 max-w-lg">
+              Sign up for an account to access exclusive deals, save your favorite properties, and get personalized accommodation recommendations.
+            </p>
+            <button 
+              onClick={openModal}
+              className="flex items-center px-6 py-3 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-all shadow-md"
+            >
+              <UserPlus className="mr-2 h-5 w-5" /> Sign Up Now
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
         <div className="bg-white rounded-lg shadow-lg p-6 sm:p-8 flex flex-col sm:flex-row items-center sm:justify-between">
@@ -131,8 +141,8 @@ const GetInTouch = () => {
 
       {/* Sign Up Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
-          <div className="bg-white rounded-2xl w-96 p-6 shadow-2xl transform transition-all">
+        <div className="w-full fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
+          <div className="bg-white rounded-2xl w-2/5 max-sm:w-full p-6 shadow-2xl transform transition-all">
             <button 
               onClick={closeModal} 
               className="absolute top-4 right-4 hover:rotate-90 transition-transform"

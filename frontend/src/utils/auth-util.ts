@@ -1,15 +1,31 @@
 "use client";
 
+import { useState, useEffect } from 'react';
+
 let cachedAuthToken: string | null = null;
+
+// Hook to handle client-side only code
+export const useClientSide = () => {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  return isClient;
+};
 
 // Function to set auth token
 export const setAuthToken = (token: string | null): void => {
   cachedAuthToken = token;
   
-  if (token) {
-    localStorage.setItem('auth_Token', token);
-  } else {
-    localStorage.removeItem('auth_Token');
+  // Check if window is defined (client-side) before accessing localStorage
+  if (typeof window !== 'undefined') {
+    if (token) {
+      localStorage.setItem('auth_Token', token);
+    } else {
+      localStorage.removeItem('auth_Token');
+    }
   }
 };
 
@@ -56,6 +72,11 @@ export const handleLogin = async (token: string): Promise<boolean> => {
 };
 
 const isAuthenticated = (): boolean => {
+  // On server-side, return false by default to match initial client render
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
   // Retrieve token from cache or localStorage
   if (cachedAuthToken === null) {
     cachedAuthToken = localStorage.getItem('auth_Token');
@@ -63,33 +84,28 @@ const isAuthenticated = (): boolean => {
 
   // If no token exists, user is not authenticated
   if (!cachedAuthToken) {
-    console.log("No auth token found");
     return false;
   }
 
   try {
-    console.log("Auth token:", cachedAuthToken);
-
     // Decode the token payload
     const base64Payload = cachedAuthToken.split('.')[1]; // Get the payload part of the token
     if (!base64Payload) {
-      console.error("Invalid token format");
       return false;
     }
 
-    // Add padding if necessary for base64 decoding
-    const decodedPayload = atob(base64Payload.replace(/-/g, '+').replace(/_/g, '/'));
-    const payload = JSON.parse(decodedPayload);
-    console.log("Token payload:", payload);
+    try {
+      // Add padding if necessary for base64 decoding
+      const decodedPayload = atob(base64Payload.replace(/-/g, '+').replace(/_/g, '/'));
+      const payload = JSON.parse(decodedPayload);
 
-    // Validate token expiration
-    const expirationTime = payload.exp * 1000; // Convert expiration time to milliseconds
-    const isValid = expirationTime > Date.now();
-    console.log("Token is valid:", isValid);
-
-    return isValid;
+      // Validate token expiration
+      const expirationTime = payload.exp * 1000; // Convert expiration time to milliseconds
+      return expirationTime > Date.now();
+    } catch (error) {
+      return false;
+    }
   } catch (error) {
-    console.error("Error decoding or validating token:", error);
     return false;
   }
 };

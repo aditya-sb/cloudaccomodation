@@ -7,8 +7,8 @@ import { useVerifyEmailMutation, useResendVerificationMutation } from '../redux/
 interface VerifyEmailProps {
     email: string;
     userId: string;
-    onVerificationComplete: () => void;
-    onResendVerification: () => Promise<void>;
+    onVerificationComplete: (otp: string) => Promise<void>;
+    onResendVerification: (email: string) => Promise<void>;
 }
 
 type MessageType = 'success' | 'error' | '';
@@ -84,9 +84,9 @@ export default function VerifyEmail({
                 type: 'success',
                 text: result.message || 'Email verified successfully!'
             });
-
-            // Notify parent component that verification is complete
-            onVerificationComplete();
+            
+            // Notify parent component that verification is complete with the OTP
+            await onVerificationComplete(code);
         } catch (error: any) {
             setMessage({
                 type: 'error',
@@ -97,6 +97,17 @@ export default function VerifyEmail({
 
     const handleResendCode = async () => {
         if (resendTimer > 0) return;
+        
+        try {
+            await onResendVerification(email);
+            setResendTimer(30);
+            setMessage({ type: 'success', text: 'Verification code resent successfully!' });
+        } catch (error) {
+            setMessage({ 
+                type: 'error', 
+                text: 'Failed to resend verification code. Please try again.' 
+            });
+        }
 
         try {
             setMessage({ type: '', text: '' });
@@ -194,7 +205,7 @@ export default function VerifyEmail({
                 <div className="mt-6 text-center text-sm">
                     <p className="text-gray-600">
                         Having trouble? Contact our{' '}
-                        <a href="mailto:support@cloudaccommodation.com" className="font-medium text-blue-600 hover:text-blue-500">
+                        <a href="mailto:info@cloudaccommodation.com" className="font-medium text-blue-600 hover:text-blue-500">
                             support team
                         </a>
                     </p>

@@ -9,11 +9,8 @@ import { signIn } from "next-auth/react";
 import VerifyEmail from './VerifyEmail';
 import toast, { Toaster } from 'react-hot-toast';
 
-interface RegisterProps {
-  onOpenLogin?: () => void;
-}
 
-const Register: React.FC<RegisterProps> = ({ onOpenLogin }) => {
+const Register: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [showVerification, setShowVerification] = useState(false);
@@ -27,20 +24,27 @@ const Register: React.FC<RegisterProps> = ({ onOpenLogin }) => {
   const router = useRouter();
 
   // Show success toast and reload the page
-  const handleVerificationComplete = () => {
-    // Show success toast
-    toast.success('Email verified successfully! Redirecting...', {
-      position: 'top-right',
-      duration: 2000,
-    });
-    
-    // Close the verification modal
-    setShowVerification(false);
-    
-    // Reload the page after the toast is shown
-    setTimeout(() => {
-      window.location.reload();
-    }, 2000);
+  const handleVerificationComplete = async (otp: string) => {
+    try {
+      // Show success toast
+      toast.success('Email verified successfully! Redirecting...', {
+        position: 'top-right',
+        duration: 2000,
+      });
+      
+      // Close the verification modal
+      setShowVerification(false);
+      
+      // Reload the page after the toast is shown
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    } catch (error) {
+      toast.error('Verification failed. Please try again.', {
+        position: 'top-right',
+        duration: 3000,
+      });
+    }
   };
 
   // Check for verification success on component mount
@@ -57,23 +61,28 @@ const Register: React.FC<RegisterProps> = ({ onOpenLogin }) => {
     }
   }, []);
 
-  const handleResendVerification = async () => {
+  const handleResendVerification = async (email: string) => {
     try {
       const response = await fetch('/api/auth/resend-verification', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: verificationEmail })
+        body: JSON.stringify({ email })
       });
       
       const data = await response.json();
       
       if (response.ok) {
         setMessage({ type: 'success', text: data.message || 'Verification code resent!' });
+        return Promise.resolve();
       } else {
-        setMessage({ type: 'error', text: data.message || 'Failed to resend verification code' });
+        const errorMsg = data.message || 'Failed to resend verification code';
+        setMessage({ type: 'error', text: errorMsg });
+        return Promise.reject(new Error(errorMsg));
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'An error occurred while resending the code' });
+      const errorMsg = 'An error occurred while resending the code';
+      setMessage({ type: 'error', text: errorMsg });
+      return Promise.reject(new Error(errorMsg));
     }
   };
   
@@ -175,15 +184,9 @@ const Register: React.FC<RegisterProps> = ({ onOpenLogin }) => {
   return (
     <div className="w-full max-w-xl space-y-6 p-6 rounded-xl relative">
       {/* Toast container */}
-      <Toaster position="top-right" />
-      {/* Close button */}
-      <button 
-        onClick={() => router.push('/')}
-        className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-100 transition-colors"
-        aria-label="Close"
-      >
-        <X className="h-5 w-5 text-gray-500" />
-      </button>
+      {/* <Toaster position="top-right" /> */}
+      
+      
       
       <div className="space-y-2 text-center">
         <h1 className="text-2xl font-bold tracking-tight">Create an Account</h1>
@@ -199,7 +202,7 @@ const Register: React.FC<RegisterProps> = ({ onOpenLogin }) => {
             <button 
               onClick={() => setShowVerification(false)}
               className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-100 transition-colors"
-              aria-label="Close"
+              aria-label="Close verification modal"
             >
               <X className="h-5 w-5 text-gray-500" />
             </button>
