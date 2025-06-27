@@ -47,157 +47,162 @@ export const apiSlice = createApi({
     // Make the API request
     const result = await baseQuery(args, api, extraOptions);
 
-    return result;
-  },
+      return result;
+    },
 
-  tagTypes: ["User", "Auth", "Property", "Booking", "Dashboard", "Payment", "Enquiry", "Review", "Verification"], 
-  endpoints: (builder) => ({
-    register: builder.mutation({
-      query: (userData) => ({
-        url: "/user/register",
-        method: "POST",
-        body: userData,
+    tagTypes: ["User", "Auth", "Property", "Booking", "Dashboard", "Payment", "Enquiry", "Review", "Verification"], 
+    endpoints: (builder) => ({
+      register: builder.mutation({
+        query: (userData) => ({
+          url: "/user/register",
+          method: "POST",
+          body: userData,
+        }),
+        // Invalidate User and Auth queries upon registration
+        invalidatesTags: ["User", "Auth"],
       }),
-      // Invalidate User and Auth queries upon registration
-      invalidatesTags: ["User", "Auth"],
-    }),
-    login: builder.mutation({
-      query: (credentials) => ({
-        url: "/user/login",
-        method: "POST",
-        body: credentials,
+      login: builder.mutation({
+        query: (credentials) => ({
+          url: "/user/login",
+          method: "POST",
+          body: credentials,
+        }),
+        // Invalidate User and Auth queries upon login
+        invalidatesTags: ["User", "Auth"],
       }),
-      // Invalidate User and Auth queries upon login
-      invalidatesTags: ["User", "Auth"],
-    }),
-    googleAuth: builder.mutation({
-      query: (googleUserData) => ({
-        url: "/user/google-auth",
-        method: "POST",
-        body: googleUserData,
+      googleAuth: builder.mutation({
+        query: (googleUserData) => ({
+          url: "/user/google-auth",
+          method: "POST",
+          body: googleUserData,
+        }),
+        invalidatesTags: ["User", "Auth"],
       }),
-      invalidatesTags: ["User", "Auth"],
-    }),
-    verifyEmail: builder.mutation({
-      query: ({ email, otp }) => ({
-        url: "/user/verify-email",
-        method: "POST",
-        body: { email, otp },
+      verifyEmail: builder.mutation({
+        query: ({ email, otp }) => ({
+          url: "/user/verify-email",
+          method: "POST",
+          body: { email, otp },
+        }),
+        invalidatesTags: ["User", "Verification"],
       }),
-      invalidatesTags: ["User", "Verification"],
-    }),
-    resendVerification: builder.mutation({
-      query: ({ email }) => ({
-        url: "/user/resend-verification",
-        method: "POST",
-        body: { email },
+      resendVerification: builder.mutation({
+        query: ({ email }) => ({
+          url: "/user/resend-verification",
+          method: "POST",
+          body: { email },
+        }),
+        invalidatesTags: ["Verification"],
       }),
-      invalidatesTags: ["Verification"],
-    }),
-    getUserDetails: builder.query({
-      query: () => "/user/getUserDetails",
-      providesTags: ["User"], // Tag this endpoint for future invalidation
-    }),
-    saveUserDetails: builder.mutation({
-      query: (userDetails) => ({
-        url: "/user/updateUser",
-        method: "POST",
-        body: userDetails,
+      getUserDetails: builder.query({
+        query: () => "/user/getUserDetails",
+        providesTags: ["User"], // Tag this endpoint for future invalidation
       }),
-      invalidatesTags: ["User"], // Invalidate the User tag after saving user details
-    }),
-    updateUser: builder.mutation({
-      query: (userData) => ({
-        url: '/user/updateUser',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      saveUserDetails: builder.mutation({
+        query: (userDetails) => ({
+          url: "/user/updateUser",
+          method: "POST",
+          body: userDetails,
+        }),
+        invalidatesTags: ["User"], // Invalidate the User tag after saving user details
+      }),
+      updateUser: builder.mutation({
+        query: (userData) => {
+          // For FormData, let the browser set the Content-Type with boundary
+          const headers = userData instanceof FormData 
+            ? {} 
+            : { 'Content-Type': 'application/json' };
+          
+          return {
+            url: '/user/updateUser',
+            method: 'POST',
+            headers,
+            body: userData,
+          };
         },
-        body: userData,
+        invalidatesTags: ['User'],
       }),
-      invalidatesTags: ['User'],
-    }),
-    submitEnquiry: builder.mutation({
-      query: (equiryDetails) => ({
-        url: "/enquiry/submitEnquiry",
-        method: "POST",
-        body: equiryDetails,
+      submitEnquiry: builder.mutation({
+        query: (equiryDetails) => ({
+          url: "/enquiry/submitEnquiry",
+          method: "POST",
+          body: equiryDetails,
+        }),
+        invalidatesTags: ["Enquiry"],
       }),
-      invalidatesTags: ["Enquiry"],
-    }),
-    verifyOtp: builder.mutation({
-      query: (otp) => ({
-        url: "/user/verify",
-        method: "POST",
-        body: otp,
+      verifyOtp: builder.mutation({
+        query: (otp) => ({
+          url: "/user/verify",
+          method: "POST",
+          body: otp,
+        }),
+        invalidatesTags: ["Auth"], // Invalidate Auth tag after OTP verification
       }),
-      invalidatesTags: ["Auth"], // Invalidate Auth tag after OTP verification
-    }),
-    getCategory: builder.query({
-      query: () => "/category/getCategory",
-    }),
-    getPlans: builder.query({
-      query: (country) => ({
-        url: `/plan/getPlan`,
-        params: {
-          country: country || "", // Add the country as a query parameter (defaults to empty string if not provided)
-        },
+      getCategory: builder.query({
+        query: () => "/category/getCategory",
       }),
-    }),
-    getPlanByUserId: builder.query({
-      query: (userId) => `/getPlanByUserId/${userId}`,
-    }),
-    getContent: builder.query({
-      query: () => `/content/allContent`,
-    }),
-    getMySubscriptions: builder.query({
-      query: () => `/user/mySubscription`,
-    }),
-    getUserPlan: builder.query({
-      query: (queryParams) => ({
-        url: `/userplan`,
-        params: queryParams,
+      getPlans: builder.query({
+        query: (country) => ({
+          url: `/plan/getPlan`,
+          params: {
+            country: country || "", // Add the country as a query parameter (defaults to empty string if not provided)
+          },
+        }),
       }),
-    }),
-    createSubscription: builder.mutation({
-      query: (planId) => ({
-        url: `/userplan`,
-        method: "POST",
-        body: planId,
+      getPlanByUserId: builder.query({
+        query: (userId) => `/getPlanByUserId/${userId}`,
       }),
-    }),
-    deleteUser: builder.mutation({
-      query: (userId) => ({
-        url: `/user/delete/${userId}`, // DELETE endpoint
-        method: "DELETE", // Use DELETE method for deleting
+      getContent: builder.query({
+        query: () => `/content/allContent`,
       }),
-      // Invalidate tags related to users after deleting
-      invalidatesTags: ["User"],
-    }),
+      getMySubscriptions: builder.query({
+        query: () => `/user/mySubscription`,
+      }),
+      getUserPlan: builder.query({
+        query: (queryParams) => ({
+          url: `/userplan`,
+          params: queryParams,
+        }),
+      }),
+      createSubscription: builder.mutation({
+        query: (planId) => ({
+          url: `/userplan`,
+          method: "POST",
+          body: planId,
+        }),
+      }),
+      deleteUser: builder.mutation({
+        query: (userId) => ({
+          url: `/user/delete/${userId}`, // DELETE endpoint
+          method: "DELETE", // Use DELETE method for deleting
+        }),
+        // Invalidate tags related to users after deleting
+        invalidatesTags: ["User"],
+      }),
 
-    // New property-related endpoints
-    createProperty: builder.mutation({
-      query: (propertyData) => ({
-        url: "/property",
-        method: "POST",
-        body: propertyData,
+      // New property-related endpoints
+      createProperty: builder.mutation({
+        query: (propertyData) => ({
+          url: "/property",
+          method: "POST",
+          body: propertyData,
+        }),
+        invalidatesTags: ["Property"], // Invalidate Property tag after creating
       }),
-      invalidatesTags: ["Property"], // Invalidate Property tag after creating
-    }),
-    getProperties: builder.query({
-      query: (queryParams) => ({
-        url: "/property",
-        params: {
-          ...queryParams,
-          verified: true
-        },
+      getProperties: builder.query({
+        query: (queryParams) => ({
+          url: "/property",
+          params: {
+            ...queryParams,
+            verified: true
+          },
+        }),
+        providesTags: ["Property"], // Tag this endpoint for future invalidation
       }),
-      providesTags: ["Property"], // Tag this endpoint for future invalidation
-    }),
-    editProperty: builder.mutation({
-      query: ({ id, ...propertyData }) => ({
-        url: `/property/${id}`,
-        method: "PATCH",
+      editProperty: builder.mutation({
+        query: ({ id, ...propertyData }) => ({
+          url: `/property/${id}`,
+          method: "PATCH",
         body: propertyData,
       }),
       invalidatesTags: ["Property"], // Invalidate Property tag after editing

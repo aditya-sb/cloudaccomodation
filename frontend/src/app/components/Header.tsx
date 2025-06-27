@@ -165,12 +165,12 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
               >
                 <FaHistory className="text-lg mr-2" /> History
               </button> */}
-              <button
+              {/* <button
                 onClick={() => openModal(<div>Chat Content</div>)}
                 className="flex items-center hover:text-blue-500 transition-colors"
               >
                 <FaComments className="text-lg mr-2" /> Chat
-              </button>
+              </button> */}
               <button
                 onClick={() => router.push('/bookings')}
                 className="flex items-center hover:text-blue-500 transition-colors"
@@ -260,12 +260,12 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
                 >
                   <FaHistory className="mr-3" /> History
                 </button> */}
-                <button
+                {/* <button
                   onClick={() => openModal(<div>Chat Content</div>)}
                   className="flex items-center hover:text-blue-500 transition-colors"
                 >
                   <FaComments className="mr-3" /> Chat
-                </button>
+                </button> */}
                 <button
                   onClick={() => openModal(<div>Bookings Content</div>)}
                   className="flex items-center hover:text-blue-500 transition-colors"

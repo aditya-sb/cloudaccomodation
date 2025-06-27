@@ -58,6 +58,9 @@ interface BookingData {
   country: string;
   stateProvince: string;
   leaseDuration: string;
+  securityDeposit?: number;
+  lastMonthPayment?: number;
+  allowSecurityDeposit?: boolean;
 }
 
 // Add interface for payment details
@@ -89,6 +92,10 @@ function BookingPageContent() {
   console.log("userData", userData);
   // State for payment modal and booking data
   const [pendingBookingData, setPendingBookingData] = useState<BookingData | null>(null);
+  const [paymentDetails, setPaymentDetails] = useState<PaymentDetails>({
+    amount: 0,
+    currency: 'GBP'
+  });
   const [selectedBedroomId, setSelectedBedroomId] = useState(bedroomId || "");
   const [selectedBedroomName, setSelectedBedroomName] = useState(bedroomName || "");
   
@@ -403,8 +410,44 @@ function BookingPageContent() {
         leaseDuration: formData.leaseDuration || ""
       };
 
-      // Store the booking data and show payment modal
-      setPendingBookingData(bookingData);
+      // Get rent and security deposit amounts
+      const rent = selectedBedroomDetails?.rent || 0;
+      const securityDeposit = property?.securityDeposit || 0;
+      
+      // Calculate payment details based on booking options
+      let paymentAmount = 0;
+      let lastMonthPayment = 0;
+      
+      if (property?.bookingOptions?.allowFirstAndLastRent) {
+        // First month + last month + security deposit
+        paymentAmount = rent * 2 + securityDeposit;
+        lastMonthPayment = rent;
+      } else if (property?.bookingOptions?.allowFirstRent) {
+        // First month + security deposit
+        paymentAmount = rent + securityDeposit;
+      } else if (property?.bookingOptions?.allowSecurityDeposit) {
+        // Security deposit only (first month rent is due on arrival)
+        paymentAmount = securityDeposit;
+      } else {
+        // Just the first month's rent
+        paymentAmount = rent;
+      }
+      
+      // Store the booking data with payment details
+      setPendingBookingData({
+        ...bookingData,
+        // allowSecurityDeposit: property?.bookingOptions?.allowSecurityDeposit,
+        securityDeposit: securityDeposit > 0 ? securityDeposit : undefined,
+        lastMonthPayment: lastMonthPayment > 0 ? lastMonthPayment : undefined,
+        price: rent // Ensure base price is set correctly
+      });
+      
+      // Set payment details for Stripe
+      setPaymentDetails({
+        amount: paymentAmount,
+        currency: property?.currency || 'GBP'
+      });
+      
       setShowPayment(true);
     } catch (err) {
       console.error("Form submission error:", err);
@@ -1009,11 +1052,16 @@ function BookingPageContent() {
           }),
           propertyId: propertyId || "",
           price: pendingBookingData?.price || 0,
-          currency: pendingBookingData?.currency || "inr",
+          securityDeposit: pendingBookingData?.securityDeposit,
+          lastMonthPayment: pendingBookingData?.lastMonthPayment,
+          allowSecurityDeposit: pendingBookingData?.allowSecurityDeposit,
+          currency: pendingBookingData?.currency || "GBP",
+          country: formData.country,
+          bedroomName: pendingBookingData?.bedroomName || ""
         }}
         paymentDetails={{
-          amount: pendingBookingData?.price || 0,
-          currency: pendingBookingData?.currency || "inr",
+          amount: paymentDetails.amount,
+          currency: paymentDetails.currency,
         }}
         isOpen={showPayment}
         onClose={() => setShowPayment(false)}

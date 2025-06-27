@@ -1,11 +1,13 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { FaSignOutAlt, FaUser, FaCamera } from "react-icons/fa";
 import { useRouter } from 'next/navigation';
 import { useGetUserDetailsQuery, useUpdateUserMutation } from '../redux/slices/apiSlice';
 import { setAuthToken } from '../../utils/auth-util';
-import { signOut } from 'next-auth/react';
+import { signOut as nextAuthSignOut } from 'next-auth/react';
 import { Loader2 } from 'lucide-react';
+import { createAvatar } from '@dicebear/core';
+import { bottts } from '@dicebear/collection';
 
 const Profile: React.FC = () => {
   const [message, setMessage] = useState('');
@@ -14,9 +16,19 @@ const Profile: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const router = useRouter();
-
+  
   const { data, error, isLoading } = useGetUserDetailsQuery();
   const [updateUser] = useUpdateUserMutation();
+
+  // Generate avatar based on user's email
+  const avatarUrl = useMemo(() => {
+    if (data?.user?.profilePicture) return undefined;
+    const avatar = createAvatar(bottts, {
+      seed: data?.user?.email || 'default',
+      size: 128,
+    });
+    return avatar.toDataUri();
+  }, [data?.user?.email, data?.user?.profilePicture]);
 
   const [formData, setFormData] = useState({
     firstname: '',
@@ -55,45 +67,109 @@ const Profile: React.FC = () => {
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setSelectedImage(e.target.files[0]);
-      setIsDirty(true);
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Check file type
+    if (!file.type.startsWith('image/')) {
+      setMessage('Please upload an image file (JPEG, PNG, etc.)');
+      return;
     }
+
+    // Check file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      setMessage('Image size should be less than 5MB');
+      return;
+    }
+
+    setSelectedImage(file);
+    setIsDirty(true);
+    setMessage(''); // Clear any previous error messages
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setMessage('Saving changes...');
+    
     try {
-      const payload = {
-        userId: data?.user?._id,
-        ...formData,
-        // Only include profilePicture if there's a selected image
-        ...(selectedImage && {
-          profilePicture: await convertImageToBase64(selectedImage)
-        })
-      };
+      const formDataPayload = new FormData();
+      
+      // Add all form fields to FormData
+      Object.entries(formData).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          formDataPayload.append(key, value);
+        }
+      });
+
+      // Add the image file if selected
+      if (selectedImage) {
+        formDataPayload.append('profilePicture', selectedImage);
+      }
+
+      // Create the payload with FormData
+      const payload = new FormData();
+      payload.append('userId', data?.user?._id || '');
+      
+      // Append all form data
+      Object.entries(formData).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          payload.append(key, value);
+        }
+      });
+      
+      // Append the file
+      if (selectedImage) {
+        payload.append('profilePicture', selectedImage);
+      }
 
       const result = await updateUser(payload).unwrap();
 
       if (result.user) {
-        setMessage("Profile updated successfully");
+        setMessage('Profile updated successfully');
         setIsDirty(false);
+        // Clear the selected image state after successful upload
+        setSelectedImage(null);
+        
+        // Auto-clear success message after 3 seconds
+        setTimeout(() => {
+          setMessage('');
+        }, 3000);
       } else {
-        setMessage("Error updating profile");
+        setMessage(result.message || 'Error updating profile');
       }
-    } catch (error) {
-      console.error("Update failed", error);
-      setMessage("Error updating profile");
+    } catch (error: any) {
+      console.error('Update failed', error);
+      setMessage(
+        error?.data?.message || 
+        error?.message || 
+        'An error occurred while updating your profile. Please try again.'
+      );
     }
   };
 
-  // Add this helper function to convert File to base64
+  // Helper function to convert File to base64 with proper error handling
   const convertImageToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = error => reject(error);
+      
+      reader.onload = () => {
+        if (typeof reader.result === 'string') {
+          resolve(reader.result);
+        } else {
+          reject(new Error('Failed to read file as data URL'));
+        }
+      };
+      
+      reader.onerror = () => {
+        reject(new Error('Error reading file'));
+      };
+      
+      try {
+        reader.readAsDataURL(file);
+      } catch (error) {
+        reject(error);
+      }
     });
   };
 
@@ -102,14 +178,21 @@ const Profile: React.FC = () => {
       setIsLoggingOut(true);
       setMessage("Logging out...");
 
-      await signOut({ redirect: false });
+      // Sign out from NextAuth
+      await nextAuthSignOut({
+        callbackUrl: '/',
+        redirect: false
+      });
 
+      // Clear any local auth tokens
       setAuthToken(null);
 
       setMessage("You have successfully logged out.");
 
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      window.location.href = '/';
+      // Redirect to home after a short delay
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 2000);
     } catch (error) {
       console.error("Logout failed", error);
       setMessage("Error logging out.");
@@ -148,13 +231,17 @@ const Profile: React.FC = () => {
         <div className="relative group">
           <div
             onClick={handleImageClick}
-            className="rounded-full w-24 h-24 flex items-center justify-center shadow-md cursor-pointer relative overflow-hidden group-hover:opacity-90"
+            className="rounded-full w-24 h-24 flex items-center justify-center shadow-lg cursor-pointer relative overflow-hidden group-hover:opacity-90"
             style={{ backgroundColor: "var(--grape)" }}
           >
             {data?.user?.profilePicture ? (
               <img src={data.user.profilePicture} alt="Profile" className="w-full h-full object-cover" />
             ) : (
-              <FaUser className="text-4xl text-white" />
+              <img 
+                src={avatarUrl} 
+                alt="Generated Avatar" 
+                className="w-full h-full object-cover"
+              />
             )}
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <FaCamera className="text-white text-xl" />

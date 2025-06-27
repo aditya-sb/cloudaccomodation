@@ -116,12 +116,12 @@ export default function LightHeader() {
               >
                 <FaUser className="text-xl mr-2 text-blue-500" /> Profile
               </button>
-              <button
+              {/* <button
                 onClick={() => openModal(<div>Chat Content</div>)}
                 className="flex items-center px-4 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
               >
                 <FaComments className="text-xl mr-2 text-blue-500" /> Chat
-              </button>
+              </button> */}
               <button
                 onClick={() => router.push('/bookings')}
                 className="flex items-center px-4 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
@@ -184,13 +184,13 @@ export default function LightHeader() {
                 >
                   <FaUser className="mr-3" /> Profile
                 </button>
-                <button
+                {/* <button
                   onClick={() => openModal(<div>Chat Content</div>)}
                   className="flex items-center transition"
                   style={{ color: "var(--gray-text)" }}
                 >
                   <FaComments className="mr-3" /> Chat
-                </button>
+                </button> */}
                 <button
                   onClick={() => openModal(<Bookings />)}
                   className="flex items-center transition"

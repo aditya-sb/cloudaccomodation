@@ -19,6 +19,8 @@ import ExploreProperties from "./components/ExploreProperties";
 import ReviewSection from "./components/Reviews";
 import GetInTouch from "./components/GetInTouch";
 import Loader from "@/loader/loader";
+import { FaWhatsapp } from "react-icons/fa";
+import Link from "next/link";
 
 export default function Home() {
   const [isHeaderVisible, setIsHeaderVisible] = useState(false);
@@ -95,6 +97,20 @@ export default function Home() {
         </div>
       </div>
       <ReviewSection />
+      
+      {/* WhatsApp Floating Button */}
+      <div className="fixed bottom-8 right-8 z-50">
+        <Link 
+          href="https://wa.me/14372887804" // Replace with your actual WhatsApp number
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-110 flex items-center justify-center"
+          aria-label="Chat on WhatsApp"
+        >
+          <FaWhatsapp className="w-8 h-8" />
+        </Link>
+      </div>
+
       {/* Booking Button */}
       {/* <div className="flex justify-center m-10">
         <BookingButton />

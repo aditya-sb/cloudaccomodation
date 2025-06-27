@@ -49,6 +49,7 @@ const CARD_ELEMENT_OPTIONS = {
 };
 
 interface BookingDetails {
+  allowSecurityDeposit?: boolean;
   leaseDuration: string;
   userId?: string; // Make userId optional since it will be extracted from token
   name: string;
@@ -144,10 +145,10 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
-
   // Add confirmPayment mutation hook
   const [createPaymentIntent] = useCreatePaymentIntentMutation();
   const [confirmPayment] = useConfirmPaymentMutation();
+  console.log("displayData", displayData);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -347,7 +348,12 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
           </div>
           {displayData?.price > 0 && (
             <div className="flex justify-between">
-              <span className="text-gray-600">First Month Rent</span>
+              <span className="text-gray-600">
+                First Month Rent
+                {(displayData?.securityDeposit ?? 0) > 0 && displayData?.allowSecurityDeposit && !displayData?.lastMonthPayment && (
+                  <span className="text-xs text-gray-500 ml-1">(due on arrival)</span>
+                )}
+              </span>
               <span className="font-medium">
                 ${displayData?.price.toLocaleString()}
               </span>

@@ -89,47 +89,72 @@ export default function PropertyPage() {
     
     const getPaymentRows = () => {
       const rows: { type: string; dueDate: string; amount: number; }[] = [];
+      const rent = bedroomInView?.rent || thisProperty.price;
+      const securityDeposit = thisProperty.securityDeposit || 0;
       
-      // Case 1: First and last rent
+      // Case 1: First and last rent with security deposit
       if (thisProperty?.bookingOptions?.allowFirstAndLastRent) {
+        // Add first month rent
         rows.push({
           type: "First month rent",
           dueDate: "Now",
-          amount: bedroomInView?.rent || thisProperty.price
+          amount: rent
         });
         
+        // Add last month rent
         rows.push({
           type: "Last month rent",
           dueDate: "Now",
-          amount: bedroomInView?.rent || thisProperty.price
+          amount: rent
         });
+        
+        // Add security deposit if it exists
+        if (securityDeposit > 0) {
+          rows.push({
+            type: "Security deposit",
+            dueDate: "Now",
+            amount: securityDeposit
+          });
+        }
         
         return rows;
       }
       
-      // Case 2: First rent only
+      // Case 2: First rent with separate security deposit
       if (thisProperty?.bookingOptions?.allowFirstRent) {
+        // Add first month rent
         rows.push({
           type: "First month rent",
-          dueDate: "On arrival",
-          amount: bedroomInView?.rent || thisProperty.price
+          dueDate: "Now",
+          amount: rent
         });
+        
+        // Add security deposit if it exists
+        if (securityDeposit > 0) {
+          rows.push({
+            type: "Security deposit",
+            dueDate: "Now",
+            amount: securityDeposit
+          });
+        }
         
         return rows;
       }
       
-      // Case 3: Security deposit only
-      if (thisProperty?.bookingOptions?.allowSecurityDeposit && thisProperty.securityDeposit) {
+      // Case 3: Security deposit only (separate from rent)
+      if (thisProperty?.bookingOptions?.allowSecurityDeposit && securityDeposit > 0) {
+        // Add security deposit
         rows.push({
           type: "Security deposit",
           dueDate: "Now",
-          amount: thisProperty.securityDeposit
+          amount: securityDeposit
         });
         
+        // Add first month rent
         rows.push({
           type: "First month rent",
           dueDate: "On arrival",
-          amount: bedroomInView?.rent || thisProperty.price
+          amount: rent
         });
         
         return rows;
@@ -139,7 +164,7 @@ export default function PropertyPage() {
       rows.push({
         type: "Monthly rent",
         dueDate: "On arrival",
-        amount: bedroomInView?.rent || thisProperty.price
+        amount: rent
       });
       
       return rows;
