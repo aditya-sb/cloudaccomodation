@@ -4,7 +4,7 @@ const Refer = () => {
   return (
     <div className="p-8  max-sm:w-full bg-gray-100  ">
       <h2 className='text-2xl  font-bold md:ml-4'>Referral Programs and Offers</h2>
-      <div className="flex md:w-1/2 justify-between border border-black/40 rounded-lg shadow-sm items-start mb-8 mt-6 p-6  md:ml-5">
+      <div className="flex md:w-1/2 justify-between border bg-white border-black/40 rounded-lg shadow-sm items-start mb-8 mt-6 p-6  md:ml-5">
         <div className="flex flex-col md:w-3/5">
           <h2 className="text-lg font-semibold mb-2">
             Refer & Earn with Cloud Accommodation!
