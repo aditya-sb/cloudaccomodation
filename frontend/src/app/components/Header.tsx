@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   FaUser,
   FaSignInAlt,
@@ -23,6 +23,7 @@ import isAuthenticated from "@/utils/auth-util";
 import { useGetUserDetailsQuery } from "../redux/slices/apiSlice";
 import Loader from "@/loader/loader";
 import { useRouter } from "next/navigation";
+import Drawer from "./Drawer";
 import Bookings from "./bookings/Bookings";
 interface HeaderProps {
   isPropertyPage: boolean;
@@ -53,7 +54,6 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
       window.removeEventListener('auth-state-changed', checkAuth);
     };
   }, []);
-  
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const router = useRouter();
   const openModal = (content: React.ReactNode) => {
@@ -101,7 +101,7 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
             />
 
             <h1 className="ml-4 text-2xl max-sm:text-lg  font-bold tracking-tight">
-              Cloud Accommodation
+              cloud accommodation
             </h1>
           </a>
         </Link>
@@ -194,17 +194,9 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
               </button>
               <button
                 onClick={() => {
-                  const openLoginModal = () => {
-                    closeModal();
-                    openModal(
-                      <Login
-                        openForgetPassword={() => openModal(<ForgetPassword />)}
-                      />
-                    );
-                  };
-                  openModal(<Register onOpenLogin={openLoginModal} />);
+                  openModal(<Register />);
                 }}
-                className="flex items-center px-4 py-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+                className="flex items-center px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
               >
                 <FaUserPlus className="mr-2" /> Sign Up
               </button>
@@ -221,83 +213,19 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
         </button>
       </header>
 
-      {/* Mobile Navigation Menu - Updated styling */}
-      {menuOpen && (
-        <div className="md:hidden fixed inset-0 backdrop-blur-lg bg-white/90 dark:bg-gray-900/90 p-6 space-y-6 z-50">
-          <div className="flex justify-end">
-            <button
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              onClick={toggleMenu}
-            >
-              <FaTimes className="text-2xl" />
-            </button>
-          </div>
-
-          <div className="space-y-6 text-lg">
-            <Link href="/list_property" passHref>
-              <button
-                className="py-2 px-6 rounded-lg shadow-md transition w-full"
-                style={{
-                  backgroundColor: "var(--cta)",
-                  color: "var(--cta-text)",
-                }}
-              >
-                List Property
-              </button>
-            </Link>
-
-            {isAuthenticatedUser ? (
-              <>
-                <button
-                  onClick={() => openModal(<Profile />)}
-                  className="flex items-center hover:text-blue-500 transition-colors"
-                >
-                  <FaUser className="mr-3" /> Profile
-                </button>
-                {/* <button
-                  onClick={() => openModal(<div>History Content</div>)}
-                  className="flex items-center hover:text-blue-500 transition-colors"
-                >
-                  <FaHistory className="mr-3" /> History
-                </button> */}
-                {/* <button
-                  onClick={() => openModal(<div>Chat Content</div>)}
-                  className="flex items-center hover:text-blue-500 transition-colors"
-                >
-                  <FaComments className="mr-3" /> Chat
-                </button> */}
-                <button
-                  onClick={() => openModal(<div>Bookings Content</div>)}
-                  className="flex items-center hover:text-blue-500 transition-colors"
-                >
-                  <FaBookmark className="mr-3" /> Bookings
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={() =>
-                    openModal(
-                      <Login
-                        openForgetPassword={() => openModal(<ForgetPassword />)}
-                      />
-                    )
-                  }
-                  className="flex items-center px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                >
-                  <FaSignInAlt className="mr-2" /> Log In
-                </button>
-                <button
-                  onClick={() => openModal(<Register />)}
-                  className="flex items-center px-4 py-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors"
-                >
-                  <FaUserPlus className="mr-2" /> Sign Up
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      )}
+      <Drawer
+        isOpen={menuOpen}
+        onClose={toggleMenu}
+        isAuthenticated={isAuthenticatedUser}
+        onProfileClick={() => openModal(<Profile />)}
+        onBookingsClick={() => router.push('/bookings')}
+        onLoginClick={() =>
+          openModal(
+            <Login openForgetPassword={() => openModal(<ForgetPassword />)} />
+          )
+        }
+        onSignUpClick={() => openModal(<Register />)}
+      />
 
       {/* Modal - Updated styling */}
       {isModalOpen && (

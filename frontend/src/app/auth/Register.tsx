@@ -182,12 +182,7 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-xl space-y-6 p-6 rounded-xl relative">
-      {/* Toast container */}
-      {/* <Toaster position="top-right" /> */}
-      
-      
-      
+    <div className="w-full space-y-6 p-8 rounded-xl bg-card/50">
       <div className="space-y-2 text-center">
         <h1 className="text-2xl font-bold tracking-tight">Create an Account</h1>
         <p className="text-sm text-muted-foreground">

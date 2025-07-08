@@ -22,7 +22,7 @@ import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
 import { FaAngleDown } from "react-icons/fa";
 import UniversityDistanceInfo from "../components/UniversityDistanceInfo";
-
+import isAuthenticated from "@/utils/auth-util";
 const CURRENCY_SYMBOLS = {
   'USD': '$',
   'CAD': 'C$',
@@ -40,6 +40,7 @@ interface BedroomDetail {
   sharedWashroom: boolean;
   furnished: boolean;
   rent: number;
+  status: string;
   _id?: string;
 }
 
@@ -216,7 +217,13 @@ const PropertyDetailsMobile: React.FC<PropertyDetailsMobileProps> = ({
     return rows;
   };
 
+  const removeHtmlTags = (htmlString: string) => {
+    return htmlString.replace(/<[^>]*>/g, '');
+  };
   const paymentRows = getPaymentRows();
+
+  const availableBedrooms = bedroomDetails?.filter(bedroom => bedroom.status === 'available') || [];
+  const bookedBedrooms = bedroomDetails?.filter(bedroom => bedroom.status === 'booked') || [];
 
   return (
     <div className=" mx-auto bg-white rounded-lg shadow">
@@ -419,7 +426,7 @@ const PropertyDetailsMobile: React.FC<PropertyDetailsMobileProps> = ({
         )}
         
         {/* Bedroom Details */}
-        {bedroomDetails && bedroomDetails.map((bedroom, index) => (
+        {availableBedrooms && availableBedrooms.map((bedroom, index) => (
           <div key={index} className="bg-white rounded-lg shadow p-4 mb-4">
             <h3 className="font-semibold text-base mb-3">{bedroom.name}</h3>
 
@@ -456,22 +463,57 @@ const PropertyDetailsMobile: React.FC<PropertyDetailsMobileProps> = ({
                 {/* Add Book/Enquire button */}
                 <div className="mt-4 flex justify-end">
                   <button
-                    onClick={() => {
-                      if (instantBooking) {
-                        window.location.href = `/booking?propertyId=${encodeURIComponent(
-                          propertyId.toString()
-                        )}&bedRoomId=${encodeURIComponent(
-                          bedroom?._id || ""
-                        )}&bedroomName=${encodeURIComponent(
-                          bedroom.name
-                        )}&price=${encodeURIComponent(bedroom.rent)}`;
-                      } else {
-                        router.push(`/enquiry?propertyId=${encodeURIComponent(propertyId.toString())}&bedroomId=${encodeURIComponent(bedroom?._id || "")}&bedroomName=${encodeURIComponent(bedroom.name)}&price=${encodeURIComponent(bedroom.rent)}`);
-                      }
-                    }}
-                    className="px-6 py-2 rounded-md text-sm font-medium bg-blue-500 hover:bg-blue-600 transition-colors text-white"
+                    disabled={!isAuthenticated()}
+                    className={`px-6 py-2 rounded-md text-sm font-medium ${isAuthenticated() ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-500'} transition-colors text-white`}
                   >
-                    {instantBooking? "Book" : "Enquire"}
+                    {isAuthenticated() ? 'Book' : 'Login to Book'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+        {bookedBedrooms && bookedBedrooms.map((bedroom, index) => (
+          <div key={index} className="bg-white rounded-lg shadow p-4 mb-4">
+            <h3 className="font-semibold text-base mb-3">{bedroom.name}</h3>
+
+            <div className="flex items-start gap-3">
+              <div className="w-24 h-24">
+                <ImageSlider images={bedroom?.images} />
+              </div>
+
+              <div className="flex flex-col gap-1 flex-1">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Square size={16} /> {bedroom.sizeSqFt} sq.ft
+                  </div>
+                  <div className="font-semibold text-blue-600">{currencySymbol}{bedroom.rent} /<span className="text-xs" >month</span></div>
+                </div>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {bedroom.sharedKitchen && (
+                    <div className="flex items-center gap-1 text-xs px-2 py-1 bg-blue-50 text-blue-700 rounded-full">
+                      <UtensilsCrossed size={12} /> Shared kitchen
+                    </div>
+                  )}
+                  {bedroom.sharedWashroom && (
+                    <div className="flex items-center gap-1 text-xs px-2 py-1 bg-blue-50 text-blue-700 rounded-full">
+                      <Bath size={12} /> Shared washroom
+                    </div>
+                  )}
+                  {bedroom.furnished && (
+                    <div className="flex items-center gap-1 text-xs px-2 py-1 bg-green-50 text-green-700 rounded-full">
+                      <Home size={12} /> Furnished
+                    </div>
+                  )}
+                </div>
+                
+                {/* Add Book/Enquire button */}
+                <div className="mt-4 flex justify-end">
+                  <button
+                    disabled={true}
+                    className="px-6 py-2 rounded-md text-sm font-medium bg-gray-500 hover:bg-gray-600 transition-colors text-white"
+                  >
+                    Booked
                   </button>
                 </div>
               </div>
@@ -488,31 +530,11 @@ const PropertyDetailsMobile: React.FC<PropertyDetailsMobileProps> = ({
       >
         <div className="text-gray-700">
           {cancellationPolicy ? (
-            <div dangerouslySetInnerHTML={{ __html: cancellationPolicy }} />
-          ) : (
-            <div>
-              <div className="mb-6 p-3 bg-blue-50 border-l-4 border-blue-500 rounded-r">
-                <span className="font-medium text-blue-700">Important:</span> Please read this policy carefully before making your booking.
-              </div>
-              
-              <h3 className="font-medium text-lg mb-2">Cancellation terms</h3>
-              <ul className="list-disc pl-5 space-y-2 mb-5">
-                <li><span className="font-semibold">Full refund:</span> If canceled at least 14 days before check-in date</li>
-                <li><span className="font-semibold">50% refund:</span> If canceled between 7-14 days before check-in date</li>
-                <li><span className="font-semibold">No refund:</span> If canceled less than 7 days before check-in date</li>
-                <li><span className="font-semibold">No refund:</span> For no-shows or early check-out</li>
-              </ul>
-              
-              <h3 className="font-medium text-lg mb-2">Security deposits</h3>
-              <p className="mb-4">Security deposits are fully refundable within 7 days after checkout, provided no damage is reported during your stay.</p>
-              
-              <h3 className="font-medium text-lg mb-2">Special circumstances</h3>
-              <p className="mb-4">Special consideration may be given for cancellations due to unforeseen emergencies or extenuating circumstances. Please contact our support team if you need to cancel due to a genuine emergency.</p>
-              
-              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                <p className="text-sm">For questions about this policy or to request a cancellation, please contact us at <a href="mailto:support@cloudaccommodation.com" className="text-blue-600">support@cloudaccommodation.com</a></p>
-              </div>
+            <div className="text-sm text-gray-600 whitespace-pre-wrap">
+              {removeHtmlTags(cancellationPolicy)}
             </div>
+          ) : (
+            <p>No cancellation policy available.</p>
           )}
         </div>
       </BottomDrawer>

@@ -6,13 +6,13 @@ import isAuthenticated, { useClientSide } from "@/utils/auth-util";
 const GetInTouch = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  
+
   useEffect(() => {
     setIsClient(true);
   }, []);
-  
+
   const isUserAuthenticated = isClient ? isAuthenticated() : false;
-  
+
   const openModal = () => {
     setIsModalOpen(true);
   };
@@ -22,11 +22,11 @@ const GetInTouch = () => {
   };
 
   const contactOptions = [
-    {
-      icon: <MessageSquare className="w-6 h-6 sm:w-8 sm:h-8" />, // Adjusted for mobile
-      label: "Live Chat",
-      color: "text-red-500 border-red-500",
-    },
+    // {
+    //   icon: <MessageSquare className="w-6 h-6 sm:w-8 sm:h-8" />, // Adjusted for mobile
+    //   label: "Live Chat",
+    //   color: "text-red-500 border-red-500",
+    // },
     {
       icon: <Phone className="w-6 h-6 sm:w-8 sm:h-8" />, // Adjusted for mobile
       label: "Call",
@@ -56,11 +56,11 @@ const GetInTouch = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+        <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
           {contactOptions.map((option, index) => (
             <div
               key={index}
-              className={`p-4 sm:p-6 border-2 rounded-lg bg-white flex flex-col items-center justify-center cursor-pointer transition-all hover:shadow-lg ${option.color}`}
+              className={`basis-1/2 sm:basis-1/4 p-4 sm:p-6 border-2 rounded-lg bg-white flex flex-col items-center justify-center cursor-pointer transition-all hover:shadow-lg ${option.color}`}
             >
               <div className={option.color}>{option.icon}</div>
               <span className="mt-2 sm:mt-3 text-xs sm:text-base font-medium">
@@ -69,6 +69,7 @@ const GetInTouch = () => {
             </div>
           ))}
         </div>
+
       </div>
 
       <div className="w-full bg-red-600">
@@ -98,7 +99,7 @@ const GetInTouch = () => {
             <p className="text-gray-600 text-sm sm:text-base mb-4 sm:mb-6 max-w-lg">
               Sign up for an account to access exclusive deals, save your favorite properties, and get personalized accommodation recommendations.
             </p>
-            <button 
+            <button
               onClick={openModal}
               className="flex items-center px-6 py-3 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-all shadow-md"
             >
@@ -143,8 +144,8 @@ const GetInTouch = () => {
       {isModalOpen && (
         <div className="w-full fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
           <div className="bg-white rounded-2xl w-2/5 max-sm:w-full p-6 shadow-2xl transform transition-all">
-            <button 
-              onClick={closeModal} 
+            <button
+              onClick={closeModal}
               className="absolute top-4 right-4 hover:rotate-90 transition-transform"
             >
               <span className="text-2xl">×</span>

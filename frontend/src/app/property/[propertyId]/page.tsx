@@ -389,6 +389,7 @@ export default function PropertyPage() {
               amenities={thisProperty?.amenities}
               instantBooking={thisProperty?.instantBooking}
               bedroomDetails={thisProperty?.overview?.bedroomDetails}
+              cancellationPolicy={thisProperty?.cancellationPolicy}
               bookingOptions={thisProperty?.bookingOptions}
               availableFrom={thisProperty?.availableFrom}
               currency={thisProperty?.currency}
