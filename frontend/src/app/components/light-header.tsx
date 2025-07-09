@@ -22,6 +22,7 @@ import Loader from "@/loader/loader";
 import { useRouter } from "next/navigation";
 import Drawer from "./Drawer";
 import Bookings from "./bookings/Bookings";
+import Wishlist from "./wishlist";
 
 export default function LightHeader() {
   const { isDarkTheme, toggleTheme } = useTheme();
@@ -138,8 +139,8 @@ export default function LightHeader() {
         onClose={toggleMenu}
         isAuthenticated={isAuthenticatedUser}
         onProfileClick={() => openModal(<Profile />)}
-        onBookingsClick={() => openModal(<Bookings />)}
-        onWishlistClick={() => openModal(<Wishlist />)}
+        onBookingsClick={() => router.push("/bookings")}
+        onWishlistClick={() => router.push("/wishlist")}
         onLoginClick={() =>
           openModal(
             <Login openForgetPassword={() => openModal(<ForgetPassword />)} />
