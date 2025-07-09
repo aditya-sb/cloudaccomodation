@@ -25,6 +25,7 @@ const ListView: React.FC<ListViewProps> = ({ properties }) => {
         {visibleProperties.map((property, index) => (
           <Link target="_blank" key={index} href={`/property/${property._id}`}>
             <PropertyCard
+              _id={property._id}
               images={property.images || []}
               title={property.title}
               location={property.location}

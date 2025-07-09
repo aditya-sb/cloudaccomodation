@@ -103,7 +103,7 @@ const ExploreProperties = () => {
                 className="hover:opacity-80 transition-all duration-300"
               >
                 <PropertyCard
-                _id={property._id}
+                  _id={property._id}
                   images={property.images || []}
                   title={property.title}
                   location={property.location}

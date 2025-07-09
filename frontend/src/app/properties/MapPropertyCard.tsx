@@ -92,11 +92,11 @@ const MapPropertyCard: React.FC<MapPropertyCardProps> = ({
             {currencySymbol}
             {formatPrice(price)} /month
           </p>
-          <div className="flex items-center text-[9px] text-gray-700 gap-1">
+          {/* <div className="flex items-center text-[9px] text-gray-700 gap-1">
             <FaStar className="text-yellow-500" />
             <span>{rating}</span>
             <span className="text-gray-500">({reviewsCount} reviews)</span>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

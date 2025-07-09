@@ -79,12 +79,12 @@ export default function PropertyCard({
           )}
         </div>
 
-        <button
+        {/* <button
           className="absolute top-3 right-3 p-2 rounded-full shadow-md transition hover:opacity-75"
           style={{ backgroundColor: "var(--gray-hover-bg)", color: "var(--cta-text)" }}
         >
           <FaHeart size={10} />
-        </button>
+        </button> */}
       </div>
 
       {/* Details */}
@@ -105,11 +105,11 @@ export default function PropertyCard({
             {currencySymbol}{formatPrice(price)} <span className="text-sm font-normal text-[var(--gray-text)]">/month</span>
           </p>
 
-          <div className="flex items-center space-x-1 text-sm text-[var(--gray-text)]">
+          {/* <div className="flex items-center space-x-1 text-sm text-[var(--gray-text)]">
             <FaStar className="text-yellow-500" />
             <span className="font-medium">{rating}</span>
             <span>({reviewsCount})</span>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

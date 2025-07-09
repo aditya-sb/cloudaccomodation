@@ -2,16 +2,17 @@ import React from 'react';
 import PropertyCard from '../components/PropertyCard';
 import { FaHeart, FaSpinner } from 'react-icons/fa';
 import { useGetUserDetailsQuery, useGetWishlistQuery } from '../redux/slices/apiSlice';
+import Link from 'next/link';
 
 const Wishlist = () => {
     const { data: user, isLoading: userLoading } = useGetUserDetailsQuery();
-    const { 
-        data: wishlistData, 
-        isLoading: wishlistLoading, 
+    const {
+        data: wishlistData,
+        isLoading: wishlistLoading,
         error: wishlistError,
-        refetch: refetchWishlist 
+        refetch: refetchWishlist
     } = useGetWishlistQuery(
-        user?.user?._id, 
+        user?.user?._id,
         { skip: !user?.user?._id }
     );
 
@@ -33,7 +34,7 @@ const Wishlist = () => {
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
                     <h2 className="text-2xl font-bold text-red-500 mb-4">Error loading wishlist</h2>
-                    <button 
+                    <button
                         onClick={() => refetchWishlist()}
                         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                     >
@@ -92,29 +93,35 @@ const Wishlist = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {wishlistData.map((wishlistItem: any) => {
                         const property = wishlistItem.property;
-                        
+
                         // Skip if property is null or undefined
                         if (!property) return null;
 
                         return (
-                            <PropertyCard
+                            <Link
                                 key={property._id}
-                                _id={property._id}
-                                images={property.images || []}
-                                title={property.title}
-                                location={property.location || property.city}
-                                price={property.price}
-                                beds={property.beds}
-                                baths={property.baths}
-                                area={property.area}
-                                rating={property.rating || 0}
-                                reviewsCount={property.reviewsCount || 0}
-                                verified={property.verified || false}
-                                country={property.country}
-                                currencyCode={property.currencyCode}
-                                isInWishlist={true} // Since this is the wishlist page
-                                className="h-full"
-                            />
+                                href={`/property/${property._id}`}
+                                className="hover:opacity-80 transition-all duration-300"
+                            >
+                                <PropertyCard
+                                    key={property._id}
+                                    _id={property._id}
+                                    images={property.images || []}
+                                    title={property.title}
+                                    location={property.location || property.city}
+                                    price={property.price}
+                                    beds={property.beds}
+                                    baths={property.baths}
+                                    area={property.area}
+                                    rating={property.rating || 0}
+                                    reviewsCount={property.reviewsCount || 0}
+                                    verified={property.verified || false}
+                                    country={property.country}
+                                    currencyCode={property.currencyCode}
+                                    isInWishlist={true} // Since this is the wishlist page
+                                    className="h-full"
+                                />
+                            </Link>
                         );
                     })}
                 </div>
