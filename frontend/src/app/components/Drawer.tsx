@@ -174,7 +174,7 @@ const Drawer = ({
     {
       icon: Heart,
       label: 'Wishlist',
-      onClick: onBookingsClick,
+      onClick: onWishlistClick,
       badge: 'Manage reservations',
       showArrow: true
     },
