@@ -463,10 +463,26 @@ const PropertyDetailsMobile: React.FC<PropertyDetailsMobileProps> = ({
                 {/* Add Book/Enquire button */}
                 <div className="mt-4 flex justify-end">
                   <button
-                    disabled={!isAuthenticated()}
-                    className={`px-6 py-2 rounded-md text-sm font-medium ${isAuthenticated() ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-500'} transition-colors text-white`}
+                    onClick={() => {
+                      if (bedroom.status === "booked") {
+                        return;
+                      }
+                      if (instantBooking) {
+                        window.location.href = `/booking?propertyId=${encodeURIComponent(
+                          propertyId.toString()
+                        )}&bedRoomId=${encodeURIComponent(
+                          bedroom?._id || ""
+                        )}&bedroomName=${encodeURIComponent(
+                          bedroom.name
+                        )}&price=${encodeURIComponent(bedroom.rent)}`;
+                      } else {
+                        router.push(`/enquiry?propertyId=${encodeURIComponent(propertyId.toString())}&bedroomId=${encodeURIComponent(bedroom?._id || "")}&bedroomName=${encodeURIComponent(bedroom.name)}&price=${encodeURIComponent(bedroom.rent)}`);
+                      }
+                    }}
+                    className={`px-6 py-2 rounded-md text-sm font-medium transition-colors text-white ${bedroom.status === "booked" ? "bg-gray-500 hover:bg-gray-500" : "bg-blue-500 hover:bg-blue-600"}`}
+                    disabled={bedroom.status === "booked"}
                   >
-                    {isAuthenticated() ? 'Book' : 'Login to Book'}
+                    {bedroom.status === "booked" ? "Booked" : instantBooking ? "Book" : "Enquire"}
                   </button>
                 </div>
               </div>
@@ -510,10 +526,26 @@ const PropertyDetailsMobile: React.FC<PropertyDetailsMobileProps> = ({
                 {/* Add Book/Enquire button */}
                 <div className="mt-4 flex justify-end">
                   <button
-                    disabled={true}
-                    className="px-6 py-2 rounded-md text-sm font-medium bg-gray-500 hover:bg-gray-600 transition-colors text-white"
+                    onClick={() => {
+                      if (bedroom.status === "booked") {
+                        return;
+                      }
+                      if (instantBooking) {
+                        window.location.href = `/booking?propertyId=${encodeURIComponent(
+                          propertyId.toString()
+                        )}&bedRoomId=${encodeURIComponent(
+                          bedroom?._id || ""
+                        )}&bedroomName=${encodeURIComponent(
+                          bedroom.name
+                        )}&price=${encodeURIComponent(bedroom.rent)}`;
+                      } else {
+                        router.push(`/enquiry?propertyId=${encodeURIComponent(propertyId.toString())}&bedroomId=${encodeURIComponent(bedroom?._id || "")}&bedroomName=${encodeURIComponent(bedroom.name)}&price=${encodeURIComponent(bedroom.rent)}`);
+                      }
+                    }}
+                    className={`px-6 py-2 rounded-md text-sm font-medium transition-colors text-white ${bedroom.status === "booked" ? "bg-gray-500 hover:bg-gray-500" : "bg-blue-500 hover:bg-blue-600"}`}
+                    disabled={bedroom.status === "booked"}
                   >
-                    Booked
+                    {bedroom.status === "booked" ? "Booked" : instantBooking ? "Book now" : "Enquire"}
                   </button>
                 </div>
               </div>

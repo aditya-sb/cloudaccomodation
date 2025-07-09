@@ -14,18 +14,21 @@ import {
   ChevronRight,
   Settings,
   Moon,
-  Sun
+  Sun,
+  Heart
 } from 'lucide-react';
 import { setAuthToken, notifyAuthStateChange } from '@/utils/auth-util';
 import { signOut as nextAuthSignOut } from 'next-auth/react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
+import Wishlist from './wishlist';
 
 interface DrawerProps {
   isOpen: boolean;
   onClose: () => void;
   isAuthenticated: boolean;
+  onWishlistClick: () => void;
   onProfileClick: () => void;
   onBookingsClick: () => void;
   onLoginClick: () => void;
@@ -114,6 +117,7 @@ const Drawer = ({
   isAuthenticated,
   onProfileClick,
   onBookingsClick,
+  onWishlistClick,
   onLoginClick,
   onSignUpClick
 }: DrawerProps) => {
@@ -167,6 +171,14 @@ const Drawer = ({
       badge: 'Manage reservations',
       showArrow: true
     },
+    {
+      icon: Heart,
+      label: 'Wishlist',
+      onClick: onBookingsClick,
+      badge: 'Manage reservations',
+      showArrow: true
+    },
+    
     // {
     //   icon: HelpCircle,
     //   label: 'Help Center',

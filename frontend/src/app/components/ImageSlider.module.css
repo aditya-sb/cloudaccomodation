@@ -3,6 +3,7 @@
   width: 100%;
   padding-bottom: 100%; /* Creates a perfect square */
   overflow: hidden;
+  border-radius: 6px;
 }
 
 .image {

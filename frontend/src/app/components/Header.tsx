@@ -13,6 +13,7 @@ import {
   FaSearch,
   FaTimes,
   FaBookmark,
+  FaHeart,
 } from "react-icons/fa";
 import Login from "../auth/Login";
 import Profile from "../auth/Profile";
@@ -159,6 +160,12 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
               >
                 <FaUser className="text-lg mr-2" /> Profile
               </button>
+              <button
+                onClick={() => router.push('/wishlist')}
+                className="flex items-center hover:text-blue-500 transition-colors"
+              >
+                <FaHeart className="text-lg mr-2" /> Wishlist
+              </button>
               {/* <button
                 onClick={() => openModal(<div>History Content</div>)}
                 className="flex items-center hover:text-blue-500 transition-colors"
@@ -219,6 +226,7 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
         isAuthenticated={isAuthenticatedUser}
         onProfileClick={() => openModal(<Profile />)}
         onBookingsClick={() => router.push('/bookings')}
+        onWishlistClick={() => router.push('/wishlist')}
         onLoginClick={() =>
           openModal(
             <Login openForgetPassword={() => openModal(<ForgetPassword />)} />

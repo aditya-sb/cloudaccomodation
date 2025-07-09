@@ -108,9 +108,9 @@ export default function BedroomSection({
       {/* Bedroom content */}
       <div className="p-4">
         {/* Top section with image and key details */}
-        <div className="flex flex-col md:flex-row gap-6">
+        <div className="flex flex-col md:flex-row bg-gray-100 rounded-lg gap-6">
           {/* Left column - Image */}
-          <div className="w-full md:w-40">
+          <div className="w-full md:w-40 rounded-lg">
             <ImageSlider images={bedroom.images} />
           </div>
 

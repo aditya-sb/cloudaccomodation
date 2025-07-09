@@ -9,6 +9,7 @@ import {
   FaMoon,
   FaSun,
   FaBookmark,
+  FaHeart,
 } from "react-icons/fa";
 import Login from "../auth/Login";
 import Profile from "../auth/Profile";
@@ -96,6 +97,12 @@ export default function LightHeader() {
                 <FaUser className="text-xl mr-2 text-blue-500" /> Profile
               </button>
               <button
+                onClick={() => router.push("/wishlist")}
+                className="flex items-center px-4 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
+              >
+                <FaHeart className="text-xl mr-2 text-blue-500" /> Wishlist
+              </button>
+              <button
                 onClick={() => router.push("/bookings")}
                 className="flex items-center px-4 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
               >
@@ -132,6 +139,7 @@ export default function LightHeader() {
         isAuthenticated={isAuthenticatedUser}
         onProfileClick={() => openModal(<Profile />)}
         onBookingsClick={() => openModal(<Bookings />)}
+        onWishlistClick={() => openModal(<Wishlist />)}
         onLoginClick={() =>
           openModal(
             <Login openForgetPassword={() => openModal(<ForgetPassword />)} />

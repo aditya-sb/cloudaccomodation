@@ -20,6 +20,8 @@ import {
   FaLocationArrow,
   FaAngleDown,
 } from "react-icons/fa";
+import Features from "../components/Features";
+import toast from "react-hot-toast";
 
 // Update PaymentResult interface
 interface PaymentResult {
@@ -180,35 +182,41 @@ function BookingPageContent() {
   const handlePaymentSuccess = async (paymentResult: PaymentResult) => {
     try {
       if (pendingBookingData) {
-        // Add payment information to booking data
         const bookingDataWithPayment = {
           ...pendingBookingData,
           paymentIntentId: paymentResult.paymentId,
           paymentStatus: "completed",
           status: "confirmed",
         };
-
-        // Create booking after successful payment
+  
         const result = await createBooking(bookingDataWithPayment).unwrap();
-
+  
         if (result) {
-          alert("Booking created successfully!");
+          // Close the payment modal
+          setShowPayment(false);
+          // Show success message
+          toast.success("🎉 Payment successful! Your booking is confirmed.");
+          // Redirect to bookings page after a short delay
           router.push("/bookings");
         }
       }
     } catch (err) {
       console.error("Error in payment success handler:", err);
-      alert(
+      // Close the payment modal on error
+      setShowPayment(false);
+      toast.error(
         "An error occurred while processing your booking. Please try again."
       );
     }
   };
-
-  // Handle payment error
+  
   const handlePaymentError = (message: string) => {
     console.error("Payment error:", message);
-    alert(`Payment failed: ${message}`);
+    // Close the payment modal on error
+    setShowPayment(false);
+    toast.error(`❌ Payment failed: ${message}`);
   };
+  
 
   // Fetch property details
   const { data: propertyData, isLoading: isLoadingProperty } =
@@ -458,12 +466,12 @@ function BookingPageContent() {
   };
 
   // Effect for success
-  useEffect(() => {
-    if (isSuccess) {
-      alert("Booking created successfully!");
-      router.push("/bookings");
-    }
-  }, [isSuccess, router]);
+  // useEffect(() => {
+  //   if (isSuccess) {
+  //     toast.success("Booking created successfully!");
+  //     router.push("/bookings");
+  //   }
+  // }, [isSuccess, router]);
 
   // Effect for errors
   useEffect(() => {
@@ -545,43 +553,7 @@ function BookingPageContent() {
                 </div>
               </div>
             </div>
-            <div className="rounded-lg overflow-hidden mt-4">
-              <Dropdown
-                className="border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
-                title="Instant Booking"
-                icon={<FaBolt size={14} />}
-              >
-                <p>Details about instant booking go here...</p>
-              </Dropdown>
-              <Dropdown
-                className="border border-gray-200 hover:border-gray-300 transition-colors"
-                title="Lowest Price Guaranteed"
-                icon={<FaDollarSign size={14} />}
-              >
-                <p>Details about price guarantee go here...</p>
-              </Dropdown>
-              <Dropdown
-                className="border border-gray-200 hover:border-gray-300 transition-colors"
-                title="Verified Properties"
-                icon={<FaCheck size={14} />}
-              >
-                <p>Details about verified properties go here...</p>
-              </Dropdown>
-              <Dropdown
-                className="border border-gray-200 hover:border-gray-300 transition-colors"
-                title="24x7 Personal Assistance"
-                icon={<FaHeadset size={14} />}
-              >
-                <p>Details about personal assistance go here...</p>
-              </Dropdown>
-              <Dropdown
-                className="border border-gray-200 hover:border-gray-300 transition-colors"
-                title="5.8K+ Reviews"
-                icon={<FaUndo size={14} />}
-              >
-                <p>Details about reviews go here...</p>
-              </Dropdown>
-            </div>
+            <Features/>
           </div>
           
 
@@ -644,7 +616,7 @@ function BookingPageContent() {
                     >
                       <option value="">Select a room</option>
                       {property?.overview?.bedroomDetails
-                        ?.filter((bedroom: any) => bedroom.status === 'available')
+                        ?.filter((bedroom: any) => bedroom.status === 'available'||bedroom.status === '')
                         .map((bedroom: any) => (
                           <option key={bedroom._id} value={bedroom._id}>
                             {bedroom.name} - {getCurrencySymbol(property?.country)}{bedroom.rent}/month
@@ -1036,38 +1008,39 @@ function BookingPageContent() {
           </div>
         </div>
       </div>
+      {showPayment && 
       <StripePayment
-        displayData={{
-          ...pendingBookingData,
-          userId: "pending",
-          leaseDuration: formData.leaseDuration,
-          name: formData.fullName,
-          email: formData.emailAddress,
-          phone: `${formData.code}${formData.mobileNumber}`,
-          rentalDays: pendingBookingData?.rentalDays || 30,
-          moveInDate: formData.moveInDate,
-          moveInMonth: new Date(formData.moveInDate).toLocaleString("default", {
-            month: "long",
-            year: "numeric",
-          }),
-          propertyId: propertyId || "",
-          price: pendingBookingData?.price || 0,
-          securityDeposit: pendingBookingData?.securityDeposit,
-          lastMonthPayment: pendingBookingData?.lastMonthPayment,
-          allowSecurityDeposit: pendingBookingData?.allowSecurityDeposit,
-          currency: pendingBookingData?.currency || "GBP",
-          country: formData.country,
-          bedroomName: pendingBookingData?.bedroomName || ""
-        }}
-        paymentDetails={{
-          amount: paymentDetails.amount,
-          currency: paymentDetails.currency,
-        }}
-        isOpen={showPayment}
-        onClose={() => setShowPayment(false)}
-        onSuccess={handlePaymentSuccess}
-        onError={handlePaymentError}
-      />
+      displayData={{
+        ...pendingBookingData,
+        userId: "pending",
+        leaseDuration: formData.leaseDuration,
+        name: formData.fullName,
+        email: formData.emailAddress,
+        phone: `${formData.code}${formData.mobileNumber}`,
+        rentalDays: pendingBookingData?.rentalDays || 30,
+        moveInDate: formData.moveInDate,
+        moveInMonth: new Date(formData.moveInDate).toLocaleString("default", {
+          month: "long",
+          year: "numeric",
+        }),
+        propertyId: propertyId || "",
+        price: pendingBookingData?.price || 0,
+        securityDeposit: pendingBookingData?.securityDeposit,
+        lastMonthPayment: pendingBookingData?.lastMonthPayment,
+        allowSecurityDeposit: pendingBookingData?.allowSecurityDeposit,
+        currency: pendingBookingData?.currency || "GBP",
+        country: formData.country,
+        bedroomName: pendingBookingData?.bedroomName || ""
+      }}
+      paymentDetails={{
+        amount: paymentDetails.amount,
+        currency: paymentDetails.currency,
+      }}
+      isOpen={showPayment}
+      onClose={() => setShowPayment(false)}
+      onSuccess={handlePaymentSuccess}
+      onError={handlePaymentError}
+    />}
       <Footer />
     </>
   );

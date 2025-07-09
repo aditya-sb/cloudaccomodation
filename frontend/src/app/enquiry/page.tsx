@@ -16,6 +16,7 @@ import {
   FaAngleDown,
 } from "react-icons/fa";
 import { toast } from "react-hot-toast";
+import Features from "../components/Features";
 
 // Enquiry form page component
 function EnquiryPageContent() {
@@ -288,43 +289,7 @@ function EnquiryPageContent() {
                 </div>
               </div>
             </div>
-            <div className="rounded-lg overflow-hidden mt-4">
-              <Dropdown
-                className="border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
-                title="Instant Booking"
-                icon={<FaBolt size={14} />}
-              >
-                <p>Details about instant booking go here...</p>
-              </Dropdown>
-              <Dropdown
-                className="border border-gray-200 hover:border-gray-300 transition-colors"
-                title="Lowest Price Guaranteed"
-                icon={<FaDollarSign size={14} />}
-              >
-                <p>Details about price guarantee go here...</p>
-              </Dropdown>
-              <Dropdown
-                className="border border-gray-200 hover:border-gray-300 transition-colors"
-                title="Verified Properties"
-                icon={<FaCheck size={14} />}
-              >
-                <p>Details about verified properties go here...</p>
-              </Dropdown>
-              <Dropdown
-                className="border border-gray-200 hover:border-gray-300 transition-colors"
-                title="24x7 Personal Assistance"
-                icon={<FaHeadset size={14} />}
-              >
-                <p>Details about personal assistance go here...</p>
-              </Dropdown>
-              <Dropdown
-                className="border border-gray-200 hover:border-gray-300 transition-colors"
-                title="5.8K+ Reviews"
-                icon={<FaUndo size={14} />}
-              >
-                <p>Details about reviews go here...</p>
-              </Dropdown>
-            </div>
+            <Features/>
           </div>
 
           {/* Right Column - Enquiry Form */}

@@ -30,6 +30,7 @@ import ReviewForm from "@/app/components/ReviewForm";
 import { useEffect, useState, useRef } from "react";
 import { BedroomDetail as BookingBedroomDetail } from "@/app/components/SelectedBedroomDropdown";
 import BedroomSection, { BedroomDetail as BedroomSectionDetail } from "../bedroomsDetails";
+import Features from "@/app/components/Features";
 
 // Function to format the date as Month DD, YYYY
 const formatDate = (date: Date): string => {
@@ -479,43 +480,7 @@ export default function PropertyPage() {
             {/* Action Buttons (View Rooms, Book Now/Enquire Now) */}
             {renderActionButtons()}
             
-            <div className="rounded-lg overflow-hidden mt-4">
-              <Dropdown
-                className="border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
-                title="Instant Booking"
-                icon={<FaBolt size={14} />}
-              >
-                <p>Details about instant booking go here...</p>
-              </Dropdown>
-              <Dropdown
-                className="border border-gray-200 hover:border-gray-300 transition-colors"
-                title="Lowest Price Guaranteed"
-                icon={<FaDollarSign size={14} />}
-              >
-                <p>Details about price guarantee go here...</p>
-              </Dropdown>
-              <Dropdown
-                className="border border-gray-200 hover:border-gray-300 transition-colors"
-                title="Verified Properties"
-                icon={<FaCheck size={14} />}
-              >
-                <p>Details about verified properties go here...</p>
-              </Dropdown>
-              <Dropdown
-                className="border border-gray-200 hover:border-gray-300 transition-colors"
-                title="24x7 Personal Assistance"
-                icon={<FaHeadset size={14} />}
-              >
-                <p>Details about personal assistance go here...</p>
-              </Dropdown>
-              <Dropdown
-                className="border border-gray-200 hover:border-gray-300 transition-colors"
-                title="5.8K+ Reviews"
-                icon={<FaUndo size={14} />}
-              >
-                <p>Details about reviews go here...</p>
-              </Dropdown>
-            </div>
+            <Features/>
           </div>
         </div>
       </div>
