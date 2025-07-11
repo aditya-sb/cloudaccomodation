@@ -2,18 +2,20 @@ import React, { useState, useEffect } from "react";
 import { MessageSquare, Phone, Mail, MessageCircle, PhoneCall, UserPlus } from "lucide-react";
 import Register from "../auth/Register";
 import isAuthenticated, { useClientSide } from "@/utils/auth-util";
+import GetAgent from "./GetAgent";
 
 const GetInTouch = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
-
+  const [modalContent, setModalContent] = useState<React.ReactNode>(null);
   useEffect(() => {
     setIsClient(true);
   }, []);
 
   const isUserAuthenticated = isClient ? isAuthenticated() : false;
 
-  const openModal = () => {
+  const openModal = (p0: React.JSX.Element) => {
+    setModalContent(p0)
     setIsModalOpen(true);
   };
 
@@ -30,16 +32,19 @@ const GetInTouch = () => {
     {
       icon: <Phone className="w-6 h-6 sm:w-8 sm:h-8" />, // Adjusted for mobile
       label: "Call",
+      oneClick: "tel:+14372887804",
       color: "text-orange-400 border-orange-400",
     },
     {
       icon: <Mail className="w-6 h-6 sm:w-8 sm:h-8" />, // Adjusted for mobile
       label: "Email",
+      oneClick: "mailto:info@cloudaccommodation.com",
       color: "text-blue-500 border-blue-500",
     },
     {
       icon: <MessageCircle className="w-6 h-6 sm:w-8 sm:h-8" />, // Adjusted for mobile
       label: "Chat on Whatsapp",
+      oneClick: "https://wa.me/14372887804",
       color: "text-green-500 border-green-500",
     },
   ];
@@ -84,9 +89,9 @@ const GetInTouch = () => {
               for you!
             </p>
           </div>
-          <button className="w-fit bg-white text-red-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors flex items-center gap-2 mt-4 sm:mt-0 sm:w-auto justify-center">
+          <div onClick={() => openModal(<GetAgent />)}  className="w-fit bg-white text-red-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors flex items-center gap-2 mt-4 sm:mt-0 sm:w-auto justify-center">
             <PhoneCall /><span>Get an agent</span>
-          </button>
+          </div>
         </div>
       </div>
 
@@ -100,7 +105,7 @@ const GetInTouch = () => {
               Sign up for an account to access exclusive deals, save your favorite properties, and get personalized accommodation recommendations.
             </p>
             <button
-              onClick={openModal}
+              onClick={() => openModal(<Register />)}
               className="flex items-center px-6 py-3 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-all shadow-md"
             >
               <UserPlus className="mr-2 h-5 w-5" /> Sign Up Now
@@ -142,15 +147,15 @@ const GetInTouch = () => {
 
       {/* Sign Up Modal */}
       {isModalOpen && (
-        <div className="w-full fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
-          <div className="bg-white rounded-2xl w-2/5 max-sm:w-full p-6 shadow-2xl transform transition-all">
+        <div className="w-full  fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
+          <div className="bg-white rounded-2xl w-3/5 max-sm:w-full p-2 shadow-2xl transform transition-all">
             <button
               onClick={closeModal}
               className="absolute top-4 right-4 hover:rotate-90 transition-transform"
             >
               <span className="text-2xl">×</span>
             </button>
-            <Register />
+            {modalContent}
           </div>
         </div>
       )}

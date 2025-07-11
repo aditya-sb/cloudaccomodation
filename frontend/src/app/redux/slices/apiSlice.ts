@@ -50,7 +50,7 @@ export const apiSlice = createApi({
     return result;
   },
 
-  tagTypes: ["User", "Auth", "Property", "Booking", "Dashboard", "Payment", "Enquiry", "Review", "Verification", "Wishlist"],
+  tagTypes: ["User", "Auth", "Property", "Booking", "Dashboard", "Payment", "Enquiry", "Review", "Verification", "Wishlist", "Agent"],
   endpoints: (builder) => ({
     register: builder.mutation({
       query: (userData) => ({
@@ -357,6 +357,45 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["Wishlist"],
     }),
+    // Agent endpoints
+    createAgentRequest: builder.mutation({
+      query: (agentData: any) => ({
+        url: '/getAgent/createAgentRequest',
+        method: 'POST',
+        body: agentData,
+      }),
+      invalidatesTags: ['Agent'],
+    }),
+
+    getAllAgentRequests: builder.query<any, void>({
+      query: () => '/getAgent/getAllAgentRequest',
+      providesTags: ['Agent'],
+    }),
+
+    getAgentRequest: builder.query<any, string>({
+      query: (id: string) => `/getAgent/getAgentRequest/${id}`,
+      providesTags: (result, error, id) => [{ type: 'Agent' as const, id }],
+    }),
+
+    updateAgentRequest: builder.mutation<unknown, { id: string; updates: any }>({
+      query: ({ id, updates }) => ({
+        url: `/getAgent/updateAgentRequest/${id}`,
+        method: 'PUT',
+        body: updates,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        'Agent',
+        { type: 'Agent' as const, id },
+      ],
+    }),
+
+    deleteAgentRequest: builder.mutation<unknown, string>({
+      query: (id: string) => ({
+        url: `/getAgent/deleteAgentRequest/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Agent'],
+    }),
   }),
 });
 
@@ -412,6 +451,12 @@ export const {
   useGetWishlistQuery,
   useAddToWishlistMutation,
   useRemoveFromWishlistMutation,
+  // Agent hooks
+  useCreateAgentRequestMutation,
+  useGetAllAgentRequestsQuery,
+  useGetAgentRequestQuery,
+  useUpdateAgentRequestMutation,
+  useDeleteAgentRequestMutation,
 } = apiSlice;
 
 // Function to handle logout and invalidate user queries
