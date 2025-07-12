@@ -13,7 +13,7 @@ export default function Footer() {
     "Overseas Sim Card"
   ];
 
-  const whatsappNumber = "+919876543210"; // Replace with your actual WhatsApp number
+  const whatsappNumber = "+14372887804"; // Replace with your actual WhatsApp number
   const whatsappLink = `https://wa.me/${whatsappNumber}`;
 
   return (
@@ -62,7 +62,7 @@ export default function Footer() {
             <div className="text-center flex flex-col items-center justify-center space-y-2">
               <p className="w-full justify-center text-gray-400 text-sm flex items-center">
                 <FaPhoneAlt className="mr-2" />
-                +91 (902) 123 4567
+                +1 (437) 288-7804
               </p>
               <a href="mailto:info@cloudaccommodation.com" className="text-gray-400 text-sm">
                 info@cloudaccommodation.com
@@ -71,10 +71,10 @@ export default function Footer() {
                 href={whatsappLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors text-sm mt-2"
+                className="inline-flex items-center bg-green-600 hover:bg-white text-white px-4 py-2 rounded-lg transition-colors text-sm mt-2"
               >
                 <FaWhatsapp className="mr-2" />
-                Chat on WhatsApp
+                WhatsApp
               </a>
             </div>
           </div>
