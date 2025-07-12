@@ -10,6 +10,7 @@ import {
   FaSun,
   FaBookmark,
   FaHeart,
+  FaInfoCircle,
 } from "react-icons/fa";
 import Login from "../auth/Login";
 import Profile from "../auth/Profile";
@@ -93,21 +94,27 @@ export default function LightHeader() {
             <>
               <button
                 onClick={() => openModal(<Profile />)}
-                className="flex items-center px-4 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
+                className="flex items-center px-4 py-2 rounded-full bg-blue-100 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
               >
                 <FaUser className="text-xl mr-2 text-blue-500" /> Profile
               </button>
               <button
                 onClick={() => router.push("/wishlist")}
-                className="flex items-center px-4 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
+                className="flex items-center px-4 py-2 rounded-full bg-blue-100 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
               >
                 <FaHeart className="text-xl mr-2 text-blue-500" /> Wishlist
               </button>
               <button
                 onClick={() => router.push("/bookings")}
-                className="flex items-center px-4 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
+                className="flex items-center px-4 py-2 rounded-full bg-blue-100 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
               >
                 <FaBookmark className="text-xl mr-2 text-blue-500" /> Bookings
+              </button>
+              <button
+                onClick={() => router.push("/about-us")}
+                className="flex items-center px-4 py-2 rounded-full bg-blue-100 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
+              >
+                <FaInfoCircle className="text-xl mr-2 text-blue-500" /> About Us
               </button>
             </>
           ) : (

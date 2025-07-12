@@ -14,6 +14,7 @@ import {
   FaTimes,
   FaBookmark,
   FaHeart,
+  FaInfoCircle,
 } from "react-icons/fa";
 import Login from "../auth/Login";
 import Profile from "../auth/Profile";
@@ -106,6 +107,17 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
             </h1>
           </a>
         </Link>
+        <Link href="/" passHref legacyBehavior>
+          <a className="max-sm:flex md:hidden items-center mr-4 cursor-pointer hover:opacity-80 transition-opacity">
+            <Image
+              src="/images/cloudlogo.png"
+              alt="Property Logo"
+              className="h-8 w-auto rounded-xl"
+              height={160}
+              width={160}
+            />
+          </a>
+        </Link>
 
         {/* Search Bar - Updated styling */}
         {!isPropertyPage? (
@@ -183,6 +195,12 @@ export default function Header({ isPropertyPage, ...props }: HeaderProps) {
                 className="flex items-center hover:text-blue-500 transition-colors"
               >
                 <FaBookmark className="text-lg mr-2" /> Bookings
+              </button>
+              <button
+                onClick={() => router.push('/about-us')}
+                className="flex items-center hover:text-blue-500 transition-colors"
+              >
+                <FaInfoCircle className="text-lg mr-2" /> About Us
               </button>
             </>
           ) : (

@@ -15,7 +15,8 @@ import {
   Settings,
   Moon,
   Sun,
-  Heart
+  Heart,
+  Lock
 } from 'lucide-react';
 import { setAuthToken, notifyAuthStateChange } from '@/utils/auth-util';
 import { signOut as nextAuthSignOut } from 'next-auth/react';
@@ -122,7 +123,6 @@ const Drawer = ({
   onSignUpClick
 }: DrawerProps) => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
 
   const handleSignOut = async () => {
     try {
@@ -194,10 +194,15 @@ const Drawer = ({
     {
       icon: FileText,
       label: 'About',
-      href: '/about',
+      href: '/about-us',
       showArrow: true
     },
-
+    {
+      icon: Lock,
+      label: 'Privacy Policy',
+      href: '/privacy-policy',
+      showArrow: true
+    },
     // { 
     //   icon: Settings, 
     //   label: 'Settings', 
@@ -236,7 +241,13 @@ const Drawer = ({
     {
       icon: FileText,
       label: 'About',
-      href: '/about',
+      href: '/about-us',
+      showArrow: true
+    },
+    {
+      icon: Lock,
+      label: 'Privacy Policy',
+      href: '/privacy-policy',
       showArrow: true
     },
   ];

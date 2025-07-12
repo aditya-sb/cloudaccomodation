@@ -91,7 +91,7 @@ const ReviewSection = () => {
         <div className="flex justify-center items-center gap-2 bg-white text-green-600 px-2 py-1 rounded-md text-xs font-bold"><StarIcon/><p>Trustpilot</p></div>
       </div>
       <div className='md:flex hidden justify-center items-center'>
-      <button className=" mt-6 px-6 py-2 bg-white text-blue-600 rounded-lg font-semibold hover:bg-gray-100">Read Reviews</button>
+      <button onClick={() => window.open("https://ca.trustpilot.com/review/cloudaccomodation.com", "_blank")} className=" mt-6 px-6 py-2 bg-white text-blue-600 rounded-lg font-semibold hover:bg-gray-100">Read Reviews</button>
       </div>
     </div>
   );

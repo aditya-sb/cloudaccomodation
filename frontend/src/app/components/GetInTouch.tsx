@@ -32,19 +32,19 @@ const GetInTouch = () => {
     {
       icon: <Phone className="w-6 h-6 sm:w-8 sm:h-8" />, // Adjusted for mobile
       label: "Call",
-      oneClick: "tel:+14372887804",
+      onclick: "tel:+14372887804",
       color: "text-orange-400 border-orange-400",
     },
     {
       icon: <Mail className="w-6 h-6 sm:w-8 sm:h-8" />, // Adjusted for mobile
       label: "Email",
-      oneClick: "mailto:info@cloudaccommodation.com",
+      onclick: "mailto:info@cloudaccommodation.com",
       color: "text-blue-500 border-blue-500",
     },
     {
       icon: <MessageCircle className="w-6 h-6 sm:w-8 sm:h-8" />, // Adjusted for mobile
       label: "Chat on Whatsapp",
-      oneClick: "https://wa.me/14372887804",
+      onclick: "https://wa.me/14372887804",
       color: "text-green-500 border-green-500",
     },
   ];
@@ -65,6 +65,9 @@ const GetInTouch = () => {
           {contactOptions.map((option, index) => (
             <div
               key={index}
+              onClick={() => {
+                window.open(option.onclick, "_blank");
+              }}
               className={`basis-1/2 sm:basis-1/4 p-4 sm:p-6 border-2 rounded-lg bg-white flex flex-col items-center justify-center cursor-pointer transition-all hover:shadow-lg ${option.color}`}
             >
               <div className={option.color}>{option.icon}</div>
@@ -74,6 +77,7 @@ const GetInTouch = () => {
             </div>
           ))}
         </div>
+
 
       </div>
 
@@ -89,7 +93,7 @@ const GetInTouch = () => {
               for you!
             </p>
           </div>
-          <div onClick={() => openModal(<GetAgent />)}  className="w-fit bg-white text-red-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors flex items-center gap-2 mt-4 sm:mt-0 sm:w-auto justify-center">
+          <div onClick={() => openModal(<GetAgent />)} className="w-fit bg-white text-red-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors flex items-center gap-2 mt-4 sm:mt-0 sm:w-auto justify-center">
             <PhoneCall /><span>Get an agent</span>
           </div>
         </div>

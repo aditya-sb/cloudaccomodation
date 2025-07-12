@@ -35,10 +35,31 @@ export default function SearchBar() {
   ];
 
   const router = useRouter();
+  
+  const handleSearch = (term: string) => {
+    if (term.trim()) {
+      router.push(`/properties?search=${encodeURIComponent(term.trim())}`);
+    } else {
+      router.push('/properties');
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
-      router.push(`/properties?search=${searchTerm}`);
+      handleSearch(searchTerm);
     }
+  };
+
+  const handleCityClick = (city: string) => {
+    setSearchTerm(city);
+    setShowDropdown(false);
+    handleSearch(city);
+  };
+
+  const handleUniversityClick = (university: string) => {
+    setSearchTerm(university);
+    setShowDropdown(false);
+    handleSearch(university);
   };
 
   return (
@@ -73,13 +94,6 @@ export default function SearchBar() {
           </a>
         </div> */}
 
-        {/* Headline */}
-        <h1
-          className="text-4xl sm:text-5xl font-bold text-center mb-4"
-          style={{ color: "var(--cta-text)" }}
-        >
-        </h1>
-
         {/* Search Bar */}
         <div className="relative w-full max-w-md sm:max-w-lg lg:max-w-2xl">
           <div
@@ -101,59 +115,56 @@ export default function SearchBar() {
               }}
               onFocus={() => setShowDropdown(true)}
               onBlur={(e) => {
+                // Delay hiding dropdown to allow clicking on items
                 setTimeout(() => {
-                  if (!e.relatedTarget) {
+                  if (!e.relatedTarget || !e.relatedTarget.closest('.dropdown-container')) {
                     setShowDropdown(false);
                   }
-                }, 150);
+                }, 200);
               }}
             />
             <button
-              className="rounded-full p-2 px-4  text-white flex items-center justify-center transition-all"
+              className="rounded-full p-2 px-4 text-white flex items-center justify-center transition-all hover:scale-105"
               style={{
                 backgroundColor: "var(--cta)",
                 color: "var(--cta-text)",
               }}
-              onClick={() => router.push(`/properties?search=${searchTerm}`)}
+              onClick={() => handleSearch(searchTerm)}
             >
               <FaSearch className="w-5 h-5" />
             </button>
           </div>
-        </div>
 
-        <div
-          className="relative rounded-full shadow-xl flex items-center space-x-2 w-full max-w-md sm:max-w-lg lg:max-w-2xl"
-          style={{}}
-        >
-          {/* ... existing search input and button code ... */}
-
+          {/* Dropdown */}
           {showDropdown && (
             <div
-              className="absolute mt-2 shadow-xl rounded-xl w-full z-10"
+              className="dropdown-container absolute mt-2 shadow-xl rounded-xl w-full z-10"
               style={{
                 backgroundColor: "var(--card)",
                 color: "var(--copy-primary)",
                 top: "100%",
                 left: 0,
+                maxHeight: "400px",
+                overflowY: "auto"
               }}
             >
               <div className="p-4">
                 <h2 className="text-lg font-semibold mb-3 flex items-center">
-                  <FaBolt className="mr-2" style={{ color: "var(--cta)" }} />{" "}
+                  <FaBolt className="mr-2" style={{ color: "var(--cta)" }} />
                   Top Cities in Canada
                 </h2>
                 <div className="flex flex-wrap gap-2">
                   {cities.map((city) => (
                     <button
                       key={city}
-                      onClick={() => router.push(`/properties?search=${city}`)}
-                    
-                      className="px-4 py-2 rounded-full text-sm transition-all hover:scale-105"
+                      onClick={() => handleCityClick(city)}
+                      className="px-4 py-2 rounded-full text-sm transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2"
                       style={{
                         backgroundColor: "var(--gray-bg)",
                         color: "var(--copy-primary)",
                         border: "1px solid var(--cta)",
                       }}
+                      onFocus={() => setShowDropdown(true)}
                     >
                       {city}
                     </button>
@@ -166,20 +177,21 @@ export default function SearchBar() {
               />
               <div className="p-4">
                 <h2 className="text-lg font-semibold mb-3 flex items-center">
-                  <FaBolt className="mr-2" style={{ color: "var(--cta)" }} />{" "}
+                  <FaBolt className="mr-2" style={{ color: "var(--cta)" }} />
                   Top Universities in Canada
                 </h2>
                 <div className="flex flex-wrap gap-2">
                   {universities.map((university) => (
                     <button
                       key={university}
-                      onClick={() => router.push(`/properties?search=${university}`)}
-                      className="px-4 py-2 rounded-full text-sm transition-all hover:scale-105"
+                      onClick={() => handleUniversityClick(university)}
+                      className="px-4 py-2 rounded-full text-sm transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2"
                       style={{
                         backgroundColor: "var(--gray-bg)",
                         color: "var(--copy-primary)",
                         border: "1px solid var(--cta)",
                       }}
+                      onFocus={() => setShowDropdown(true)}
                     >
                       {university}
                     </button>
@@ -189,6 +201,7 @@ export default function SearchBar() {
             </div>
           )}
         </div>
+
         {/* Scroll Down Arrow */}
         {/* <div className="absolute right-8 bottom-8">
           <div
@@ -214,4 +227,4 @@ export default function SearchBar() {
       </div>
     </div>
   );
-}
+} 

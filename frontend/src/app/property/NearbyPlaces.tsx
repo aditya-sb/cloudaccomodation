@@ -65,11 +65,11 @@ const NearbyPlaces: React.FC<NearbyPlacesProps> = ({ latitude, longitude, locati
   );
   
   const placeCategories: PlaceCategory[] = [
-    { type: 'restaurant', label: 'Restaurants', icon: <FaUtensils />, color: '#FF5252' },
-    { type: 'shopping_mall', label: 'Shopping', icon: <FaShoppingBag />, color: '#7C4DFF' },
-    { type: 'university', label: 'Education', icon: <FaGraduationCap />, color: '#448AFF' },
-    { type: 'transit_station', label: 'Transport', icon: <FaSubway />, color: '#FF9800' },
-    { type: 'hospital', label: 'Healthcare', icon: <FaHospital />, color: '#4CAF50' },
+    { type: 'restaurant', label: 'Restaurants', icon: <FaUtensils />, color: '#2664eb' },
+    { type: 'shopping_mall', label: 'Shopping', icon: <FaShoppingBag />, color: '#2664eb' },
+    { type: 'university', label: 'Education', icon: <FaGraduationCap />, color: '#2664eb' },
+    { type: 'transit_station', label: 'Transport', icon: <FaSubway />, color: '#2664eb' },
+    { type: 'hospital', label: 'Healthcare', icon: <FaHospital />, color: '#2664eb' },
     // { type: 'office', label: 'Offices', icon: <FaBriefcase />, color: '#607D8B' }
   ];
 
