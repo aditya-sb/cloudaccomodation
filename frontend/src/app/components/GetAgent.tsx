@@ -84,7 +84,7 @@ const GetAgent = () => {
   if (!isOpen) return null;
 
   return (
-    <div className="w-100%">
+    <div className="w-full">
 
         <div className="flex justify-between items-center p-6 border-b">
           <div>

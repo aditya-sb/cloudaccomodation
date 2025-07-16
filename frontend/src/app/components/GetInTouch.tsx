@@ -151,7 +151,7 @@ const GetInTouch = () => {
 
       {/* Sign Up Modal */}
       {isModalOpen && (
-        <div className="w-full  fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
+        <div className="w-full max-sm:w-full  fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
           <div className="bg-white rounded-2xl w-3/5 max-sm:w-full p-2 shadow-2xl transform transition-all">
             <button
               onClick={closeModal}
