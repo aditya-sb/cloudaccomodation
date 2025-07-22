@@ -28,7 +28,7 @@ export default function Footer() {
 
   const discoverLinks = [
     { name: "Blog", href: "/blog" },
-    { name: "Podcast", href: "/podcast" },
+    // { name: "Podcast", href: "/podcast" },
     { name: "Newsroom", href: "/newsroom" },
     { name: "Media Mention", href: "/media" }
   ];
