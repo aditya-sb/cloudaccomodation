@@ -196,7 +196,7 @@ export default function PropertyCard({
         {/* Property Details */}
         <div className="p-4">
           <h2 className="text-base font-semibold text-gray-800 truncate">{title}</h2>
-          <p className="text-sm text-gray-500 mt-1">{location}</p>
+          <p className="text-sm text-gray-500 mt-1 line-clamp-2">{location}</p>
 
           {/* Price and Ratings */}
           <div className="flex items-center justify-between mt-4">
