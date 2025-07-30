@@ -127,14 +127,14 @@ const Wishlist = () => {
                 </div>
 
                 {/* Refresh Button */}
-                <div className="mt-8 text-center">
+                {/* <div className="mt-8 text-center">
                     <button
                         onClick={() => refetchWishlist()}
                         className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
                     >
                         Refresh Wishlist
                     </button>
-                </div>
+                </div> */}
             </div>
         </div>
     );
