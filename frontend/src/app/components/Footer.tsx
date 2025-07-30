@@ -157,12 +157,12 @@ export default function Footer() {
                   <div className="space-y-3">
                     <div className="flex items-center">
                       <FaPhoneAlt className="text-blue-400 mr-3" size={14} />
-                      <span className="text-gray-300 text-sm">+1 7040701919</span>
+                      <span className="text-gray-300 text-sm">+1 (437) 288-7804</span>
                     </div>
                     <div className="flex items-center">
                       <FaEnvelope className="text-blue-400 mr-3" size={14} />
                       <a href="mailto:contact@amberstudent.com" className="text-gray-300 hover:text-white transition-colors text-sm">
-                        contact@amberstudent.com
+                        info@cloudaccommodation.com
                       </a>
                     </div>
                     <div className="flex items-center">
@@ -174,7 +174,7 @@ export default function Footer() {
                     <div className="flex items-start">
                       <FaMapMarkerAlt className="text-red-400 mr-3 mt-1" size={14} />
                       <span className="text-gray-300 text-sm">
-                        40 E Main St #1215 Newark 19711-4639
+                        20 Leaman DrDartmouth, NS B3A 2K5, Canada
                       </span>
                     </div>
                   </div>
