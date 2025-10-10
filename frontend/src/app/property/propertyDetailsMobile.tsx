@@ -77,6 +77,7 @@ interface PropertyDetailsMobileProps {
     lat: number;
     lng: number;
   };
+  onRequireAuth?: () => void;
 }
 
 const PropertyDetailsMobile: React.FC<PropertyDetailsMobileProps> = ({
@@ -96,6 +97,7 @@ const PropertyDetailsMobile: React.FC<PropertyDetailsMobileProps> = ({
   onSiteVerification,
   bedroomDetails,
   bookingOptions,
+  onRequireAuth,
 }) => {
   const [openDrawer, setOpenDrawer] = useState<"cancellation" | "verification" | null>(null);
   const router = useRouter();
@@ -224,6 +226,14 @@ const PropertyDetailsMobile: React.FC<PropertyDetailsMobileProps> = ({
 
   const availableBedrooms = bedroomDetails?.filter(bedroom => bedroom.status === 'available') || [];
   const bookedBedrooms = bedroomDetails?.filter(bedroom => bedroom.status === 'booked') || [];
+
+  const navigateWithAuthCheck = (navigate: () => void) => {
+    if (!isAuthenticated()) {
+      onRequireAuth?.();
+      return;
+    }
+    navigate();
+  };
 
   return (
     <div className=" mx-auto bg-white rounded-lg shadow">
@@ -467,17 +477,19 @@ const PropertyDetailsMobile: React.FC<PropertyDetailsMobileProps> = ({
                       if (bedroom.status === "booked") {
                         return;
                       }
-                      if (instantBooking) {
-                        window.location.href = `/booking?propertyId=${encodeURIComponent(
-                          propertyId.toString()
-                        )}&bedRoomId=${encodeURIComponent(
-                          bedroom?._id || ""
-                        )}&bedroomName=${encodeURIComponent(
-                          bedroom.name
-                        )}&price=${encodeURIComponent(bedroom.rent)}`;
-                      } else {
-                        router.push(`/enquiry?propertyId=${encodeURIComponent(propertyId.toString())}&bedroomId=${encodeURIComponent(bedroom?._id || "")}&bedroomName=${encodeURIComponent(bedroom.name)}&price=${encodeURIComponent(bedroom.rent)}`);
-                      }
+                      navigateWithAuthCheck(() => {
+                        if (instantBooking) {
+                          window.location.href = `/booking?propertyId=${encodeURIComponent(
+                            propertyId.toString()
+                          )}&bedRoomId=${encodeURIComponent(
+                            bedroom?._id || ""
+                          )}&bedroomName=${encodeURIComponent(
+                            bedroom.name
+                          )}&price=${encodeURIComponent(bedroom.rent)}`;
+                        } else {
+                          router.push(`/enquiry?propertyId=${encodeURIComponent(propertyId.toString())}&bedroomId=${encodeURIComponent(bedroom?._id || "")}&bedroomName=${encodeURIComponent(bedroom.name)}&price=${encodeURIComponent(bedroom.rent)}`);
+                        }
+                      });
                     }}
                     className={`px-6 py-2 rounded-md text-sm font-medium transition-colors text-white ${bedroom.status === "booked" ? "bg-gray-500 hover:bg-gray-500" : "bg-blue-500 hover:bg-blue-600"}`}
                     disabled={bedroom.status === "booked"}
@@ -530,17 +542,19 @@ const PropertyDetailsMobile: React.FC<PropertyDetailsMobileProps> = ({
                       if (bedroom.status === "booked") {
                         return;
                       }
-                      if (instantBooking) {
-                        window.location.href = `/booking?propertyId=${encodeURIComponent(
-                          propertyId.toString()
-                        )}&bedRoomId=${encodeURIComponent(
-                          bedroom?._id || ""
-                        )}&bedroomName=${encodeURIComponent(
-                          bedroom.name
-                        )}&price=${encodeURIComponent(bedroom.rent)}`;
-                      } else {
-                        router.push(`/enquiry?propertyId=${encodeURIComponent(propertyId.toString())}&bedroomId=${encodeURIComponent(bedroom?._id || "")}&bedroomName=${encodeURIComponent(bedroom.name)}&price=${encodeURIComponent(bedroom.rent)}`);
-                      }
+                      navigateWithAuthCheck(() => {
+                        if (instantBooking) {
+                          window.location.href = `/booking?propertyId=${encodeURIComponent(
+                            propertyId.toString()
+                          )}&bedRoomId=${encodeURIComponent(
+                            bedroom?._id || ""
+                          )}&bedroomName=${encodeURIComponent(
+                            bedroom.name
+                          )}&price=${encodeURIComponent(bedroom.rent)}`;
+                        } else {
+                          router.push(`/enquiry?propertyId=${encodeURIComponent(propertyId.toString())}&bedroomId=${encodeURIComponent(bedroom?._id || "")}&bedroomName=${encodeURIComponent(bedroom.name)}&price=${encodeURIComponent(bedroom.rent)}`);
+                        }
+                      });
                     }}
                     className={`px-6 py-2 rounded-md text-sm font-medium transition-colors text-white ${bedroom.status === "booked" ? "bg-gray-500 hover:bg-gray-500" : "bg-blue-500 hover:bg-blue-600"}`}
                     disabled={bedroom.status === "booked"}

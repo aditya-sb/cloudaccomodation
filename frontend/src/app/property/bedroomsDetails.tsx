@@ -41,6 +41,7 @@ interface BedroomSectionProps {
   country?: string;
   floor?: number;
   onBookClick?: (bedroom: BedroomDetail) => void;
+  onRequireAuth?: () => void;
 }
 
 export default function BedroomSection({
@@ -51,6 +52,7 @@ export default function BedroomSection({
   country,
   floor,
   onBookClick,
+  onRequireAuth,
 }: BedroomSectionProps) {
   const [showBookedRooms, setShowBookedRooms] = useState(false);
   const [expandedLeaseTerms, setExpandedLeaseTerms] = useState<{
@@ -231,15 +233,17 @@ export default function BedroomSection({
                 <button
                   onClick={() => {
                     if (instantBooking) {
-                      window.location.href = `/booking?propertyId=${encodeURIComponent(
-                        propertyId.toString()
-                      )}&bedRoomId=${encodeURIComponent(
-                        bedroom?._id || ""
-                      )}&bedroomName=${encodeURIComponent(
-                        bedroom.name
-                      )}&price=${encodeURIComponent(bedroom.rent)}`;
+                      if (!onBookClick) {
+                        onRequireAuth?.();
+                        return;
+                      }
+                      onBookClick(bedroom);
                     } else {
-                      window.location.href = `/enquiry?propertyId=${encodeURIComponent(propertyId.toString())}&bedroomId=${encodeURIComponent(bedroom?._id || "")}&bedroomName=${encodeURIComponent(bedroom.name)}&price=${encodeURIComponent(bedroom.rent)}`;
+                      if (!onBookClick) {
+                        onRequireAuth?.();
+                        return;
+                      }
+                      onBookClick(bedroom);
                     }
                   }}
                   className="px-8 py-2 rounded-md text-sm font-medium bg-blue-500 hover:bg-blue-600 transition-colors text-white"

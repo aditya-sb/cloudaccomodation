@@ -8,6 +8,7 @@ import {
   FaCheck,
   FaLocationArrow,
   FaAngleDown,
+  FaTimes,
 } from "react-icons/fa";
 import { use } from "react";
 import { useParams } from "next/navigation";
@@ -28,6 +29,9 @@ import { Pin } from "lucide-react";
 import { FaLocationPin, FaMapLocationDot } from "react-icons/fa6";
 import ReviewForm from "@/app/components/ReviewForm";
 import { useEffect, useState, useRef } from "react";
+import Login from "@/app/auth/Login";
+import ForgetPassword from "@/app/auth/ForgetPassword";
+import isAuthenticated from "@/utils/auth-util";
 import { BedroomDetail as BookingBedroomDetail } from "@/app/components/SelectedBedroomDropdown";
 import BedroomSection, { BedroomDetail as BedroomSectionDetail } from "../bedroomsDetails";
 import Features from "@/app/components/Features";
@@ -50,12 +54,44 @@ export default function PropertyPage() {
   const rentDetailsRef = useRef<HTMLDivElement>(null);
   const [bookingFormType, setBookingFormType] = useState<"booking" | "enquiry" | null>(null);
   const [isBookingMinimized, setIsBookingMinimized] = useState(true);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalView, setAuthModalView] = useState<"login" | "forgot">("login");
 
   useEffect(() => {
     if (thisProperty?.overview?.bedroomDetails?.length > 0) {
       setBedroomInView(thisProperty.overview.bedroomDetails[0]);
     }
   }, [thisProperty]);
+
+  useEffect(() => {
+    const handleAuthChange = () => {
+      if (isAuthenticated()) {
+        setIsAuthModalOpen(false);
+      }
+    };
+
+    window.addEventListener("auth-state-changed", handleAuthChange);
+    return () => {
+      window.removeEventListener("auth-state-changed", handleAuthChange);
+    };
+  }, []);
+
+  const openAuthModal = (view: "login" | "forgot" = "login") => {
+    setAuthModalView(view);
+    setIsAuthModalOpen(true);
+  };
+
+  const closeAuthModal = () => {
+    setIsAuthModalOpen(false);
+  };
+
+  const navigateWithAuthCheck = (url: string) => {
+    if (!isAuthenticated()) {
+      openAuthModal("login");
+      return;
+    }
+    window.location.href = url;
+  };
 
   const scrollToBedroomSection = () => {
     if (bedroomSectionRef.current) {
@@ -77,7 +113,10 @@ export default function PropertyPage() {
 
   // Handler for when the Book button is clicked in the BedroomSection
   const handleBedroomBookClick = (bedroom: BedroomSectionDetail) => {
-    // Instead of opening the modal, navigate directly to the booking page
+    if (!isAuthenticated()) {
+      openAuthModal();
+      return;
+    }
     window.location.href = `/booking?propertyId=${encodeURIComponent(propertyId as string)}&bedroomName=${encodeURIComponent(bedroom.name)}&price=${encodeURIComponent(bedroom.rent)}`;
   };
   const removeHtmlTags = (str: string): string => {
@@ -310,14 +349,22 @@ export default function PropertyPage() {
         
         {thisProperty.instantBooking ? (
           <button 
-            onClick={() => window.location.href = `/booking?propertyId=${encodeURIComponent(propertyId as string)}&bedroomName=Default&price=${encodeURIComponent(thisProperty.price)}`}
+            onClick={() =>
+              navigateWithAuthCheck(`/booking?propertyId=${
+                encodeURIComponent(propertyId as string)
+              }&bedroomName=Default&price=${encodeURIComponent(thisProperty.price)}`)
+            }
             className="w-full py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-colors"
           >
             Book Now
           </button>
         ) : (
           <button 
-            onClick={() => window.location.href = `/enquiry?propertyId=${encodeURIComponent(propertyId as string)}&bedroomName=Default&price=${encodeURIComponent(thisProperty.price)}`}
+            onClick={() =>
+              navigateWithAuthCheck(`/enquiry?propertyId=${
+                encodeURIComponent(propertyId as string)
+              }&bedroomName=Default&price=${encodeURIComponent(thisProperty.price)}`)
+            }
             className="w-full py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-colors"
           >
             Enquire Now
@@ -404,6 +451,7 @@ export default function PropertyPage() {
               securityDeposit={thisProperty?.securityDeposit}
               rentPayments={[]}
               rent={0}
+              onRequireAuth={() => openAuthModal()}
             />
           </div>
           </div>
@@ -557,6 +605,25 @@ export default function PropertyPage() {
           setIsMinimized={setIsBookingMinimized}
           setActiveForm={setBookingFormType}
         />
+      )}
+      {isAuthModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="relative w-full max-w-md rounded-2xl bg-white shadow-lg">
+            <button
+              onClick={closeAuthModal}
+              className="absolute right-4 top-4 text-gray-500 transition-colors hover:text-gray-700"
+            >
+              <FaTimes size={20} />
+            </button>
+            <div className="p-6">
+              {authModalView === "login" ? (
+                <Login openForgetPassword={() => openAuthModal("forgot")} />
+              ) : (
+                <ForgetPassword />
+              )}
+            </div>
+          </div>
+        </div>
       )}
       <Footer />
     </>
