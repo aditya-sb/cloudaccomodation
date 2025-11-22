@@ -1,21 +1,19 @@
 
-import Lottie from 'lottie-react';
+"use client";
+
+import dynamic from 'next/dynamic';
+import { Suspense } from 'react';
 import lottieLoader from './lottieLoader.json';
 
-const Loader = () => {
+// Dynamically import lottie-react on the client only to avoid server-side document usage
+const Lottie = dynamic(() => import('lottie-react').then((mod) => mod.default), { ssr: false });
 
+const Loader = () => {
   return (
-    <div
-      className=
-        'w-full flex flex-col items-center justify-center'
-      style={{ height: 'calc(100vh - 200px)' }}
-    >
-      <Lottie animationData={lottieLoader} loop autoplay />
-      {/* {showText && (
-        <h3 className="text-lg font-semibold text-body italic">
-          {t(text)}
-        </h3>
-      )} */}
+    <div className="w-full flex flex-col items-center justify-center" style={{ height: 'calc(100vh - 200px)' }}>
+      <Suspense fallback={<div style={{ height: 120 }} />}> 
+        <Lottie animationData={lottieLoader} loop autoplay />
+      </Suspense>
     </div>
   );
 };

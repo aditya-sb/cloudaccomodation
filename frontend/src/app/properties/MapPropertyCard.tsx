@@ -1,6 +1,14 @@
+"use client";
+
 import React from "react";
+import dynamic from "next/dynamic";
 import { FaBed, FaBath, FaVectorSquare, FaStar, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
-import ImageSlider from "../components/ImageSlider";
+
+// Dynamically import ImageSlider to avoid SSR issues with antd Carousel
+const ImageSlider = dynamic(() => import("../components/ImageSlider"), {
+  ssr: false,
+  loading: () => <div className="w-full h-48 bg-gray-200 animate-pulse" />
+});
 
 const CURRENCY_SYMBOLS = {
   USD: "$",

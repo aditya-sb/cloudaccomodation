@@ -26,29 +26,35 @@ interface Booking {
 
 export default function Bookings() {
   const [activeTab, setActiveTab] = useState("all"); // "all", "active", "completed"
+  const [userId, setUserId] = useState<string | null>(null);
 
-  // Extract userId from token
-  const getUserId = () => {
-    try {
-      const token = localStorage.getItem("auth_Token");
-      if (!token) return null;
+  // Extract userId from token - only on client side
+  useEffect(() => {
+    const getUserId = () => {
+      try {
+        if (typeof window === 'undefined') return null;
 
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
+        const token = localStorage.getItem("auth_Token");
+        if (!token) return null;
 
-      const parsedToken = JSON.parse(jsonPayload);
-      return parsedToken._id || parsedToken.id;
-    } catch (error) {
-      console.error("Error extracting userId:", error);
-      return null;
-    }
-  };
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
 
-  const userId = getUserId();
-  console.log("User ID extracted from token:", userId);
+        const parsedToken = JSON.parse(jsonPayload);
+        return parsedToken._id || parsedToken.id;
+      } catch (error) {
+        console.error("Error extracting userId:", error);
+        return null;
+      }
+    };
+
+    const id = getUserId();
+    setUserId(id);
+    console.log("User ID extracted from token:", id);
+  }, []);
   
   const {
     data,

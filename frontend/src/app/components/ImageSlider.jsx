@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { Carousel } from "antd";
 import styles from "./ImageSlider.module.css"; // Create a CSS module for styling

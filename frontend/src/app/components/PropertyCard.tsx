@@ -1,11 +1,19 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { FaHeart, FaBed, FaBath, FaVectorSquare, FaStar, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
-import ImageSlider from "./ImageSlider";
 import styles from "./ImageSlider.module.css";
 import { useAddToWishlistMutation, useRemoveFromWishlistMutation, useGetWishlistQuery } from '../redux/slices/apiSlice';
 import { useGetUserDetailsQuery } from "../redux/slices/apiSlice";
 import { useState, useEffect } from 'react';
+
+// Dynamically import ImageSlider to avoid SSR issues with antd Carousel
+const ImageSlider = dynamic(() => import("./ImageSlider"), {
+  ssr: false,
+  loading: () => <div className="w-full h-48 bg-gray-200 animate-pulse" />
+});
 
 // Add currency mapping
 const COUNTRY_TO_CURRENCY = {

@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import PropertyCard from "./PropertyCard";
 import { useGetPropertiesQuery } from "../redux/slices/apiSlice";
