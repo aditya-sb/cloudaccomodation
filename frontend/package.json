@@ -19,6 +19,7 @@
     "@stripe/stripe-js": "^6.0.0",
     "antd": "^5.23.2",
     "axios": "^1.7.7",
+    "framer-motion": "^12.23.24",
     "leaflet": "^1.9.4",
     "lottie-react": "^2.4.0",
     "lucide-react": "^0.469.0",

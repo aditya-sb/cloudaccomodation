@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaSearch, FaBolt } from "react-icons/fa";
+import { motion } from "framer-motion";
 
 export default function SearchBar() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -95,8 +96,16 @@ export default function SearchBar() {
         </div> */}
 
         {/* Search Bar */}
-        <div className="relative w-full max-w-md sm:max-w-lg lg:max-w-2xl">
-          <div
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="relative w-full max-w-md sm:max-w-lg lg:max-w-2xl"
+        >
+          <motion.div
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
             className="flex px-3 py-1 items-center rounded-full shadow-lg border border-gray-300 overflow-hidden bg-white"
             style={{
               backgroundColor: "var(--card)",
@@ -123,8 +132,10 @@ export default function SearchBar() {
                 }, 200);
               }}
             />
-            <button
-              className="rounded-full p-2 px-4 text-white flex items-center justify-center transition-all hover:scale-105"
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              className="rounded-full p-2 px-4 text-white flex items-center justify-center transition-all"
               style={{
                 backgroundColor: "var(--cta)",
                 color: "var(--cta-text)",
@@ -132,12 +143,16 @@ export default function SearchBar() {
               onClick={() => handleSearch(searchTerm)}
             >
               <FaSearch className="w-5 h-5" />
-            </button>
-          </div>
+            </motion.button>
+          </motion.div>
 
           {/* Dropdown */}
           {showDropdown && (
-            <div
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
               className="dropdown-container absolute mt-2 shadow-xl rounded-xl w-full z-10"
               style={{
                 backgroundColor: "var(--card)",
@@ -198,9 +213,9 @@ export default function SearchBar() {
                   ))}
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
-        </div>
+        </motion.div>
 
         {/* Scroll Down Arrow */}
         {/* <div className="absolute right-8 bottom-8">

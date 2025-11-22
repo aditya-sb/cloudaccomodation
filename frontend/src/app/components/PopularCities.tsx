@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import ExploreProperties from './ExploreProperties';
 import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 
 const cityData = {
   Canada: [
@@ -143,9 +144,17 @@ const PopularCities = () => {
                 <div key={pageIndex} className="w-full flex-shrink-0 flex gap-2 sm:gap-4">
                   {cityData[selectedCountry]
                     .slice(pageIndex * itemsPerPage, (pageIndex + 1) * itemsPerPage)
-                    .map((city) => (
-                      <div
+                    .map((city, index) => (
+                      <motion.div
                         key={city.name}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        whileHover={{ scale: 1.05, y: -5 }}
+                        transition={{
+                          delay: index * 0.1,
+                          duration: 0.3
+                        }}
+                        viewport={{ once: true }}
                         className={`flex-1 min-w-0 ${
                           itemsPerPage === 6 ? 'w-1/6' : 
                           itemsPerPage === 3 ? 'w-1/3' : 
@@ -171,7 +180,7 @@ const PopularCities = () => {
                             </div>
                           </div>
                         </div>
-                      </div>
+                      </motion.div>
                     ))}
                 </div>
               ))}

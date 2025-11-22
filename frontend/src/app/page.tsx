@@ -21,6 +21,7 @@ import GetInTouch from "./components/GetInTouch";
 import Loader from "@/loader/loader";
 import { FaWhatsapp } from "react-icons/fa";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 export default function Home() {
   const [isHeaderVisible, setIsHeaderVisible] = useState(false);
@@ -78,38 +79,102 @@ export default function Home() {
       </div>
 
       {/* Popular Cities Section */}
-      <PopularCities />
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true, amount: 0.2 }}
+      >
+        <PopularCities />
+      </motion.div>
 
       {/* Explore Properties Section */}
-      <ExploreProperties />
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true, amount: 0.2 }}
+      >
+        <ExploreProperties />
+      </motion.div>
 
       {/* Other Sections */}
       <div className="flex flex-col text-2xl max-md:text-lg mt-6 mb-10 w-full">
-        <div className="flex gap-3 justify-start text-xl max-sm:text-base px-10  font-semibold text-gray-800 mb-10 md:mb-20 w-full">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="flex gap-3 justify-start text-xl max-sm:text-base px-10  font-semibold text-gray-800 mb-10 md:mb-20 w-full"
+        >
           <h3 className="font-bold">Why Choose </h3>
           <h3 className="font-bold text-blue-500">Cloud Accommodation?</h3>
-        </div>
+        </motion.div>
         <div className="flex flex-col text-base items-center">
-          <PrivacySection />
-          <MoveInSection />
-          <SecurityDepositSection />
-          <NestNetworkSection />
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            viewport={{ once: true }}
+          >
+            <PrivacySection />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
+            <MoveInSection />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            viewport={{ once: true }}
+          >
+            <SecurityDepositSection />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            viewport={{ once: true }}
+          >
+            <NestNetworkSection />
+          </motion.div>
         </div>
       </div>
       <ReviewSection />
       
       {/* WhatsApp Floating Button */}
-      <div className="fixed bottom-8 right-8 z-50">
-        <Link 
-          href="https://wa.me/14372887804" // Replace with your actual WhatsApp number
-          target="_blank"
-          rel="noopener noreferrer"
-          className="bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-110 flex items-center justify-center"
-          aria-label="Chat on WhatsApp"
+      <motion.div
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 1, duration: 0.5, type: "spring", stiffness: 200 }}
+        className="fixed bottom-8 right-8 z-50"
+      >
+        <motion.div
+          animate={{
+            y: [0, -10, 0],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            repeatType: "loop",
+          }}
         >
-          <FaWhatsapp className="w-8 h-8" />
-        </Link>
-      </div>
+          <Link
+            href="https://wa.me/14372887804" // Replace with your actual WhatsApp number
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-110 flex items-center justify-center"
+            aria-label="Chat on WhatsApp"
+          >
+            <FaWhatsapp className="w-8 h-8" />
+          </Link>
+        </motion.div>
+      </motion.div>
 
       {/* Booking Button */}
       {/* <div className="flex justify-center m-10">
@@ -117,13 +182,42 @@ export default function Home() {
       </div> */}
 
       {/* Other Services */}
-      <OtherServices />
-      <Refer />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true, amount: 0.2 }}
+      >
+        <OtherServices />
+      </motion.div>
 
-      <GetInTouch/>
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true, amount: 0.2 }}
+      >
+        <Refer />
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true, amount: 0.2 }}
+      >
+        <GetInTouch />
+      </motion.div>
 
       {/* Footer */}
-      <Footer />
+      <motion.div
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+      >
+        <Footer />
+      </motion.div>
     </div>
   );
 }

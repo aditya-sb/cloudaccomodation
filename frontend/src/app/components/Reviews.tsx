@@ -1,9 +1,10 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/pagination';
-import { Pagination } from 'swiper/modules';
+import { Pagination, Autoplay } from 'swiper/modules';
 import { Star, StarIcon } from 'lucide-react';
 import { FaUserCircle } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
 const reviews = [
   {
@@ -45,13 +46,33 @@ const reviews = [
 
 const ReviewSection = () => {
   return (
-    <div className="bg-gradient-to-l from-blue-400 to-blue-700 py-10 text-white text-center px-6">
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8 }}
+      viewport={{ once: true }}
+      className="bg-gradient-to-l from-blue-400 to-blue-700 py-10 text-white text-center px-6"
+    >
       <div className='flex flex-row justify-between items-center mb-6'>
-      <h2 className="text-xl font-semibold mb-6">Trusted by Our Growing Community</h2>
-      <div className="flex md:flex hidden justify-center items-center gap-4 mb-4">
+      <motion.h2
+        initial={{ opacity: 0, x: -30 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        viewport={{ once: true }}
+        className="text-xl font-semibold mb-6"
+      >
+        Trusted by Our Growing Community
+      </motion.h2>
+      <motion.div
+        initial={{ opacity: 0, x: 30 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        viewport={{ once: true }}
+        className="flex md:flex hidden justify-center items-center gap-4 mb-4"
+      >
         <span className="text-sm font-medium">Excellent 4.9 out of 5</span>
         <div className="flex justify-center items-center gap-2 bg-white text-green-600 px-2 py-1 rounded-md text-xs font-bold"><StarIcon/><p>Trustpilot</p></div>
-      </div>
+      </motion.div>
       </div>
       <Swiper
         slidesPerView={1.5}
@@ -61,7 +82,14 @@ const ReviewSection = () => {
         slidesOffsetBefore={0}
         slidesOffsetAfter={0}
         pagination={{ clickable: true }}
-        modules={[Pagination]}
+        modules={[Pagination, Autoplay]}
+        autoplay={{
+          delay: 3000,
+          disableOnInteraction: false,
+          pauseOnMouseEnter: true,
+        }}
+        loop={true}
+        speed={800}
         className="px-10"
         breakpoints={{
           // when  width is >= 768px (tablet/desktop)
@@ -91,9 +119,16 @@ const ReviewSection = () => {
         <div className="flex justify-center items-center gap-2 bg-white text-green-600 px-2 py-1 rounded-md text-xs font-bold"><StarIcon/><p>Trustpilot</p></div>
       </div>
       <div className='md:flex hidden justify-center items-center'>
-      <button onClick={() => window.open("https://ca.trustpilot.com/review/cloudaccomodation.com", "_blank")} className=" mt-6 px-6 py-2 bg-white text-blue-600 rounded-lg font-semibold hover:bg-gray-100">Read Reviews</button>
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => window.open("https://ca.trustpilot.com/review/cloudaccomodation.com", "_blank")}
+        className=" mt-6 px-6 py-2 bg-white text-blue-600 rounded-lg font-semibold hover:bg-gray-100 transition-all"
+      >
+        Read Reviews
+      </motion.button>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
