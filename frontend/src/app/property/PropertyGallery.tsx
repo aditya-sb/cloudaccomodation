@@ -123,12 +123,18 @@ export default function PropertyGallery({ images }: PropertyGalleryProps) {
       </div>
 
       {/* Thumbnails */}
-      <div className="col-span-4 grid grid-cols-2 gap-4 h-[300px] overflow-y-hidden pl-1 pt-1 pr-2">
+      <div
+        className="col-span-4 grid grid-cols-2 gap-3 h-[300px] overflow-y-auto pl-1 pt-1 pr-2"
+        style={{
+          scrollbarWidth: 'thin',
+          scrollbarColor: '#CBD5E0 #F7FAFC'
+        }}
+      >
         {loadedImages.map((image, index) => (
           <button
             key={index}
             onClick={() => goToSlide(index)}
-            className={`relative aspect-square rounded-lg overflow-hidden transition-all ${
+            className={`relative w-full h-[140px] rounded-lg overflow-hidden transition-all ${
               currentIndex === index
                 ? "ring-2 ring-offset-2 ring-blue-500"
                 : "opacity-80 hover:opacity-100"
