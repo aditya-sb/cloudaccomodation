@@ -17,7 +17,7 @@ const nextConfig: NextConfig = {
     return config;
   },
   images: {
-    domains: ["145.223.23.97",'localhost', 'cloudaccommodation.com'],
+    domains: ["145.223.23.97",'localhost', 'cloudaccomodation.com'],
   },
   async headers() {
     return [

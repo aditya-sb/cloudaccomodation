@@ -34,7 +34,7 @@ const ExploreProperties = () => {
   const maxPropertiesToShow = 5;
 
   return (
-    <section className="w-full max-w-screen-2xl mx-auto max-sm:px-4 px-10 py-8">
+    <section className="w-full max-w-screen-2xl mx-auto max-sm:px-4 px-10 py-8 overflow-x-hidden">
       <h2 className="text-xl sm:text-2xl mt-4 font-bold text-start mb-4">
         Explore Properties
       </h2>

@@ -59,7 +59,7 @@ export default function Home() {
 
   return (
     <div
-      className="min-h-screen"
+      className="min-h-screen overflow-x-hidden"
       style={{
         backgroundColor: "var(--background)",
         color: "var(--foreground)",

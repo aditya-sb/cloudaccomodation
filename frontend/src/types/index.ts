@@ -4,7 +4,6 @@ export interface Overview {
   bathrooms: number;
   squareFeet: number;
   kitchen: string;
-  yearOfConstruction: number;
 }
 
 export interface Property {

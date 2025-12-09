@@ -74,7 +74,7 @@ const PopularCities = () => {
   };
 
   return (
-    <section className="w-full max-w-screen-2xl mx-auto sm:px-4 mb-6">
+    <section className="w-full max-w-screen-2xl mx-auto sm:px-4 mb-6 overflow-x-hidden">
       <h2 className="text-xl px-5 sm:text-2xl mt-4 font-bold text-start mb-4">
         Popular Cities
       </h2>
