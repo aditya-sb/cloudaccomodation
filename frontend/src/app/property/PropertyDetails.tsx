@@ -15,6 +15,7 @@ import {
 import { getCurrencySymbol } from "@/constants/currency";
 import Map from "./Map";
 import BedroomDetails from "./BedroomDetails";
+import RichTextDisplay from "@/app/components/RichTextDisplay";
 
 const PropertyDetails = ({
   title,
@@ -290,9 +291,7 @@ const PropertyDetails = ({
             <div className="space-y-4">
               {typeof termsOfStay === 'string' ? (
                 <div className="p-4 border border-[var(--border)] rounded-lg">
-                  <p className="text-gray-700 whitespace-pre-line">
-                    {termsOfStay?.replace(/<[^>]*>/g, '')}
-                  </p>
+                  <RichTextDisplay content={termsOfStay} className="text-gray-700" />
                 </div>
               ) : (
                 <div className="space-y-4">

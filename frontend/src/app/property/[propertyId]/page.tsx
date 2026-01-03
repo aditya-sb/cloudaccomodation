@@ -35,6 +35,7 @@ import isAuthenticated from "@/utils/auth-util";
 import { BedroomDetail as BookingBedroomDetail } from "@/app/components/SelectedBedroomDropdown";
 import BedroomSection, { BedroomDetail as BedroomSectionDetail } from "../bedroomsDetails";
 import Features from "@/app/components/Features";
+import RichTextDisplay from "@/app/components/RichTextDisplay";
 
 // Function to format the date as Month DD, YYYY
 const formatDate = (date: Date): string => {
@@ -290,9 +291,10 @@ export default function PropertyPage() {
         </div>
         {isCancellationOpen && (
           <div className="p-4">
-            <div className="text-sm text-gray-600 whitespace-pre-wrap">
-              {removeHtmlTags(thisProperty.cancellationPolicy)}
-            </div>
+            <RichTextDisplay
+              content={thisProperty.cancellationPolicy}
+              className="text-sm text-gray-600"
+            />
           </div>
         )}
       </div>

@@ -23,6 +23,7 @@ import { useParams } from "next/navigation";
 import { FaAngleDown } from "react-icons/fa";
 import UniversityDistanceInfo from "../components/UniversityDistanceInfo";
 import isAuthenticated from "@/utils/auth-util";
+import RichTextDisplay from "../components/RichTextDisplay";
 const CURRENCY_SYMBOLS = {
   'USD': '$',
   'CAD': 'C$',
@@ -298,19 +299,7 @@ const PropertyDetailsMobile: React.FC<PropertyDetailsMobileProps> = ({
         {/* Description */}
         <div className="space-y-2">
           <h3 className="font-semibold text-lg">Description</h3>
-          {description.split(" ").length > 30 ? (
-            <div className="text-gray-600">
-              {description.split(" ").slice(0, 30).join(" ")}
-              <span className="text-blue-600 hover:underline cursor-pointer">
-                , view more
-              </span>
-            </div>
-          ) : (
-            <div
-              className="text-gray-600"
-              dangerouslySetInnerHTML={{ __html: description }}
-            />
-          )}
+          <RichTextDisplay content={description} className="text-gray-600" />
         </div>
 
         {/* Utilities */}
@@ -576,9 +565,10 @@ const PropertyDetailsMobile: React.FC<PropertyDetailsMobileProps> = ({
       >
         <div className="text-gray-700">
           {cancellationPolicy ? (
-            <div className="text-sm text-gray-600 whitespace-pre-wrap">
-              {removeHtmlTags(cancellationPolicy)}
-            </div>
+            <RichTextDisplay
+              content={cancellationPolicy}
+              className="text-sm text-gray-600"
+            />
           ) : (
             <p>No cancellation policy available.</p>
           )}
