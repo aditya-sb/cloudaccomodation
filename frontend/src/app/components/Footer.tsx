@@ -1,6 +1,6 @@
 "use client";
 
-import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn, FaPhoneAlt, FaMapMarkerAlt, FaWhatsapp, FaYoutube, FaEnvelope, FaChevronDown } from "react-icons/fa";
+import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn, FaPhoneAlt, FaMapMarkerAlt, FaWhatsapp, FaYoutube, FaEnvelope, FaChevronDown, FaGlobe } from "react-icons/fa";
 import { useState } from "react";
 
 export default function Footer() {
@@ -157,12 +157,20 @@ export default function Footer() {
                   <div className="space-y-3">
                     <div className="flex items-center">
                       <FaPhoneAlt className="text-blue-400 mr-3" size={14} />
-                      <span className="text-gray-300 text-sm">+1 (437) 288-7804</span>
+                      <a href="tel:4372887804" className="text-gray-300 hover:text-white transition-colors text-sm">
+                        4372887804
+                      </a>
                     </div>
                     <div className="flex items-center">
                       <FaEnvelope className="text-blue-400 mr-3" size={14} />
-                      <a href="mailto:contact@amberstudent.com" className="text-gray-300 hover:text-white transition-colors text-sm">
-                        info@cloudaccommodation.com
+                      <a href="mailto:info@cloudaccomodation.com" className="text-gray-300 hover:text-white transition-colors text-sm">
+                        info@cloudaccomodation.com
+                      </a>
+                    </div>
+                    <div className="flex items-center">
+                      <FaGlobe className="text-blue-400 mr-3" size={14} />
+                      <a href="https://cloudaccomodation.com" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors text-sm">
+                        cloudaccomodation.com
                       </a>
                     </div>
                     <div className="flex items-center">
@@ -174,7 +182,7 @@ export default function Footer() {
                     <div className="flex items-start">
                       <FaMapMarkerAlt className="text-red-400 mr-3 mt-1" size={14} />
                       <span className="text-gray-300 text-sm">
-                        20 Leaman DrDartmouth, NS B3A 2K5, Canada
+                        Suite 903, 1701 Hollis Street, B3J3M8, Halifax, Canada
                       </span>
                     </div>
                   </div>
@@ -270,12 +278,20 @@ export default function Footer() {
               <div className="mt-4 space-y-3">
                 <div className="flex items-center">
                   <FaPhoneAlt className="text-gray-400 mr-3" size={14} />
-                  <span className="text-gray-300 text-sm">+1 7040701919</span>
+                  <a href="tel:4372887804" className="text-gray-300 hover:text-white transition-colors text-sm">
+                    4372887804
+                  </a>
                 </div>
                 <div className="flex items-center">
                   <FaEnvelope className="text-gray-400 mr-3" size={14} />
-                  <a href="mailto:contact@amberstudent.com" className="text-gray-300 hover:text-white transition-colors text-sm">
-                    contact@amberstudent.com
+                  <a href="mailto:info@cloudaccomodation.com" className="text-gray-300 hover:text-white transition-colors text-sm">
+                    info@cloudaccomodation.com
+                  </a>
+                </div>
+                <div className="flex items-center">
+                  <FaGlobe className="text-gray-400 mr-3" size={14} />
+                  <a href="https://cloudaccomodation.com" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors text-sm">
+                    cloudaccomodation.com
                   </a>
                 </div>
                 <div className="flex items-center">
@@ -287,7 +303,7 @@ export default function Footer() {
                 <div className="flex items-start">
                   <FaMapMarkerAlt className="text-gray-400 mr-3 mt-1" size={14} />
                   <span className="text-gray-300 text-sm">
-                    40 E Main St #1215 Newark 19711-4639
+                    Suite 903, 1701 Hollis Street, B3J3M8, Halifax, Canada
                   </span>
                 </div>
               </div>
